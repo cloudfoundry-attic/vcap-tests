@@ -179,6 +179,15 @@ Given /^I have deployed a simple application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a simple PHP application$/ do
+  @app = create_app SIMPLE_PHP_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token
@@ -485,4 +494,3 @@ Then /^be able to delete the record$/ do
   contents.response_code.should == 404
   contents.close
 end
-

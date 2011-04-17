@@ -24,6 +24,7 @@ REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
 SIMPLE_DB_APP = "simple_db_app"
+SIMPLE_PHP_APP = "simple_php"
 BROKEN_APP = "broken_app"
 RAILS3_APP = "rails3_app"
 JPA_APP = "jpa_app"
@@ -89,6 +90,11 @@ end
 After("@creates_roo_app") do
   AppCloudHelper.instance.delete_app_internal ROO_APP
 end
+
+After("@creates_simple_php_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
+end
+
 
 at_exit do
   AppCloudHelper.instance.cleanup
@@ -157,6 +163,7 @@ class AppCloudHelper
     delete_app_internal(DBRAILS_BROKEN_APP)
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
+    delete_app_internal(SIMPLE_PHP_APP)
     delete_user
   end
 
@@ -248,7 +255,9 @@ class AppCloudHelper
   end
 
   def get_app_name app
-    "#{@namespace}my_test_app_#{app}"
+    # Replace underscores with hyphens, as support for underscores isn't universal, and lighttpd
+    # (used for PHP support) doesn't support it.
+    "#{@namespace}my_test_app_#{app}".gsub("_", "-")
   end
 
   def upload_app app, token
