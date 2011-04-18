@@ -15,6 +15,13 @@ test:
 	@mkdir -p .eunit
 	@$(REBAR) skip_deps=true eunit
 
+rel: all
+	./rebar generate
+
+relclean:
+	rm -rf rel/mochiweb_test
+
+
 clean:
 	@$(REBAR) clean
 

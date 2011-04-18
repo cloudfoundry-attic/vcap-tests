@@ -61,3 +61,9 @@ roo_app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+
+mochiweb_test:
+  framework: "otp_rebar"
+  startup: erlangR14B02
+  memory: 64
+  

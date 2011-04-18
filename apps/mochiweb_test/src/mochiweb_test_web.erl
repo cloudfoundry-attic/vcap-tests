@@ -26,6 +26,7 @@ loop(Req, DocRoot) ->
         case Req:get(method) of
             Method when Method =:= 'GET'; Method =:= 'HEAD' ->
                 case Path of
+                    "" -> Req:ok({"text/plain", "Hello from VCAP"});
                     _ ->
                         Req:serve_file(Path, DocRoot)
                 end;
