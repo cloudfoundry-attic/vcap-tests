@@ -32,6 +32,7 @@ DBRAILS_APP = "dbrails_app"
 DBRAILS_BROKEN_APP = "dbrails_broken_app"
 GRAILS_APP = "grails_app"
 ROO_APP = "roo_app"
+SIMPLE_ERLANG_APP = "mochiweb_test"
 
 After do
   AppCloudHelper.instance.delete_user
@@ -88,6 +89,10 @@ end
 
 After("@creates_roo_app") do
   AppCloudHelper.instance.delete_app_internal ROO_APP
+end
+
+After("@creates_mochiweb_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
 end
 
 at_exit do
@@ -251,8 +256,8 @@ class AppCloudHelper
     "#{@namespace}my_test_app_#{app}"
   end
 
-  def upload_app app, token
-    Dir.chdir("#{@testapps_dir}/#{app}")
+  def upload_app app, token, subdir = nil
+    Dir.chdir("#{@testapps_dir}/#{app}" + (if subdir then "/#{subdir}" else "" end))
     opt_war_file = nil
     if Dir.glob('*.war').first
       opt_war_file = Dir.glob('*.war').first

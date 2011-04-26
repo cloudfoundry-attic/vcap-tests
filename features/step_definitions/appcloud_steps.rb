@@ -179,6 +179,29 @@ Given /^I have deployed a simple application$/ do
   health.should == expected_health
 end
 
+Given /^I have built a simple Erlang application$/ do
+  # Try to find an appropriate Erlang
+  make_prefix = ''
+  path_erl_v = `erl -version 2>&1`
+  unless path_erl_v =~ /.*5.8.4$/
+    raise "No appropriate Erlang R14B02 runtime found" unless File.exists? '/opt/vcap/runtimes/erlang-R14B02/bin/erl'
+    make_prefix = "PATH=/opt/vcap/runtimes/erlang-R14B02/bin:$PATH"
+  end
+  
+  Dir.chdir("#{@testapps_dir}/#{SIMPLE_ERLANG_APP}")
+  rel_build_result = `#{make_prefix} make relclean rel`
+  raise "Erlang application build failed: #{rel_build_result}" if $? != 0
+end
+
+Given /^I have deployed a simple Erlang application$/ do
+  @app = create_app SIMPLE_ERLANG_APP, @token
+  upload_app @app, @token, "rel/mochiweb_test"
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token
