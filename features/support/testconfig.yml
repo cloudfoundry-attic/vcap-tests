@@ -66,3 +66,13 @@ mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
+
+rack_app:
+  framework: "rack"
+  startup: "thin start"
+  memory: 64
+
+rack_broken_no_gemfile_app:
+  framework: "rack"
+  startup: "thin start"
+  memory: 64
