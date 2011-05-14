@@ -179,6 +179,22 @@ Given /^I have deployed a simple application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a rack application$/ do
+  @app = create_app RACK_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Then /^The rack app should work$/ do
+  response = get_app_contents @app, '/'
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should == 'hello'
+end
+
 Given /^I have built a simple Erlang application$/ do
   # Try to find an appropriate Erlang
   erlang_path = '/var/vcap/runtimes/erlang-R14B02/bin'

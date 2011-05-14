@@ -68,11 +68,11 @@ mochiweb_test:
   memory: 64
 
 rack_app:
-  framework: "rack"
+  framework: "rack/1.0"
   startup: "thin start"
   memory: 64
 
 rack_broken_no_gemfile_app:
-  framework: "rack"
+  framework: "rack/1.0"
   startup: "thin start"
   memory: 64
