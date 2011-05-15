@@ -201,6 +201,15 @@ Given /^I have deployed a simple Erlang application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a simple Python application$/ do
+  @app = create_app SIMPLE_PYTHON_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token
