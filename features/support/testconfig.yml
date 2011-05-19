@@ -69,3 +69,6 @@ mochiweb_test:
 
 simple_wsgi_app:
   framework: "wsgi"
+
+wsgi_app_with_requirements:
+  framework: "wsgi"
