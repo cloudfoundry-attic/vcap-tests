@@ -34,6 +34,7 @@ GRAILS_APP = "grails_app"
 ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
+PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 
 After do
   AppCloudHelper.instance.delete_user
@@ -94,6 +95,10 @@ end
 
 After("@creates_mochiweb_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
+end
+
+After("@creates_wsgi_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
 end
 
 After("@creates_wsgi_app") do
@@ -168,6 +173,7 @@ class AppCloudHelper
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
     delete_app_internal(SIMPLE_PYTHON_APP)
+    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_user
   end
 

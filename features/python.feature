@@ -9,3 +9,8 @@ Feature: Use Python on AppCloud
   Scenario: Deploy Simple Python Application
     Given I have deployed a simple Python application
     Then it should be available for use
+
+  @creates_wsgi_app_with_dependency
+  Scenario: Deploy Python Application with a dependency
+    Given I have deployed a Python application with a dependency
+    Then it should be available for use
