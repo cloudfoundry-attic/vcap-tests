@@ -110,3 +110,6 @@ my_test_app_env_test_app:
 
 simple_wsgi_app:
   framework: "wsgi"
+
+wsgi_app_with_requirements:
+  framework: "wsgi"
