@@ -14,3 +14,8 @@ Feature: Use Python on AppCloud
   Scenario: Deploy Python Application with a dependency
     Given I have deployed a Python application with a dependency
     Then it should be available for use
+
+  @creates_django_app
+  Scenario: Deploy Django Application
+    Given I have deployed a Django application
+    Then it should be available for use
