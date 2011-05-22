@@ -113,3 +113,6 @@ simple_wsgi_app:
 
 wsgi_app_with_requirements:
   framework: "wsgi"
+
+simple_django_app:
+  framework: "django"
