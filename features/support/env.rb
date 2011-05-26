@@ -33,6 +33,7 @@ DBRAILS_BROKEN_APP = "dbrails_broken_app"
 GRAILS_APP = "grails_app"
 ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
+NEO4J_APP = "neo4j_app"
 
 After do
   AppCloudHelper.instance.delete_user
@@ -93,6 +94,10 @@ end
 
 After("@creates_mochiweb_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
+end
+
+After("@creates_neo4j_app") do
+  AppCloudHelper.instance.delete_app_internal NEO4J_APP
 end
 
 at_exit do
@@ -162,6 +167,7 @@ class AppCloudHelper
     delete_app_internal(DBRAILS_BROKEN_APP)
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
+    delete_app_internal(NEO4J_APP)
     delete_user
   end
 
@@ -444,6 +450,18 @@ class AppCloudHelper
     response = HTTPClient.get "#{@base_uri}/info/services", nil, auth_hdr(token)
     services = JSON.parse(response.content)
     services
+  end
+
+  def provision_neo4j_service token
+    service_manifest = {
+     :type=>"graphdatabase",
+     :vendor=>"neo4j",
+     :tier=>"free",
+     :version=>"1.4",
+     :name=>"#{@namespace}neo4j_app"}
+     @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+puts "Provisioned service #{service_manifest}"
+    service_manifest
   end
 
   def provision_db_service token

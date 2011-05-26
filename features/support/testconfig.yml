@@ -62,7 +62,13 @@ roo_app:
   startup: "thin start"
   memory: 256
 
+
 mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
+
+neo4j_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby neo4j.rb"
+  memory: 256
