@@ -84,9 +84,7 @@ post '/question' do
   data = JSON.parse request.body.read
   node = new_node(data['question'],data['answer'])
   status 400 unless node
-#  redirect to("/question/#{node.neo_id}"), 201
-  target=url("/question/#{node.neo_id}")
-  [200, {"Location" => target}, target]
+  url("/question/#{node.neo_id}")
 end
 
 post '/add' do 

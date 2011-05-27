@@ -454,13 +454,11 @@ class AppCloudHelper
 
   def provision_neo4j_service token
     service_manifest = {
-     :type=>"graphdatabase",
      :vendor=>"neo4j",
      :tier=>"free",
      :version=>"1.4",
      :name=>"#{@namespace}neo4j_app"}
      @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
-puts "Provisioned service #{service_manifest}"
     service_manifest
   end
 
@@ -551,7 +549,7 @@ puts "Provisioned service #{service_manifest}"
     provisioned_service << svc_name
     app_manifest['services'] = provisioned_service
     response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem attaching service #{svc_name} to application #{appname}." if response.status != 200
+    raise "Problem attaching service #{svc_name} to application #{appname}. #{response.status}" if response.status != 200
   end
 
   def delete_services services, token
@@ -582,10 +580,15 @@ puts "Provisioned service #{service_manifest}"
     easy
   end
 
-  def post_record uri, data_hash
+  def post_record_no_close uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
     easy.http_post(data_hash.to_json)
+    easy
+  end
+
+  def post_record uri, data_hash
+    easy = post_record_no_close(uri,data_hash)
     easy.close
   end
 
