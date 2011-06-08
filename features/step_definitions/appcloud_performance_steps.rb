@@ -115,11 +115,11 @@ Given /^I have my env_test app on AppCloud$/ do
   # bind to the service, adapt if service isn't running
   @should_be_there = []
   ["aurora", "redis"].each do |v|
-    s = services_list.find {|service| service["vendor"].downcase == v}
+    s = services_list.find {|service| service[:vendor].downcase == v}
     if s
 
       # create named service
-      myname = "my-#{s['vendor']}"
+      myname = "my-#{s[:vendor]}"
       if v == 'aurora'
         name = aurora_name(myname)
         service = provision_aurora_service_named @token, myname
@@ -152,7 +152,7 @@ Given /^I have my mozyatmos app on AppCloud$/ do
 
   # the mozy service needs to be available
   vendor = 'mozyatmos'
-  s = @services_list.find {|service| service["vendor"].downcase == vendor}
+  s = @services_list.find {|service| service[:vendor].downcase == vendor}
 
   if s
     # create named service
@@ -191,12 +191,12 @@ Then /^it should be bound to an atmos service$/ do
   # execute this block, but only if mozy service is present
   # in the system
   vendor = 'mozyatmos'
-  s = @services_list.find {|service| service["vendor"].downcase == vendor}
+  s = @services_list.find {|service| service[:vendor].downcase == vendor}
   if s
 
     app_info = get_app_status @app, @token
     app_info.should_not == nil
-    services = app_info['services']
+    services = app_info[:services]
     services.should_not == nil
 
     # grab the services bound to the app from its env
@@ -207,16 +207,16 @@ Then /^it should be bound to an atmos service$/ do
     response.close
 
     # assert that there should only be a single service bound to this app
-    service_list['services'].length.should == 1
-    service_list['services'][0]['vendor'].should == 'mozyatmos'
+    service_list[:services].length.should == 1
+    service_list[:services][0][:vendor].should == 'mozyatmos'
 
 
     # assert that the services list that we get from the app environment
     # matches what we expect from provisioning
     found = 0
-    service_list['services'].each do |s|
+    service_list[:services].each do |s|
       @should_be_there.each do |v|
-        if v['name'] == s['name'] && v['type'] == s['type'] && v['vendor'] == s['vendor']
+        if v[:name] == s[:name] && v[:type] == s[:type] && v[:vendor] == s[:vendor]
           found += 1
           break
         end
@@ -229,7 +229,7 @@ Then /^it should be bound to an atmos service$/ do
 Then /^it should be bound to the right services$/ do
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  services = app_info['services']
+  services = app_info[:services]
   services.should_not == nil
 
   response = get_app_contents @app, 'services'
@@ -243,7 +243,7 @@ Then /^it should be bound to the right services$/ do
   found = 0
   service_list['services'].each do |s|
     @should_be_there.each do |v|
-      if v['name'] == s['name'] && v['type'] == s['type'] && v['vendor'] == s['vendor']
+      if v[:name] == s[:name] && v[:type] == s[:type] && v[:vendor] == s[:vendor]
         found += 1
         break
       end
@@ -256,7 +256,7 @@ end
 After("@lb_check") do |scenario|
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  services = app_info['services']
+  services = app_info[:services]
   delete_services services, @token if services.length.to_i > 0
 
   if(scenario.failed?)
@@ -273,7 +273,7 @@ end
 After("@env_test_check") do |scenario|
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  services = app_info['services']
+  services = app_info[:services]
   delete_services services, @token if services.length.to_i > 0
 
   if(scenario.failed?)
@@ -297,7 +297,6 @@ def calculate_service_list
   end
   @services_list = services_list
 end
-
 
 Given /^The appcloud instance has a set of available frameworks$/ do
   calculate_frameworks_list
@@ -338,18 +337,13 @@ end
 
 When /^I upload my foo-based ruby18 application it should fail$/ do
   response = create_failed_app_with_runtime_and_framework ENV_TEST_APP, @token, 'ruby18', 'foo'
-  response.status.should == 400
-  content = JSON.parse(response.content)
-  content['code'].should == 300
-  content['description'].should == 'Invalid application description'
+  response.message.should =="Error 300: Invalid application description"
 end
 
 When /^I upload my sinatra ruby2010 application it should fail$/ do
   response = create_failed_app_with_runtime_and_framework ENV_TEST_APP, @token, 'ruby2010', 'sinatra'
-  response.status.should == 400
-  content = JSON.parse(response.content)
-  content['code'].should == 300
-  content['description'].should == 'Invalid application description'
+
+  response.message.should =="Error 300: Invalid application description"
 end
 
 def create_failed_app_with_runtime_and_framework app, token, runtime, framework
@@ -368,7 +362,12 @@ def create_failed_app_with_runtime_and_framework app, token, runtime, framework
     :uris => [url],
     :instances => "1",
   }
-  response = @client.create_app_internal @droplets_uri, manifest, auth_hdr(token)
+  begin
+    response = @client.create_app appname, manifest
+  rescue Exception => e
+    return e 
+  end
+  return response
 end
 
 def calculate_frameworks_list
@@ -380,4 +379,4 @@ def calculate_frameworks_list
     frameworks_list << k
   end
   @frameworks_list = frameworks_list
-end
+end  
