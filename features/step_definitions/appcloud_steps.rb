@@ -135,7 +135,7 @@ end
 Then /^it should be started$/ do
   status = get_app_status @app, @token
   status.should_not == nil
-  status['state'].should == 'STARTED'
+  status[:state].should == 'STARTED'
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
   health.should == expected_health
@@ -157,7 +157,7 @@ end
 Then /^it should be stopped$/ do
   status = get_app_status @app, @token
   status.should_not == nil
-  status['state'].should == 'STOPPED'
+  status[:state].should == 'STOPPED'
   expected_health = 0.0
   health = poll_until_done @app, expected_health, @token
   health.should == expected_health
@@ -168,6 +168,15 @@ Then /^it should not be available for use$/ do
   contents.should_not == nil
   contents.response_code.should == 404
   contents.close
+end
+
+Given /^I have deployed my application named (\w+)$/ do |app_name|
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
 end
 
 # List apps
@@ -195,7 +204,7 @@ end
 
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
-  upload_app @app, @token, "rel/mochiweb_test"
+  upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
@@ -231,15 +240,18 @@ When /^I list files associated with my application$/ do
 end
 
 Then /^I should get a list of directories and files associated with my application on AppCloud$/ do
-  @response.status.should == 200
-  @response.content.should_not == nil
+# new vmc client no longer returns the response status it just returns the body
+#   @response.status.should == 200
+  @response.should_not == nil
 end
 
 Then /^I should be able to retrieve any of the listed files$/ do
   @instance = '0'
   path = '/app'
   response = get_app_files @app, @instance, path, @token
-  response.status.should == 200
+# new vmc client no longer returns the response status it just returns the body
+#   @response.status.should == 200
+  response.should_not == nil
 end
 
 # Get instances info
@@ -253,7 +265,7 @@ end
 
 Then /^I should get status on all instances of my application$/ do
   @instances_info.should_not == nil
-  @instances_info['instances'].length.should == @instances
+  @instances_info[:instances].length.should == @instances
 end
 
 # Get crash info
@@ -261,8 +273,10 @@ Given /^I that my application has a crash$/ do
   @instance = '0'
   path = '/run.pid'
   response = get_app_files @app, @instance, path, @token
-  response.status.should == 200
-  pid = response.content.chomp
+# new vmc client no longer returns the response status it just returns the body
+#   @response.status.should == 200
+  response.should_not == nil
+  pid = response.chomp
   # This call causes the app to crash
   begin
     contents = get_app_contents @app, "crash/#{pid}"
@@ -277,15 +291,16 @@ end
 
 Then /^I should be able to get the time of the crash from that information$/ do
   @crash_info.should_not == nil
-  Time.at(@crash_info['crashes'][0]['since']).should_not == nil
+  Time.at(@crash_info[:crashes][0][:since]).should_not == nil
 end
 
 Then /^I should be able to get a list of files associated with my application on AppCloud$/ do
   @instance = '0'
   path = '/'
   @response = get_app_files @app, @instance, path, @token
-  @response.status.should == 200
-  @response.content.should_not == nil
+# new vmc client no longer returns the response status it just returns the body
+#   @response.status.should == 200
+  @response.should_not == nil
 end
 
 # Crash info for a broken (persistently broken) app
@@ -303,48 +318,48 @@ end
 
 Then /^I should get information representing my application\'s resource use\.$/ do
   @app_stats.should_not == nil
-  stats = @app_stats.to_a[0][1]['stats']
+  stats = @app_stats.to_a[1][1]
   stats.should_not == nil
   appname = get_app_name @app
-  stats['name'].should == appname
+  stats[:name].should == appname
 
   timeout = 6 # Because monitor sweeps are 5 secs..
   sleep_time = 0.5
 
-  while stats['usage'] == nil && timeout > 0
+  while stats[:usage] == nil && timeout > 0
     sleep sleep_time
     timeout -= sleep_time
     @app_stats = get_app_stats @app, @token
-    stats = @app_stats.to_a[0][1]['stats']
+    stats = @app_stats.to_a[1][1]
   end
 
-  stats['usage'].should_not == nil
+  stats[:usage].should_not == nil
 end
 
 # Update app instance count
 When /^I increase the instance count of my application by (\d+)$/ do |arg1|
   instances_info = get_instances_info @app, @token
   instances_info.should_not == nil
-  set_app_instances @app, instances_info['instances'].length + arg1.to_i, @token
+  set_app_instances @app, instances_info[:instances].length + arg1.to_i, @token
 end
 
 Then /^I should have (\d+) instances of my application$/ do |arg1|
   instances_info = get_instances_info @app, @token
   instances_info.should_not == nil
-  instances_info['instances'].length.should == arg1.to_i
+  instances_info[:instances].length.should == arg1.to_i
 end
 
 When /^I decrease the instance count of my application by (\d+)$/ do |arg1|
   instances_info = get_instances_info @app, @token
   instances_info.should_not == nil
-  set_app_instances @app, instances_info['instances'].length - arg1.to_i, @token
+  set_app_instances @app, instances_info[:instances].length - arg1.to_i, @token
 end
 
 # Map & unmap application URIs
 When /^I add a url to my application$/ do
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  uris = app_info['uris']
+  uris = app_info[:uris]
   @original_uri = uris[0]
   appname = get_app_name @app
   @new_uri = create_uri "#{appname}-1"
@@ -362,7 +377,7 @@ When /^I add a url that differs only by case$/ do
   pending "the expected behavior of this test is under discussion"
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  uris = app_info['uris']
+  uris = app_info[:uris]
   uris.length.should == 1
   @original_uri = uris[0]
   appname = get_app_name @app
@@ -374,7 +389,7 @@ end
 Then /^I should have (\d+) urls associated with my application$/ do |arg1|
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  uris = app_info['uris']
+  uris = app_info[:uris]
   uris.length.should == arg1.to_i
 end
 
@@ -400,7 +415,7 @@ end
 Given /^I have my application associated with '(\d+)' urls$/ do |arg1|
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  uris = app_info['uris']
+  uris = app_info[:uris]
   @remaining_uri = uris[0]
   appname = get_app_name @app
   @uri_to_be_removed = appname << "-1"
@@ -454,11 +469,47 @@ Then /^my update should succeed$/ do
   @response.should == 'SUCCEEDED'
 end
 
+
+Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
+  contents = post_to_app @app, "service/#{service}/#{key}", body
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\w+)$/ do |service, key, value|
+  contents = get_app_contents @app, "service/#{service}/#{key}"
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 200
+  contents.body_str.should == value
+  contents.close
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
   contents.body_str.should_not == nil
   contents.body_str.should =~ /Hello from modified VCAP/
+  contents.close
+end
+
+Then /^I delete all my service$/ do
+  delete_services(all_my_services)
+end
+
+Then /^I should be able to access crash and it should crash$/ do
+  contents = get_app_contents @app, 'crash'
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 500
+  contents.close
+end
+
+Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
+  contents = get_app_contents @app
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should == "hello from #{framework}"
   contents.close
 end
 
@@ -469,6 +520,27 @@ Then /^I should be able to access the original version of my application$/ do
   contents.body_str.should_not == nil
   contents.body_str.should =~ /Hello from VCAP/
   contents.close
+end
+
+Then /^I delete my service$/ do
+  s = delete_service @service[:name]
+end
+
+When /^I provision (\w+) service$/ do |requested_service|
+  @service = case requested_service
+  when "mysql" then provision_db_service @token
+  when "redis" then provision_redis_service @token
+  when "mongodb" then provision_mongodb_service @token
+  when "rabbitmq" then provision_rabbitmq_service @token
+  end
+
+  attach_provisioned_service @app, @service, @token
+  upload_app @app, @token
+  stop_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
 end
 
 # Simple Sinatra CRUD application that uses MySQL
