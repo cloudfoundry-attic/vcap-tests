@@ -1,0 +1,12 @@
+source "http://rubygems.org"
+gem 'rails', '~> 3.0.5'
+# Without any bound services, app runs on sqlite3
+gem 'sqlite3'
+#.. but may also be staged with mysql
+gem 'mysql2'
+gem 'thin'
+gem 'json'
+gem 'redis'
+gem 'mongo'
+gem 'mongo_mapper'
+gem 'amqp'
