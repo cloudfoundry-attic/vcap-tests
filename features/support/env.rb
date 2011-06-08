@@ -1,15 +1,23 @@
 
 require 'rubygems'
 require 'bundler'
+require 'httpclient'
+
 Bundler.setup
 
 $:.unshift(File.join(File.dirname(__FILE__), '../../lib/client/lib'))
 require 'json/pure'
 require 'singleton'
 require 'spec'
-require 'vmc_base'
+require 'zip/zipfilesystem'
+require 'vmc'
+require 'cli'
 require 'curb'
 require 'pp'
+require 'fileutils'
+require 'tempfile'
+require 'tmpdir'
+require 'digest/sha1'
 
 # The integration test automation based on Cucumber uses the AppCloudHelper as a driver that takes care of
 # of all interactions with AppCloud through the VCAP::BaseClient intermediary.
@@ -35,9 +43,7 @@ ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 
 After do
-  # This used to delete the entire user, but that now require admin privs
-  # so it was removed.
-  AppCloudHelper.instance.cleanup
+  AppCloudHelper.instance.delete_user
 end
 
 After("@creates_simple_app") do
@@ -94,7 +100,7 @@ After("@creates_roo_app") do
 end
 
 After("@creates_mochiweb_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
+    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
 end
 
 at_exit do
@@ -138,7 +144,7 @@ class AppCloudHelper
       exit
     end
     @testapps_dir = File.join(File.dirname(__FILE__), '../../apps')
-    @client = VMC::BaseClient.new()
+    @client = VMC::Client.new(@base_uri)
 
     # Make sure we cleanup if we had a failed run..
     # Fake out the login and registration piece..
@@ -164,6 +170,7 @@ class AppCloudHelper
     delete_app_internal(DBRAILS_BROKEN_APP)
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
+#     delete_user
     # This used to delete the entire user, but that now require admin privs
     # so it was removed, as we the delete_user method.  See the git
     # history if it needs to be revived.
@@ -184,19 +191,29 @@ class AppCloudHelper
   alias :test_user :create_user
   alias :test_passwd :create_passwd
 
+  def delete_user
+    unless @registered_user && @last_login_token && @last_registered_user
+      if @last_registered_user
+        @client.delete_user(@last_registered_user)
+      end
+      @last_login_token = nil
+      @last_registered_user = nil
+    end
+  end
+
   def get_registered_user
     @last_registered_user
   end
 
   def register
     unless @registered_user
-      @client.register_internal(@base_uri, test_user, test_passwd)
+      @client.add_user(test_user, test_passwd)
     end
     @last_registered_user = test_user
   end
 
   def login
-    token = @client.login_internal(@base_uri, test_user, test_passwd)
+    token = @client.login(test_user, test_passwd)
     # TBD - ABS: This is a hack around the 1 sec granularity of our token time stamp
     sleep(1)
     @last_login_token = token
@@ -207,7 +224,7 @@ class AppCloudHelper
   end
 
   def list_apps token
-    @client.get_apps_internal(@droplets_uri, auth_hdr(token))
+    @client.apps
   end
 
   def get_app_info app_list, app
@@ -238,8 +255,8 @@ class AppCloudHelper
       :uris => [url],
       :instances => "#{instances}",
     }
-    response = @client.create_app_internal @droplets_uri, manifest, auth_hdr(token)
-    if response.status == 400
+    response = @client.create_app(appname, manifest)
+    if response.first == 400
       puts "Creation of app #{appname} failed"
       return
     end
@@ -250,21 +267,72 @@ class AppCloudHelper
     "#{@namespace}my_test_app_#{app}"
   end
 
-  def upload_app app, token, subdir = nil
-    Dir.chdir("#{@testapps_dir}/#{app}" + (if subdir then "/#{subdir}" else "" end))
-    opt_war_file = nil
-    if Dir.glob('*.war').first
-      opt_war_file = Dir.glob('*.war').first
-    end
+  def upload_app app, token
+    upload_app_help("#{@testapps_dir}/#{app}", app)
+  end
+
+  def upload_app_help(app_dir, app)
     appname = get_app_name app
-    @client.upload_app_bits @resources_uri, @droplets_uri, appname, auth_hdr(token), opt_war_file
+
+    upload_file, file = "#{Dir.tmpdir}/#{appname}.zip", nil
+    FileUtils.rm_f(upload_file)
+
+    explode_dir = "#{Dir.tmpdir}/.vmc_#{appname}_files"
+    FileUtils.rm_rf(explode_dir) # Make sure we didn't have anything left over..
+    Dir.chdir(app_dir) do
+      if war_file = Dir.glob('*.war').first
+        VMC::Cli::ZipUtil.unpack(war_file, explode_dir)
+      else
+        FileUtils.mkdir(explode_dir)
+        files = Dir.glob('{*,.[^\.]*}')
+        # Do not process .git files
+        files.delete('.git') if files
+        FileUtils.cp_r(files, explode_dir)
+      end
+
+      fingerprints = []
+      total_size = 0
+      resource_files = Dir.glob("#{explode_dir}/**/*", File::FNM_DOTMATCH)
+      resource_files.each do |filename|
+        next if (File.directory?(filename) || !File.exists?(filename))
+        fingerprints << {
+          :size => File.size(filename),
+          :sha1 => Digest::SHA1.file(filename).hexdigest,
+          :fn => filename
+        }
+        total_size += File.size(filename)
+      end
+
+      unless VMC::Cli::ZipUtil.get_files_to_pack(explode_dir).empty?
+        VMC::Cli::ZipUtil.pack(explode_dir, upload_file)
+        file = File.open(upload_file, 'rb')
+      end
+      @client.upload_app(appname , file)
+    end
+    ensure
+      # Cleanup if we created an exploded directory.
+      FileUtils.rm_f(upload_file) if upload_file
+      FileUtils.rm_rf(explode_dir) if explode_dir
+  end
+
+  def update_app_help(app_dir, app)
+    appname = get_app_name app
+    manifest = {
+      :name => "#{appname}",
+      :staging => {
+        :model => @config[app]['framework'],
+        :stack => @config[app]['startup']
+      }
+    }
+    @client.update_app(appname , manifest)
   end
 
   def get_app_status app, token
     appname = get_app_name app
-    response = @client.get_app_internal(@droplets_uri, appname, auth_hdr(token))
-    if (response.status == 200)
-      JSON.parse(response.content)
+    begin
+      response = @client.app_info(appname)
+    rescue
+      nil
     end
   end
 
@@ -277,7 +345,10 @@ class AppCloudHelper
 
   def delete_app app, token
     appname = get_app_name app
-    response = @client.delete_app_internal(@droplets_uri, appname, [], auth_hdr(token))
+    begin
+      response = @client.delete_app(appname)
+    rescue
+    end
     @app = nil
     response
   end
@@ -289,13 +360,13 @@ class AppCloudHelper
      raise "Application #{appname} does not exist, app needs to be created."
     end
 
-    if (app_manifest['state'] == 'STARTED')
+    if (app_manifest[:state] == 'STARTED')
       return
     end
 
-    app_manifest['state'] = 'STARTED'
-    response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem starting application #{appname}." if response.status != 200
+    app_manifest[:state] = 'STARTED'
+    response = @client.update_app(appname, app_manifest)
+    raise "Problem starting application #{appname}." if response.first != 200
   end
 
   def poll_until_done app, expected_health, token
@@ -306,8 +377,8 @@ class AppCloudHelper
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
       status = get_app_status app, token
-      runningInstances = status['runningInstances'] || 0
-      health = runningInstances/status['instances'].to_f
+      runningInstances = status[:runningInstances] || 0
+      health = runningInstances/status[:instances].to_f
       # to mark? Not sure why this change, but breaks simple stop tests
       #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
     end
@@ -321,22 +392,27 @@ class AppCloudHelper
      raise "Application #{appname} does not exist."
     end
 
-    if (app_manifest['state'] == 'STOPPED')
+    if (app_manifest[:state] == 'STOPPED')
       return
     end
 
-    app_manifest['state'] = 'STOPPED'
-    @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
+    app_manifest[:state] = 'STOPPED'
+    @client.update_app(appname, app_manifest)
+  end
+  
+  def restart_app app, token
+    stop_app app, token
+    start_app app, token
   end
 
   def get_app_files app, instance, path, token
     appname = get_app_name app
-    @client.get_app_files_internal @droplets_uri, appname, instance, path, auth_hdr(token)
+    @client.app_files(appname, path, instance)
   end
 
   def get_instances_info app, token
     appname = get_app_name app
-    instances_info = @client.get_app_instances_internal @droplets_uri, appname, auth_hdr(token)
+    instances_info = @client.app_instances(appname)
     instances_info
   end
 
@@ -347,16 +423,16 @@ class AppCloudHelper
       raise "App #{appname} needs to be deployed on AppCloud before being able to increment its instance count"
     end
 
-    instances = app_manifest['instances']
-    health = app_manifest['health']
+    instances = app_manifest[:instances]
+    health = app_manifest[:health]
     if (instances == new_instance_count)
       return
     end
-    app_manifest['instances'] = new_instance_count
+    app_manifest[:instances] = new_instance_count
 
 
-    response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem setting instance count for application #{appname}." if response.status != 200
+    response = @client.update_app(appname, app_manifest)
+    raise "Problem setting instance count for application #{appname}." if response.first != 200
     expected_health = 1.0
     poll_until_done app, expected_health, token
     new_instance_count
@@ -364,17 +440,15 @@ class AppCloudHelper
 
   def get_app_crashes app, token
     appname = get_app_name app
-    response = @client.get_app_crashes_internal @droplets_uri, appname, auth_hdr(token)
+    response = @client.app_crashes(appname)
 
-    crash_info = JSON.parse(response.content) if (response.status == 200)
+    crash_info = response if response
   end
 
   def get_app_stats app, token
     appname = get_app_name app
-    response = @client.get_app_stats_internal(@droplets_uri, appname, auth_hdr(token))
-    if (response.status == 200)
-      JSON.parse(response.content)
-    end
+    response = @client.app_stats(appname)
+    response.first if response
   end
 
   def add_app_uri app, uri, token
@@ -384,9 +458,9 @@ class AppCloudHelper
      raise "Application #{appname} does not exist, app needs to be created."
     end
 
-    app_manifest['uris'] << uri
-    response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem adding uri #{uri} to application #{appname}." if response.status != 200
+    app_manifest[:uris] << uri
+    response = @client.update_app(appname, app_manifest)
+    raise "Problem adding uri #{uri} to application #{appname}." if response.first!= 200
     expected_health = 1.0
     poll_until_done app, expected_health, token
   end
@@ -398,46 +472,40 @@ class AppCloudHelper
      raise "Application #{appname} does not exist, app needs to be created."
     end
 
-    if app_manifest['uris'].delete(uri) == nil
+    if app_manifest[:uris].delete(uri) == nil
       raise "Application #{appname} is not associated with #{uri} to be removed"
     end
-    response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem removing uri #{uri} from application #{appname}." if response.status != 200
+    response = @client.update_app(appname, app_manifest)
+    raise "Problem removing uri #{uri} from application #{appname}." if response.first != 200
     expected_health = 1.0
     poll_until_done app, expected_health, token
   end
 
   def modify_and_upload_app app,token
-    Dir.chdir("#{@testapps_dir}/modified_#{app}")
-    appname = get_app_name app
-    @client.upload_app_bits @resources_uri, @droplets_uri, appname, auth_hdr(token), nil
+    upload_app_help("#{@testapps_dir}/modified_#{app}", app)
+    restart_app app, token
   end
 
   def modify_and_upload_bad_app app,token
-    appname = get_app_name app
-    Dir.chdir("#{@testapps_dir}/#{BROKEN_APP}")
-    @client.upload_app_bits @resources_uri, @droplets_uri, appname, auth_hdr(token), nil
+    upload_app_help("#{@testapps_dir}/#{BROKEN_APP}", app)
   end
 
   def poll_until_update_app_done app, token
     appname = get_app_name app
-    @client.update_app_internal @droplets_uri, appname, auth_hdr(token)
+    @client.app_update_info(appname)
     update_state = nil
     secs_til_timeout = @config['timeout_secs']
     while secs_til_timeout > 0 && update_state != 'SUCCEEDED' && update_state != 'CANARY_FAILED'
       sleep 1
       secs_til_timeout = secs_til_timeout - 1
-      response = @client.get_update_app_status @droplets_uri, appname, auth_hdr(token)
-      update_info = JSON.parse(response.content)
-      update_state = update_info['state']
+      response = @client.app_update_info(appname)
+      update_state = response[:state]
     end
     update_state
   end
 
   def get_services token
-    response = HTTPClient.get "#{@base_uri}/info/services", nil, auth_hdr(token)
-    services = JSON.parse(response.content)
-    services
+    @client.services_info
   end
 
   def get_frameworks token
@@ -446,44 +514,62 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
+   def provision_rabbitmq_service token 
+     name = "#{@namespace}#{@app || 'simple_rabbitmq_app'}"
+     service_manifest = {
+       :type=>"generic",
+       :vendor=>"rabbitmq",
+       :tier=>"free",
+       :version=>"2.4",
+       :name=>name,
+       :options=>{"size"=>"256MiB"}}
+     @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+     #puts "Provisioned service #{service_manifest}"
+     service_manifest
+   end
+   
+   def provision_mongodb_service token #     name = "#{@namespace}#{@app || 'simple_db_app'}"
+     name = "#{@namespace}#{@app || 'simple_mongodb_app'}"
+     service_manifest = {
+       :type=>"key-value",
+       :vendor=>"mongodb",
+       :tier=>"free",
+       :version=>"1.8",
+       :name=>name,
+       :options=>{"size"=>"256MiB"}}
+       @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+       #puts "Provisioned service #{service_manifest}"
+       service_manifest
+     end
+
   def provision_db_service token
     name = "#{@namespace}#{@app || 'simple_db_app'}"
+    @client.create_service(:mysql, name)
     service_manifest = {
-     :type=>"database",
-     :vendor=>"mysql",
-     :tier=>"free",
-     :version=>"5.1.45",
-     :name=>name,
-     :options=>{"size"=>"256MiB"}}
-     @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
-    #puts "Provisioned service #{service_manifest}"
-    service_manifest
+      :type=>"database", 
+      :vendor=>"mysql", 
+      :tier=>"free", 
+      :version=>"5.1.45", 
+      :name=>name, 
+      :options=>{"size"=>"256MiB"},  
+    }
   end
 
   def provision_redis_service token
-    service_manifest = {
-     :type=>"key-value",
-     :vendor=>"redis",
-     :tier=>"free",
-     :version=>"5.1.45",
-     :name=>"#{@namespace}redis_lb_app-service",
+    @client.create_service(:redis, "#{@namespace}redis_lb_app-service")
+    {
+        :type=>"key-value", 
+        :vendor=>"redis", 
+        :tier=>"free", 
+        :version=>"5.1.45", 
+        :name=>"#{@namespace}redis_lb_app-service", 
     }
-    @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
-    #puts "Provisioned service #{service_manifest}"
-    service_manifest
   end
 
   def provision_redis_service_named token, name
-    service_manifest = {
-     :type=>"key-value",
-     :vendor=>"redis",
-     :tier=>"free",
-     :version=>"5.1.45",
-     :name=>redis_name(name),
-    }
-    @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
-    #puts "Provisioned service #{service_manifest}"
-    service_manifest
+    r_name = redis_name(name)
+    @client.create_service(:redis, r_name)
+    { :type=>"key-value", :vendor=>"redis", :tier=>"free", :version=>"5.1.45", :name=> r_name }
   end
 
   def redis_name name
@@ -506,7 +592,7 @@ class AppCloudHelper
      :tier=>"std",
      :name=>aurora_name(name),
     }
-    @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+    @client.create_service(:aurora, aurora_name(name))
     #puts "Provisioned service #{service_manifest}"
     service_manifest
   end
@@ -518,7 +604,7 @@ class AppCloudHelper
      :tier=>"std",
      :name=>mozyatmos_name(name),
     }
-    @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+    @client.create_service(:mozyatoms, mozyatmos_name(name))
     #puts "Provisioned service #{service_manifest}"
     service_manifest
   end
@@ -527,19 +613,20 @@ class AppCloudHelper
   def attach_provisioned_service app, service_manifest, token
     appname = get_app_name app
     app_manifest = get_app_status app, token
-    provisioned_service = app_manifest['services']
+    provisioned_service = app_manifest[:services]
     provisioned_service = [] unless provisioned_service
     svc_name = service_manifest[:name]
     provisioned_service << svc_name
-    app_manifest['services'] = provisioned_service
-    response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
-    raise "Problem attaching service #{svc_name} to application #{appname}." if response.status != 200
+    app_manifest[:services] = provisioned_service
+    @client.update_app(appname, app_manifest)
   end
 
   def delete_services services, token
-    #puts "Deleting services #{services}"
-    response = @client.delete_services_internal(@services_uri, services, auth_hdr(token))
-    response
+    begin
+      @client.delete_service(services)
+    rescue
+      nil
+    end
   end
 
   def get_uri app, relative_path=nil
@@ -552,7 +639,6 @@ class AppCloudHelper
   end
 
   def get_app_contents app, relative_path=nil
-
     uri = get_uri app, relative_path
     get_uri_contents uri
   end
@@ -561,6 +647,18 @@ class AppCloudHelper
     easy = Curl::Easy.new
     easy.url = uri
     easy.http_get
+    easy
+  end
+
+  def post_to_app app, relative_path, data
+    uri = get_uri app, relative_path
+    post_uri uri, data
+  end
+
+  def post_uri uri, data
+    easy = Curl::Easy.new
+    easy.url = uri
+    easy.http_post(data)
     easy
   end
 
