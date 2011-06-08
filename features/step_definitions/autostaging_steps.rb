@@ -150,8 +150,8 @@ end
 def delete_app_services
   app_info = get_app_status @app, @token
   app_info.should_not == nil
-  services = app_info['services']
-  delete_services services, @token if services.length.to_i > 0
+  services = app_info[:services]
+  delete_services services if services.length.to_i > 0
   @services = nil
 end
 

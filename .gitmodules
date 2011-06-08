@@ -1,0 +1,3 @@
+[submodule "lib/client"]
+	path = lib/client
+	url = ssh://cloudfoundry-codereview.qa.mozycloud.com:29418/vmc
