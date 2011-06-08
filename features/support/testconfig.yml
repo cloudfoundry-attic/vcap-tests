@@ -66,3 +66,23 @@ mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
+
+app_rails_service:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+
+app_sinatra_service:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby main.rb"
+  memory: 64
+
+app_node_service:
+  framework: "node"
+  startup: node
+  memory: 64
+
+app_spring_service:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256

@@ -446,6 +446,34 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
+  def provision_rabbitmq_service token 
+    name = "#{@namespace}#{@app || 'simple_rabbitmq_app'}"
+    service_manifest = {
+     :type=>"generic",
+     :vendor=>"rabbitmq",
+     :tier=>"free",
+     :version=>"2.4",
+     :name=>name,
+     :options=>{"size"=>"256MiB"}}
+     @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+    #puts "Provisioned service #{service_manifest}"
+    service_manifest
+  end
+
+  def provision_mongodb_service token #     name = "#{@namespace}#{@app || 'simple_db_app'}"
+    name = "#{@namespace}#{@app || 'simple_mongodb_app'}"
+    service_manifest = {
+     :type=>"key-value",
+     :vendor=>"mongodb",
+     :tier=>"free",
+     :version=>"1.8",
+     :name=>name,
+     :options=>{"size"=>"256MiB"}}
+     @client.add_service_internal @services_uri, service_manifest, auth_hdr(token)
+    #puts "Provisioned service #{service_manifest}"
+    service_manifest
+  end
+
   def provision_db_service token
     name = "#{@namespace}#{@app || 'simple_db_app'}"
     service_manifest = {
@@ -561,6 +589,18 @@ class AppCloudHelper
     easy = Curl::Easy.new
     easy.url = uri
     easy.http_get
+    easy
+  end
+
+  def post_to_app app, relative_path, data
+    uri = get_uri app, relative_path
+    post_uri uri, data
+  end
+
+  def post_uri uri, data
+    easy = Curl::Easy.new
+    easy.url = uri
+    easy.http_post(data)
     easy
   end
 

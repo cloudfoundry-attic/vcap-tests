@@ -170,6 +170,15 @@ Then /^it should not be available for use$/ do
   contents.close
 end
 
+Given /^I have deployed my application named (\w+)$/ do |app_name|
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 # List apps
 Given /^I have deployed a simple application$/ do
   @app = create_app SIMPLE_APP, @token
@@ -454,11 +463,42 @@ Then /^my update should succeed$/ do
   @response.should == 'SUCCEEDED'
 end
 
+
+Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
+  contents = post_to_app @app, "service/#{service}/#{key}", body
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\w+)$/ do |service, key, value|
+  contents = get_app_contents @app, "service/#{service}/#{key}"
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should == value
+  contents.close
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
   contents.body_str.should_not == nil
   contents.body_str.should =~ /Hello from modified VCAP/
+  contents.close
+end
+
+Then /^I should be able to access crash and it should crash$/ do
+  contents = get_app_contents @app, 'crash'
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 500
+  contents.close
+end
+
+Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
+  contents = get_app_contents @app
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should == "hello from #{framework}"
   contents.close
 end
 
@@ -469,6 +509,31 @@ Then /^I should be able to access the original version of my application$/ do
   contents.body_str.should_not == nil
   contents.body_str.should =~ /Hello from VCAP/
   contents.close
+end
+
+Then /^I delete my service$/ do
+  delete_services [@service[:name]], @token
+end
+
+Then /^I delete all my services$/ do
+  delete_services @service, @token
+end
+
+When /^I provision (\w+) service$/ do |requested_service|
+  @service = case requested_service
+  when "mysql" then provision_db_service @token
+  when "redis" then provision_redis_service @token
+  when "mongodb" then provision_mongodb_service @token
+  when "rabbitmq" then provision_rabbitmq_service @token
+  end
+  
+  attach_provisioned_service @app, @service, @token
+  upload_app @app, @token
+  stop_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
 end
 
 # Simple Sinatra CRUD application that uses MySQL
