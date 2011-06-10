@@ -33,6 +33,9 @@ DBRAILS_BROKEN_APP = "dbrails_broken_app"
 GRAILS_APP = "grails_app"
 ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
+SIMPLE_LIFT_APP = "simple-lift-app"
+LIFT_DB_APP = "lift-db-app"
+
 
 After do
   # This used to delete the entire user, but that now require admin privs
@@ -95,6 +98,14 @@ end
 
 After("@creates_mochiweb_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
+end
+
+After("@creates_simple_lift_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
+end
+
+After("@creates_lift_db_app") do
+  AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
 end
 
 at_exit do
@@ -164,6 +175,8 @@ class AppCloudHelper
     delete_app_internal(DBRAILS_BROKEN_APP)
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
+    delete_app_internal(SIMPLE_LIFT_APP)
+    delete_app_internal(LIFT_DB_APP)
     # This used to delete the entire user, but that now require admin privs
     # so it was removed, as we the delete_user method.  See the git
     # history if it needs to be revived.
@@ -247,7 +260,7 @@ class AppCloudHelper
   end
 
   def get_app_name app
-    "#{@namespace}my_test_app_#{app}"
+    "#{@namespace}my-test-app-#{app}"
   end
 
   def upload_app app, token, subdir = nil

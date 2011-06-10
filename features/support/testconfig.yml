@@ -66,3 +66,13 @@ mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
+
+simple-lift-app:
+  framework: "lift/1.0"
+  startup: "thin start"
+  memory: 256
+
+lift-db-app:
+  framework: "lift/1.0"
+  startup: "thin start"
+  memory: 512
