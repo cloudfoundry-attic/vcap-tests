@@ -3,7 +3,7 @@ Feature: Deploy applications that make use of autostaging
   As a user of AppCloud
   I want to launch apps that expect automatic binding of the services that they use
 
-  Background: MySQL autostaging
+  Background: MySQL and PostgreSQL autostaging
     Given I have registered and logged in
 
       @creates_jpa_app @creates_jpa_db_adapter
@@ -61,3 +61,12 @@ Feature: Deploy applications that make use of autostaging
         Given I deploy a broken dbrails application  using the MySQL DB service
         Then The broken dbrails application should fail
 
+      @creates_hibernate_app @creates_hibernate_db_adapter
+      Scenario: start Spring Web application using Hibernate and add some records
+        Given I deploy a hibernate application that is backed by the PostgreSQL database service on AppCloud
+        When I add 3 records to the application
+        Then I should have the same 3 records on retrieving all records from the application
+
+        When I delete my application
+        And I deploy a hibernate application that is backed by the PostgreSQL database service on AppCloud
+        Then I should have the same 3 records on retrieving all records from the application
