@@ -41,6 +41,8 @@ DBRAILS_BROKEN_APP = "dbrails_broken_app"
 GRAILS_APP = "grails_app"
 ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
+SIMPLE_LIFT_APP = "simple-lift-app"
+LIFT_DB_APP = "lift-db-app"
 
 After do
   AppCloudHelper.instance.delete_user
@@ -101,6 +103,14 @@ end
 
 After("@creates_mochiweb_app") do
     AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
+end
+
+After("@creates_simple_lift_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
+end
+
+After("@creates_lift_db_app") do
+  AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
 end
 
 at_exit do
@@ -170,6 +180,8 @@ class AppCloudHelper
     delete_app_internal(DBRAILS_BROKEN_APP)
     delete_app_internal(GRAILS_APP)
     delete_app_internal(ROO_APP)
+    delete_app_internal(SIMPLE_LIFT_APP)
+    delete_app_internal(LIFT_DB_APP)
 #     delete_user
     # This used to delete the entire user, but that now require admin privs
     # so it was removed, as we the delete_user method.  See the git
@@ -264,7 +276,9 @@ class AppCloudHelper
   end
 
   def get_app_name app
-    "#{@namespace}my_test_app_#{app}"
+    # URLs synthesized from app names containing '_' are not handled well by the Lift framework.
+    # So we used '-' instead of '_'
+    "#{@namespace}my-test-app-#{app}"
   end
 
   def upload_app app, token
@@ -399,7 +413,7 @@ class AppCloudHelper
     app_manifest[:state] = 'STOPPED'
     @client.update_app(appname, app_manifest)
   end
-  
+
   def restart_app app, token
     stop_app app, token
     start_app app, token
@@ -518,7 +532,7 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
-   def provision_rabbitmq_service token 
+   def provision_rabbitmq_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_app'}rabbitmq"
      @client.create_service(:rabbitmq, name)
      service_manifest = {
@@ -531,7 +545,7 @@ class AppCloudHelper
      #puts "Provisioned service #{service_manifest}"
      service_manifest
    end
-   
+
    def provision_mongodb_service token
      name = "#{@namespace}#{@app || 'simple_mongodb_app'}mongodb"
      @client.create_service(:mongodb, name)
@@ -550,12 +564,12 @@ class AppCloudHelper
     name = "#{@namespace}#{@app || 'simple_db_app'}mysql"
     @client.create_service(:mysql, name)
     service_manifest = {
-      :type=>"database", 
-      :vendor=>"mysql", 
-      :tier=>"free", 
-      :version=>"5.1.45", 
-      :name=>name, 
-      :options=>{"size"=>"256MiB"},  
+      :type=>"database",
+      :vendor=>"mysql",
+      :tier=>"free",
+      :version=>"5.1.45",
+      :name=>name,
+      :options=>{"size"=>"256MiB"},
     }
   end
 
@@ -563,10 +577,10 @@ class AppCloudHelper
     name = "#{@namespace}#{@app}redis"
     @client.create_service(:redis, name)
     {
-        :type=>"key-value", 
-        :vendor=>"redis", 
-        :tier=>"free", 
-        :version=>"5.1.45", 
+        :type=>"key-value",
+        :vendor=>"redis",
+        :tier=>"free",
+        :version=>"5.1.45",
         :name=>name,
     }
   end
