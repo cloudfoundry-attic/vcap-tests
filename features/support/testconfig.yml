@@ -67,6 +67,16 @@ mochiweb_test:
   startup: erlangR14B02
   memory: 64
 
+simple-lift-app:
+  framework: "lift/1.0"
+  startup: "thin start"
+  memory: 256
+
+lift-db-app:
+  framework: "lift/1.0"
+  startup: "thin start"
+  memory: 512
+
 app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
@@ -86,7 +96,7 @@ app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
-  
+
 my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
