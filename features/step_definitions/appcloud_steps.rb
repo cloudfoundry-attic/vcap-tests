@@ -526,12 +526,13 @@ Then /^I delete my service$/ do
   s = delete_service @service[:name]
 end
 
-When /^I provision (\w+) service$/ do |requested_service|
+When /^I provision ([\w\-]+) service$/ do |requested_service|
   @service = case requested_service
   when "mysql" then provision_db_service @token
   when "redis" then provision_redis_service @token
   when "mongodb" then provision_mongodb_service @token
   when "rabbitmq" then provision_rabbitmq_service @token
+  when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
   end
 
   attach_provisioned_service @app, @service, @token

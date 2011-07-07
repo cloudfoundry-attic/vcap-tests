@@ -518,6 +518,20 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
+   def provision_rabbitmq_srs_service token 
+     name = "#{@namespace}#{@app || 'simple_rabbitmq_srs_app'}rabbitmq_srs"
+     @client.create_service('rabbitmq-srs', name)
+     service_manifest = {
+       :type=>"generic",
+       :vendor=>"rabbitmq-srs",
+       :tier=>"free",
+       :version=>"2.4.1",
+       :name=>name,
+       :options=>{"size"=>"256MiB"}}
+     #puts "Provisioned service #{service_manifest}"
+     service_manifest
+   end
+
    def provision_rabbitmq_service token 
      name = "#{@namespace}#{@app || 'simple_rabbitmq_app'}rabbitmq"
      @client.create_service(:rabbitmq, name)

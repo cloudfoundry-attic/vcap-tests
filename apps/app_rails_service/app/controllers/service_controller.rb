@@ -23,7 +23,11 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'mongo'
         MongoDataValue.new(:key => params[:key], :data_value => value).save
       elsif params[:service] == 'rabbit'
-        value = write_to_rabbit(params[:key], value)
+        client = rabbit_service
+        value = write_to_rabbit(params[:key], value, client)
+      elsif params[:service] == 'rabbitsrs'
+        client = rabbit_srs_service
+        value = write_to_rabbit(params[:key], value, client)
       end
     else
       if params[:service] == 'redis'
@@ -33,7 +37,11 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'mongo'
         value = MongoDataValue.find_by_key(params[:key]).data_value
       elsif params[:service] == 'rabbit'
-        value = read_from_rabbit params[:key]
+        client = rabbit_service
+        value = read_from_rabbit params[:key], client
+      elsif params[:service] == 'rabbitsrs'
+        client = rabbit_srs_service
+        value = read_from_rabbit params[:key], client
       end
     end
      render :text => value
@@ -47,14 +55,23 @@ class ServiceController < ApplicationController
     service = service["options"] if service
   end
 
-  def write_to_rabbit(key, value)
-    client = rabbit_service
+  def rabbit_srs_service
+    service = load_service('rabbitmq-srs')
+    uri = URI.parse(service['url'])
+    host = uri.host
+    port = uri.port
+    user = uri.user
+    pass = uri.password
+    vhost = uri.path[1..uri.path.length]
+    Carrot.new( :host => host, :port => port, :user => user, :pass => pass, :vhost => vhost )
+  end
+
+  def write_to_rabbit(key, value, client)
     q = client.queue(key)
     q.publish(value)
   end
 
-  def read_from_rabbit(key)
-    client = rabbit_service
+  def read_from_rabbit(key, client )
     q = client.queue(key)
     msg = q.pop(:ack => true)
     q.ack

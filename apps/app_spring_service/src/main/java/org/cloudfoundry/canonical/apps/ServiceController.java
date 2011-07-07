@@ -11,12 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.cloudfoundry.runtime.env.AbstractServiceInfo;
 import org.cloudfoundry.runtime.env.CloudEnvironment;
 import org.cloudfoundry.runtime.env.MongoServiceInfo;
-//import org.cloudfoundry.runtime.env.RabbitServiceInfo;
 import org.cloudfoundry.runtime.env.RedisServiceInfo;
 import org.cloudfoundry.runtime.service.messaging.RabbitServiceCreator;
-//import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,8 +47,7 @@ public class ServiceController {
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public void hello(HttpServletResponse response)
-			throws IOException {
+	public void hello(HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
 		out.print("hello from spring");
 	}
@@ -141,6 +137,24 @@ public class ServiceController {
 		out.print((String) amq.receiveAndConvert(key));
 	}
 
+	@RequestMapping(value = "/service/rabbitsrs/{key}", method = RequestMethod.POST)
+	public void rabbitsrs_post(@RequestBody String body,
+			@PathVariable String key, HttpServletResponse response)
+			throws IOException {
+		PrintWriter out = response.getWriter();
+		RabbitTemplate amq = loadSRSRabbit(key);
+		amq.convertAndSend(key, body);
+		out.print(body);
+	}
+
+	@RequestMapping(value = "/service/rabbitsrs/{key}", method = RequestMethod.GET)
+	public void rabbitsrs_get(@PathVariable String key,
+			HttpServletResponse response) throws IOException {
+		PrintWriter out = response.getWriter();
+		RabbitTemplate amq = loadSRSRabbit(key);
+		out.print((String) amq.receiveAndConvert(key));
+	}
+
 	private RabbitTemplate loadRabbit(String key) {
 		try {
 			Connection conn = connectionRabbit().createConnection();
@@ -155,6 +169,24 @@ public class ServiceController {
 		}
 	}
 
+	private RabbitTemplate loadSRSRabbit(String key) {
+		try {
+			Connection conn = connectionRabbitSRS().createConnection();
+			Channel channel = conn.createChannel(true);
+			channel.exchangeDeclare(key, "direct");
+			channel.queueDeclare(key, true, false, false, null);
+			channel.close();
+			return new RabbitTemplate(connectionRabbitSRS());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AmqpException("Failed to create rabbit template");
+		}
+	}
+
+	private ConnectionFactory connectionRabbitSRS() {
+		return new RabbitSRSServiceCreator(environment()).createService();
+	}
+
 	private ConnectionFactory connectionRabbit() {
 		return new RabbitServiceCreator(environment()).createSingletonService().service;
 	}
@@ -167,7 +199,8 @@ public class ServiceController {
 	}
 
 	private DBCollection loadMongo() {
-		Map<String, Object> service = (Map<String, Object>) getMongoSettings().get("credentials");
+		Map<String, Object> service = (Map<String, Object>) getMongoSettings()
+				.get("credentials");
 		Mongo m = null;
 		DBCollection coll = null;
 		DB db = null;
@@ -213,15 +246,6 @@ public class ServiceController {
 		PrintWriter out = response.getWriter();
 		CloudEnvironment env = environment();
 		out.println(env.getValue("VCAP_SERVICES"));
-		out.println(env.getServices());
-		for (AbstractServiceInfo info : (List<AbstractServiceInfo>) env.getServiceInfos()) {
-			out.println("Service Plan:" + info.getClass().toString());
-			out.println("Service name:" + info.getServiceName());
-			out.println("Host: " + info.getHost());
-			out.println("Port: " + info.getPort());
-			out.println("Password: " + info.getPassword());
-			out.println("------------------------------");
-		}
 	}
 
 	private <T extends AbstractServiceInfo> AbstractServiceInfo getService(
