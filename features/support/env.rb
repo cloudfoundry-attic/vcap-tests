@@ -571,6 +571,23 @@ class AppCloudHelper
     }
   end
 
+  def postgresql_name name
+    "#{@namespace}postgresql_#{name}"
+  end
+
+  def provision_postgresql_service_named token, name
+    service_manifest = {
+     :type=>"database",
+     :vendor=>"postgresql",
+     :tier=>"free",
+     :version=>"8.4",
+     :name=>postgresql_name(name),
+    }
+    @client.create_service(:postgresql, name)
+    #puts "Provisioned service #{service_manifest}"
+    service_manifest
+  end
+
   def provision_redis_service_named token, name
     r_name = redis_name(name)
     @client.create_service(:redis, r_name)
