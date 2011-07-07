@@ -46,6 +46,12 @@ When /^I deploy a Spring Hibernate application using the created MySQL service$/
   health.should == expected_health
 end
 
+When /^I deploy a Spring Hibernate application using the created PostgreSQL service$/ do
+  expected_health = 1.0
+  health = create_and_start_app HIBERNATE_APP, expected_health, @service
+  health.should == expected_health
+end
+
 Given /^I deploy a dbrails application using the MySQL DB service$/ do
   expected_health = 1.0
   health = create_and_start_app DBRAILS_APP, expected_health
