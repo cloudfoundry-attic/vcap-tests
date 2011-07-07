@@ -46,6 +46,12 @@ When /^I deploy a Spring Hibernate application using the created MySQL service$/
   health.should == expected_health
 end
 
+When /^I deploy a Spring Hibernate application using the created PostgreSQL service$/ do
+  expected_health = 1.0
+  health = create_and_start_app HIBERNATE_APP, expected_health, @service
+  health.should == expected_health
+end
+
 Given /^I deploy a dbrails application using the MySQL DB service$/ do
   expected_health = 1.0
   health = create_and_start_app DBRAILS_APP, expected_health
@@ -155,6 +161,16 @@ def delete_app_services
   @services = nil
 end
 
+# check application exist before deleting its services.
+def delete_app_services_check
+  if @app.nil?
+    @services = nil
+    return
+  else
+    delete_app_services
+  end
+end
+
 Given /^I deploy a Spring Grails application using the MySQL DB service$/ do
   expected_health = 1.0
   health = create_and_start_app GRAILS_APP, expected_health
@@ -226,6 +242,11 @@ end
 
 After("@creates_hibernate_db_adapter") do |scenario|
   delete_app_services
+end
+
+
+After("@creates_hibernate_postgresql_adapter") do |scenario|
+  delete_app_services_check
 end
 
 After("@creates_grails_db_adapter") do |scenario|
