@@ -8,6 +8,8 @@
 
 #World(AppCloudHelper)
 
+require 'nokogiri'
+
 World do
   AppCloudHelper.instance
 end
@@ -602,3 +604,59 @@ Then /^be able to delete the record$/ do
   contents.close
 end
 
+# Hiberate application that uses PostgreSQL
+Given /^I deploy a hibernate application that is backed by the PostgreSQL database service on AppCloud$/ do
+  # Enumerate system services, if postgresql service is present,
+  # then create the app, provision the service and bind it to app,
+  # otherwise put this step pending
+  services = get_services @token
+  # flatten
+  services_list = []
+
+  services.each do |service_type, value|
+    value.each do |k,v|
+      v.each do |version, s|
+        services_list << s
+      end
+    end
+  end
+
+  # find postgresql service in the list
+  postgresql_service = services_list.find {|service| service[:vendor].downcase == "postgresql"}
+
+  if postgresql_service
+    @app = create_app HIBERNATE_APP, @token
+    @service = provision_postgresql_service_named @token, "mydb"
+    attach_provisioned_service @app, @service, @token
+    upload_app @app, @token
+    start_app @app, @token
+    expected_health = 1.0
+    health = poll_until_done @app, expected_health, @token
+    health.should == expected_health
+  else
+    pending "Not running Postgresql test because Postgresql service is not available"
+  end
+
+end
+
+When /^I add one entry in the Guestbook$/ do
+  uri = get_uri @app, "guest.html"
+
+  easy = Curl::Easy.new
+  easy.url = uri
+  easy.http_post("name=guest")
+  easy.close
+end
+
+Then /^I should be able to retrieve entries from Guestbook$/ do
+  uri = get_uri @app
+
+  easy = Curl::Easy.new
+  easy.url = uri
+  easy.http_get
+  doc = Nokogiri::HTML(easy.body_str)
+  number = doc.xpath('//p').count
+  easy.close
+
+  number.should >= 1
+end
