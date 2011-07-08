@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.cloudfoundry.runtime.env.AbstractServiceInfo;
 import org.cloudfoundry.runtime.env.CloudEnvironment;
 import org.cloudfoundry.runtime.env.MongoServiceInfo;
@@ -156,7 +157,8 @@ public class ServiceController {
 	}
 
 	private ConnectionFactory connectionRabbit() {
-		return new RabbitServiceCreator(environment()).createSingletonService().service;
+		//TODO: this need to be fixed once we fix our environment 
+		return new CorrectRabbitServiceCreator(environment()).createService(new CorrectRabbitServiceInfo(this.getRabbitSettings()));
 	}
 
 	private Jedis loadJedis() {
@@ -201,6 +203,19 @@ public class ServiceController {
 		for (Map<String, Object> service : services) {
 			String label = (String) service.get("label");
 			if (label.indexOf("mongodb-1.8") > -1) {
+				return service;
+			}
+		}
+		return null;
+	}
+	
+	private Map<String, Object> getRabbitSettings(){
+		CloudEnvironment env = environment();
+		List<Map<String, Object>> services = env.getServices();
+
+		for (Map<String, Object> service : services) {
+			String label = (String) service.get("label");
+			if (label.indexOf("rabbitmq-2.4") > -1) {
 				return service;
 			}
 		}
