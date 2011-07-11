@@ -68,7 +68,7 @@ var app = [
     var mongo_service = load_service('mongodb');
     var db = new mongodb.Db(mongo_service["db"], new mongodb.Server(mongo_service["hostname"], mongo_service["port"], {}), {});
     db.open(function (error, client) {
-      db.authenticate(mongo_service["username"], mongo_service["password"], function(err, replies) { 
+      db.authenticate(mongo_service["username"], mongo_service["password"], function(err, replies) {
         var collection = new mongodb.Collection(client, 'test_collection');
         collection.find({'key': key}, function(err, cursor) {
           cursor.toArray(function(err, items) {
@@ -84,8 +84,8 @@ var app = [
       var mongo_service = load_service('mongodb');
       var db = new mongodb.Db(mongo_service["db"], new mongodb.Server(mongo_service["hostname"], mongo_service["port"], {}), {});
       db.open(function (error, client) {
-        db.authenticate(mongo_service["username"], mongo_service["password"], function(err, replies) { 
-          db.createCollection('test_collection', function(err, collection) { 
+        db.authenticate(mongo_service["username"], mongo_service["password"], function(err, replies) {
+          db.createCollection('test_collection', function(err, collection) {
             collection.insert({ 'key' : key, 'data_value': body});
             db.close();
           });
@@ -100,6 +100,15 @@ var app = [
   [post(/^\/service\/rabbit\/(\w+)$/), function(req, res, key) {
     getBody(req, function(body){
       rabbit(key,body);
+      res.end();
+    });
+  }],
+  [get(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+    res.end(msg_value);
+  }],
+  [post(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+    getBody(req, function(body){
+      rabbitsrs(key,body);
       res.end();
     });
   }],
@@ -141,6 +150,33 @@ function load_service(service_name){
   return service;
 }
 
+function rabbitsrs(key, value, res){
+  var service = load_service('rabbitmq-srs');
+  var amqp = require('./lib/node-amqp');
+  url = require('url').parse(service['url']);
+  var hostname = url['hostname'];
+  var auth = url['auth'].split(':');
+  var user = auth[0];
+  var pass = auth[1];
+  var connection = amqp.createConnection({ host: url['hostname'],  port: url['port'], login: user, password: pass, vhost:  url.pathname.substr(1) });
+  connection.on('ready', function () {
+    var q = connection.queue('node-default-exchange', function() {
+      q.bind("#");
+      q.on('queueBindOk', function() { // wait until queue is bound
+        q.on('basicConsumeOk', function () { // wait until consumer is registered
+          connection.publish(key, {'data_value' : value});
+          setTimeout(function () {
+            connection.end();
+          }, 1000);
+        });
+        q.subscribe({ routingKeyInPayload: true }, function (msg) { // register consumer
+          msg_value = msg.data_value;
+          console.log(msg.data_value);
+        });
+      });
+    });
+  });
+}
 function rabbit(key, value, res){
   var service = load_service('rabbitmq');
   var amqp = require('./lib/node-amqp');
