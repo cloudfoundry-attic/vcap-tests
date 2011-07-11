@@ -13,7 +13,7 @@
 		<org.springframework.roo-version>1.0.2.RELEASE</org.springframework.roo-version>
 		<org.aspectj-version>1.6.9</org.aspectj-version>
 		<org.slf4j-version>1.6.1</org.slf4j-version>
-		<rabbitmq.version>2.5.1</rabbitmq.version>
+		<rabbitmq.version>2.1.0</rabbitmq.version>
 		<spring.amqp.version>1.0.0.BUILD-SNAPSHOT</spring.amqp.version>
 	</properties>
 	<dependencies>

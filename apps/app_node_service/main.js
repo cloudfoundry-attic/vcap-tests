@@ -144,7 +144,7 @@ function load_service(service_name){
 function rabbit(key, value, res){
   var service = load_service('rabbitmq');
   var amqp = require('./lib/node-amqp');
-  var connection = amqp.createConnection({ host: service['hostname'] || service['host'],  port: service['port'], login: service['user'], password: service['pass'], vhost: service['vhost']});
+  var connection = amqp.createConnection({ host: service['hostname'],  port: service['port'], login: service['user'], password: service['pass'], vhost: service['vhost']});
   connection.on('ready', function () {
     var q = connection.queue('node-default-exchange', function() {
       q.bind("#");

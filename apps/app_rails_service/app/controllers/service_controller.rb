@@ -63,6 +63,6 @@ class ServiceController < ApplicationController
 
   def rabbit_service
     service = load_service('rabbitmq')
-    Carrot.new( :host => service['hostname'] || service['host'], :port => service['port'], :user => service['user'], :pass => service['pass'], :vhost => service['vhost'] )
+    Carrot.new( :host => service['hostname'], :port => service['port'], :user => service['user'], :pass => service['pass'], :vhost => service['vhost'] )
   end
 end
