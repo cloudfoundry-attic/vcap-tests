@@ -15,7 +15,7 @@ get '/' do
 end
 
 get '/crash' do
-  raise "This should crash!!!!"
+  Process.kill("KILL", Process.pid)
 end
 
 get '/service/redis/:key' do

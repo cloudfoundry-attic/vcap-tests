@@ -502,8 +502,8 @@ end
 Then /^I should be able to access crash and it should crash$/ do
   contents = get_app_contents @app, 'crash'
   contents.should_not == nil
-  contents.body_str.should_not == nil
-  contents.response_code.should == 500
+  contents.response_code.should >= 500
+  contents.response_code.should < 600
   contents.close
 end
 

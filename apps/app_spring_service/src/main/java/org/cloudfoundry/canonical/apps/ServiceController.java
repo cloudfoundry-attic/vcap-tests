@@ -53,8 +53,11 @@ public class ServiceController {
 	}
 
 	@RequestMapping(value = "/crash", method = RequestMethod.GET)
-	public String crash() throws Exception {
-		throw new Exception();
+	public void crash(HttpServletResponse response) throws IOException{
+		PrintWriter out = response.getWriter();
+//		Thread.currentThread().interrupt();
+		System.exit(0);
+		out.println("it should not get here");
 	}
 
 	@RequestMapping(value = "/service/mongo/{key}", method = RequestMethod.POST)

@@ -9,7 +9,7 @@ class ServiceController < ApplicationController
   end
 
   def crash
-    raise "It should crash"
+    Process.kill("KILL", Process.pid) 
   end
 
   def service

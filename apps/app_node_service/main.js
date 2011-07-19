@@ -27,8 +27,7 @@ var app = [
     res.respond('hello from node');
   }],
   [get(/^\/crash$/), function(req, res, name) {
-    res.writeHead(500, { 'content-type': 'text/plain' });
-    res.end();
+    process.kill(process.pid, 'SIGKILL');
   }],
   [get(/^\/service\/redis\/(\w+)$/), function(req, res, key) {
     var client = redis_services();
