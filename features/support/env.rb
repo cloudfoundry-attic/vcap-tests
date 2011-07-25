@@ -43,6 +43,7 @@ ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
+TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 
 After do
   AppCloudHelper.instance.delete_user
@@ -63,7 +64,6 @@ end
 After("@creates_redis_lb_app") do
   AppCloudHelper.instance.delete_app_internal REDIS_LB_APP
 end
-
 
 After("@creates_env_test_app") do
   AppCloudHelper.instance.delete_app_internal ENV_TEST_APP
@@ -111,6 +111,10 @@ end
 
 After("@creates_lift_db_app") do
   AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
+end
+
+After("@creates_tomcat_version_check_app") do
+  AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
 end
 
 at_exit do
@@ -182,6 +186,7 @@ class AppCloudHelper
     delete_app_internal(ROO_APP)
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
+    delete_app_internal(TOMCAT_VERSION_CHECK_APP)
 #     delete_user
     # This used to delete the entire user, but that now require admin privs
     # so it was removed, as we the delete_user method.  See the git
