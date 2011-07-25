@@ -77,6 +77,11 @@ lift-db-app:
   startup: "thin start"
   memory: 512
 
+tomcat-version-check-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 128
+
 app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
