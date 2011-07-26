@@ -25,7 +25,7 @@ require 'digest/sha1'
 # Author:: A.B.Srinivasan
 # Copyright:: Copyright (c) 2010 VMware Inc.
 
-TEST_AUTOMATION_USER_ID = "tester@vcap.example.com"
+TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
 REDIS_LB_APP = "redis_lb_app"
@@ -45,7 +45,7 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 
 After do
-  AppCloudHelper.instance.delete_user
+  AppCloudHelper.instance.cleanup
 end
 
 After("@creates_simple_app") do
@@ -182,10 +182,10 @@ class AppCloudHelper
     delete_app_internal(ROO_APP)
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
-#     delete_user
-    # This used to delete the entire user, but that now require admin privs
-    # so it was removed, as we the delete_user method.  See the git
-    # history if it needs to be revived.
+    delete_services(all_my_services) unless @registered_user
+    # This used to delete the entire user, but that now require admin
+    # privs so it was removed, as was the delete_user method; see the
+    # git history if it needs to be revived.
   end
 
   def create_uri name
@@ -202,16 +202,6 @@ class AppCloudHelper
 
   alias :test_user :create_user
   alias :test_passwd :create_passwd
-
-  def delete_user
-    unless @registered_user && @last_login_token && @last_registered_user
-      if @last_registered_user
-        @client.delete_user(@last_registered_user)
-      end
-      @last_login_token = nil
-      @last_registered_user = nil
-    end
-  end
 
   def get_registered_user
     @last_registered_user
