@@ -25,7 +25,7 @@ require 'digest/sha1'
 # Author:: A.B.Srinivasan
 # Copyright:: Copyright (c) 2010 VMware Inc.
 
-TEST_AUTOMATION_USER_ID = "tester@vcap.example.com"
+TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
 REDIS_LB_APP = "redis_lb_app"
@@ -45,7 +45,8 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 
 After do
-  AppCloudHelper.instance.delete_user
+  # delete-user requires admin so no longer works, see also 'cleanup'
+  # AppCloudHelper.instance.delete_user
 end
 
 After("@creates_simple_app") do
