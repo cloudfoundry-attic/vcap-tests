@@ -473,18 +473,22 @@ end
 
 
 Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
-  contents = post_to_app @app, "service/#{service}/#{key}", body
-  contents.response_code.should == 200
-  contents.close
+  if @service
+    contents = post_to_app @app, "service/#{service}/#{key}", body
+    contents.response_code.should == 200
+    contents.close
+  end
 end
 
 Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\w+)$/ do |service, key, value|
-  contents = get_app_contents @app, "service/#{service}/#{key}"
-  contents.should_not == nil
-  contents.body_str.should_not == nil
-  contents.response_code.should == 200
-  contents.body_str.should == value
-  contents.close
+  if @service
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.should_not == nil
+    contents.body_str.should_not == nil
+    contents.response_code.should == 200
+    contents.body_str.should == value
+    contents.close
+  end
 end
 
 Then /^I should be able to access the updated version of my application$/ do
@@ -525,25 +529,30 @@ Then /^I should be able to access the original version of my application$/ do
 end
 
 Then /^I delete my service$/ do
-  s = delete_service @service[:name]
+  if @service
+    s = delete_service @service[:name]
+  end
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|
-  @service = case requested_service
-  when "mysql" then provision_db_service @token
-  when "redis" then provision_redis_service @token
-  when "mongodb" then provision_mongodb_service @token
-  when "rabbitmq" then provision_rabbitmq_service @token
-  when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
-  end
+  @service = nil
+  if find_service requested_service
+    @service = case requested_service
+               when "mysql" then provision_db_service @token
+               when "redis" then provision_redis_service @token
+               when "mongodb" then provision_mongodb_service @token
+               when "rabbitmq" then provision_rabbitmq_service @token
+               when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
+               end
 
-  attach_provisioned_service @app, @service, @token
-  upload_app @app, @token
-  stop_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
+    attach_provisioned_service @app, @service, @token
+    upload_app @app, @token
+    stop_app @app, @token
+    start_app @app, @token
+    expected_health = 1.0
+    health = poll_until_done @app, expected_health, @token
+    health.should == expected_health
+  end
 end
 
 # Simple Sinatra CRUD application that uses MySQL
@@ -622,7 +631,7 @@ Given /^I deploy a hibernate application that is backed by the PostgreSQL databa
   end
 
   # find postgresql service in the list
-  postgresql_service = services_list.find {|service| service[:vendor].downcase == "postgresql"}
+  postgresql_service = find_service "postgresql"
 
   if postgresql_service
     @app = create_app HIBERNATE_APP, @token
