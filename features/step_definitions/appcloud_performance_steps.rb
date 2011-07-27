@@ -365,7 +365,7 @@ def create_failed_app_with_runtime_and_framework app, token, runtime, framework
   begin
     response = @client.create_app appname, manifest
   rescue Exception => e
-    return e 
+    return e
   end
   return response
 end
@@ -379,4 +379,4 @@ def calculate_frameworks_list
     frameworks_list << k
   end
   @frameworks_list = frameworks_list
-end  
+end

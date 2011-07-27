@@ -526,7 +526,7 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
-   def provision_rabbitmq_srs_service token 
+   def provision_rabbitmq_srs_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_srs_app'}rabbitmq_srs"
      @client.create_service('rabbitmq-srs', name)
      service_manifest = {
@@ -540,7 +540,7 @@ class AppCloudHelper
      service_manifest
    end
 
-   def provision_rabbitmq_service token 
+   def provision_rabbitmq_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_app'}rabbitmq"
      @client.create_service(:rabbitmq, name)
      service_manifest = {

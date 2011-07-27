@@ -94,10 +94,10 @@ Feature: Deploy all canonical apps and check their services
       When I delete my application
       Then it should not be on AppCloud
 
-	  Scenario: rails test services
+    Scenario: rails test services
       Given I have deployed my application named app_rails_service
-	    When I query status of my application
-	    Then I should get the state of my application
+      When I query status of my application
+	  Then I should get the state of my application
       Then I should be able to access my application root and see hello from rails
       Then I should be able to access crash and it should crash
       When I provision mysql service
