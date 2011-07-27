@@ -25,7 +25,7 @@ require 'digest/sha1'
 # Author:: A.B.Srinivasan
 # Copyright:: Copyright (c) 2010 VMware Inc.
 
-TEST_AUTOMATION_USER_ID = "tester@vcap.example.com"
+TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
 REDIS_LB_APP = "redis_lb_app"
