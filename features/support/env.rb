@@ -521,6 +521,29 @@ class AppCloudHelper
     @client.services_info
   end
 
+  def services_list
+    return @services_list if @services_list
+
+    # flatten
+    @services_list = []
+
+    services = get_services @token
+    services.each do |service_type, value|
+      value.each do |k,v|
+        # k is really the vendor
+        v.each do |version, s|
+          @services_list << s
+        end
+      end
+    end
+
+    return @services_list
+  end
+
+  def find_service vendor
+    services_list.find { |s| s[:vendor].downcase == vendor }
+  end
+
   def get_frameworks token
     response = HTTPClient.get "#{@base_uri}/info", nil, auth_hdr(token)
     frameworks = JSON.parse(response.content)

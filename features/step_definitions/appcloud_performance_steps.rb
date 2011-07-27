@@ -97,25 +97,11 @@ Given /^I have my env_test app on AppCloud$/ do
   # enumerate system services. IFF aurora is present,
   # bind to aurora. If not, bind to other services
 
-  services = get_services @token
-
-  # flatten
-  services_list = []
-
-  services.each do |service_type, value|
-    value.each do |k,v|
-      # k is really the vendor
-      v.each do |version, s|
-        services_list << s
-      end
-    end
-  end
-
   # look through the services list. for each available service
   # bind to the service, adapt if service isn't running
   @should_be_there = []
   ["aurora", "redis"].each do |v|
-    s = services_list.find {|service| service[:vendor].downcase == v}
+    s = find_service v
     if s
 
       # create named service
@@ -152,9 +138,8 @@ Given /^I have my mozyatmos app on AppCloud$/ do
 
   # the mozy service needs to be available
   vendor = 'mozyatmos'
-  s = @services_list.find {|service| service[:vendor].downcase == vendor}
 
-  if s
+  if find_service vendor
     # create named service
     myname = "my-#{'vendor'}"
     name = mozyatmos_name(myname)
@@ -174,8 +159,7 @@ Given /^I have my mozyatmos app on AppCloud$/ do
 end
 
 Given /^The appcloud instance has a set of available services$/ do
-  calculate_service_list
-  @services_list.length.should > 1
+  services_list.length.should > 1
 end
 
 Then /^env_test's health_check entrypoint should return OK$/ do
@@ -191,7 +175,7 @@ Then /^it should be bound to an atmos service$/ do
   # execute this block, but only if mozy service is present
   # in the system
   vendor = 'mozyatmos'
-  s = @services_list.find {|service| service[:vendor].downcase == vendor}
+  s = find_service vendor
   if s
 
     app_info = get_app_status @app, @token
@@ -279,23 +263,6 @@ After("@env_test_check") do |scenario|
   if(scenario.failed?)
      puts "The scenario failed #{scenario}"
   end
-end
-
-def calculate_service_list
-  services = get_services @token
-
-  # flatten
-  services_list = []
-
-  services.each do |service_type, value|
-    value.each do |k,v|
-      # k is really the vendor
-      v.each do |version, s|
-        services_list << s
-      end
-    end
-  end
-  @services_list = services_list
 end
 
 Given /^The appcloud instance has a set of available frameworks$/ do
