@@ -187,6 +187,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+    delete_services(all_my_services) unless @registered_user
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
     # git history if it needs to be revived.
