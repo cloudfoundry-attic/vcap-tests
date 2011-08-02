@@ -24,7 +24,7 @@ public class RabbitSRSServiceCreator extends RabbitServiceCreator {
 		String env = this.cloudEnvironment.getValue("VCAP_SERVICES");
 		JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON(env);
 		JSONObject rabbit = (JSONObject) jsonObject.getJSONArray(
-				"rabbitmq-srs-2.4.1").get(0);
+				"rabbitmq-2.4").get(0);
 		String strUrl = rabbit.getJSONObject("credentials").getString("url");
 		URI uri = null;
 		try {
