@@ -140,7 +140,7 @@ public class ServiceController {
 		out.print((String) amq.receiveAndConvert(key));
 	}
 
-	@RequestMapping(value = "/service/rabbitsrs/{key}", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/rabbitmq/{key}", method = RequestMethod.POST)
 	public void rabbitsrs_post(@RequestBody String body,
 			@PathVariable String key, HttpServletResponse response)
 			throws IOException {
@@ -150,7 +150,7 @@ public class ServiceController {
 		out.print(body);
 	}
 
-	@RequestMapping(value = "/service/rabbitsrs/{key}", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/rabbitmq/{key}", method = RequestMethod.GET)
 	public void rabbitsrs_get(@PathVariable String key,
 			HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
@@ -174,20 +174,16 @@ public class ServiceController {
 
 	private RabbitTemplate loadSRSRabbit(String key) {
 		try {
-			Connection conn = connectionRabbitSRS().createConnection();
+			Connection conn = connectionRabbit().createConnection();
 			Channel channel = conn.createChannel(true);
 			channel.exchangeDeclare(key, "direct");
 			channel.queueDeclare(key, true, false, false, null);
 			channel.close();
-			return new RabbitTemplate(connectionRabbitSRS());
+			return new RabbitTemplate(connectionRabbit());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new AmqpException("Failed to create rabbit template");
 		}
-	}
-
-	private ConnectionFactory connectionRabbitSRS() {
-		return new RabbitSRSServiceCreator(environment()).createService();
 	}
 
 	private ConnectionFactory connectionRabbit() {

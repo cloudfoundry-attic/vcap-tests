@@ -102,10 +102,10 @@ var app = [
       res.end();
     });
   }],
-  [get(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+  [get(/^\/service\/rabbitmq\/(\w+)$/), function(req, res, key) {
     res.end(msg_value);
   }],
-  [post(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+  [post(/^\/service\/rabbitmq\/(\w+)$/), function(req, res, key) {
     getBody(req, function(body){
       rabbitsrs(key,body);
       res.end();
@@ -150,7 +150,7 @@ function load_service(service_name){
 }
 
 function rabbitsrs(key, value, res){
-  var service = load_service('rabbitmq-srs');
+  var service = load_service('rabbitmq');
   var amqp = require('./lib/node-amqp');
   url = require('url').parse(service['url']);
   var hostname = url['hostname'];
