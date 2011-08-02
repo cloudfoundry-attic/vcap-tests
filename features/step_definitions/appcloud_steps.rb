@@ -320,7 +320,7 @@ end
 
 Then /^I should get information representing my application\'s resource use\.$/ do
   @app_stats.should_not == nil
-  stats = @app_stats.to_a[1][1]
+  stats = @app_stats[:stats]
   stats.should_not == nil
   appname = get_app_name @app
   stats[:name].should == appname
@@ -332,7 +332,7 @@ Then /^I should get information representing my application\'s resource use\.$/ 
     sleep sleep_time
     timeout -= sleep_time
     @app_stats = get_app_stats @app, @token
-    stats = @app_stats.to_a[1][1]
+    stats = @app_stats[:stats]
   end
 
   stats[:usage].should_not == nil
