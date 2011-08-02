@@ -69,14 +69,14 @@ get '/service/rabbit/:key' do
   read_from_rabbit(params[:key], client)
 end
 
-post '/service/rabbitsrs/:key' do
+post '/service/rabbitmq/:key' do
   value = request.env["rack.input"].read
   client = rabbit_srs_service
   write_to_rabbit(params[:key], value, client)
   value
 end
 
-get '/service/rabbitsrs/:key' do
+get '/service/rabbitmq/:key' do
   client = rabbit_srs_service
   read_from_rabbit(params[:key], client)
 end
@@ -113,7 +113,7 @@ def rabbit_service
 end
 
 def rabbit_srs_service
-  service = load_service('rabbitmq-srs')
+  service = load_service('rabbitmq')
   uri = URI.parse(service['url'])
   host = uri.host
   port = uri.port

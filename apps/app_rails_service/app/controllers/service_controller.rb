@@ -25,7 +25,7 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'rabbit'
         client = rabbit_service
         value = write_to_rabbit(params[:key], value, client)
-      elsif params[:service] == 'rabbitsrs'
+      elsif params[:service] == 'rabbitmq'
         client = rabbit_srs_service
         value = write_to_rabbit(params[:key], value, client)
       end
@@ -39,7 +39,7 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'rabbit'
         client = rabbit_service
         value = read_from_rabbit params[:key], client
-      elsif params[:service] == 'rabbitsrs'
+      elsif params[:service] == 'rabbitmq'
         client = rabbit_srs_service
         value = read_from_rabbit params[:key], client
       end
@@ -56,7 +56,7 @@ class ServiceController < ApplicationController
   end
 
   def rabbit_srs_service
-    service = load_service('rabbitmq-srs')
+    service = load_service('rabbitmq')
     uri = URI.parse(service['url'])
     host = uri.host
     port = uri.port
