@@ -137,9 +137,11 @@ export BUNDLE_PATH=#{BuildConfig.bundle_path}
 #{start_command_for 'redis_node'}
 #{start_command_for 'mysql_node'}
 #{start_command_for 'mongodb_node'}
+#{start_command_for 'neo4j_node'}
 #{start_command_for 'redis_gateway'}
 #{start_command_for 'mysql_gateway'}
 #{start_command_for 'mongodb_gateway'}
+#{start_command_for 'neo4j_gateway'}
 START
 
     File.open(BuildConfig.service_startup_script, 'w') do |fh|
