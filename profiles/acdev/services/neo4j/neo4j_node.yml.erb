@@ -1,0 +1,13 @@
+---
+local_db: sqlite3:<%= config.working_dir %>/services/neo4j/neo4j_node.db
+mbus: <%= config.nats_uri %>
+base_dir: <%= config.working_dir %>/services/neo4j/instances
+log_level: DEBUG
+pid: <%= config.working_dir %>/sys/run/neo4j_node.pid
+available_memory: 4096
+max_memory: 128
+node_id: neo4j_node_1
+neo4j_path: <%= config.working_dir %>/services/neo4j
+port_range:
+  first: 45000
+  last: 55000
