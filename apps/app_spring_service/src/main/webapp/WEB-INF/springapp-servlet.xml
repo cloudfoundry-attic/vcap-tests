@@ -32,7 +32,7 @@ http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
-	<jdbc:initialize-database data-source="dataSource">
+	<jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
 		<jdbc:script location="classpath:db-schema.sql" />
 	</jdbc:initialize-database>
 
