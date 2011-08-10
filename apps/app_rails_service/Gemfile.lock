@@ -51,6 +51,7 @@ GEM
       activesupport (~> 3.0.0)
       plucky (~> 0.3.6)
     mysql2 (0.2.7)
+    pg (0.11.0)
     plucky (0.3.7)
       mongo (~> 1.1)
     polyglot (0.3.1)
@@ -93,6 +94,7 @@ DEPENDENCIES
   mongo
   mongo_mapper
   mysql2
+  pg
   rails (~> 3.0.5)
   redis
   sqlite3

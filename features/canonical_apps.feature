@@ -28,6 +28,10 @@ Feature: Deploy all canonical apps and check their services
       Then I post rabbitabc to rabbitmq service with key abc
       Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
       Then I delete my service
+      When I provision postgresql service
+      Then I post postgresqlabc to postgresql service with key abc
+      Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+      Then I delete my service
       When I delete my application
       Then it should not be on AppCloud
 
@@ -52,6 +56,10 @@ Feature: Deploy all canonical apps and check their services
       When I provision rabbitmq service
       Then I post rabbitabc to rabbitmq service with key abc
       Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
+      Then I delete my service
+      When I provision postgresql service
+      Then I post postgresqlabc to postgresql service with key abc
+      Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
       Then I delete my service
       When I delete my application
       Then it should not be on AppCloud
@@ -79,6 +87,10 @@ Feature: Deploy all canonical apps and check their services
       Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
       Then I delete my service
       Then I delete all my service
+      When I provision postgresql service
+      Then I post postgresqlabc to postgresql service with key abc
+      Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+      Then I delete my service
       When I delete my application
       Then it should not be on AppCloud
 
@@ -103,6 +115,10 @@ Feature: Deploy all canonical apps and check their services
       When I provision rabbitmq service
       Then I post rabbitabc to rabbitmq service with key abc
       Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
+      Then I delete my service
+      When I provision postgresql service
+      Then I post postgresqlabc to postgresql service with key abc
+      Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
       Then I delete my service
       When I delete my application
       Then it should not be on AppCloud
