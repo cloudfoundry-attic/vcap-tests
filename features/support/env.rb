@@ -592,6 +592,19 @@ class AppCloudHelper
        service_manifest
      end
 
+  def provision_postgresql_service
+    name = "#{@namespace}#{@app || 'simple_db_app'}postgresql"
+    @client.create_service(:postgresql, name)
+    service_manifest = {
+      :type=>"database",
+      :vendor=>"postgresql",
+      :tier=>"free",
+      :version=>"9.0",
+      :name=>name,
+      :options=>{"size"=>"256MiB"},
+    }
+  end
+
   def provision_db_service token
     name = "#{@namespace}#{@app || 'simple_db_app'}mysql"
     @client.create_service(:mysql, name)

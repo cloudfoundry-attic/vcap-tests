@@ -542,6 +542,7 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
                when "redis" then provision_redis_service @token
                when "mongodb" then provision_mongodb_service @token
                when "rabbitmq" then provision_rabbitmq_service @token
+               when "postgresql" then provision_postgresql_service
                when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
                end
 

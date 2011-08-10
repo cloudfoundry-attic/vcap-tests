@@ -86,6 +86,26 @@ public class ServiceController {
 		out.print(d.getDataValue());
 	}
 
+	@RequestMapping(value = "/service/postgresql/{key}", method = RequestMethod.POST)
+	public void postgresql_post(@RequestBody String body, @PathVariable String key,
+			HttpServletResponse response) throws IOException {
+		PrintWriter out = response.getWriter();
+		DataValue d = new DataValue();
+		d.setId(key);
+		d.setDataValue(body);
+		referenceRepository.save(d);
+		out.print(body);
+	}
+
+	@RequestMapping(value = "/service/postgresql/{key}", method = RequestMethod.GET)
+	public void postgresql_get(@PathVariable String key, HttpServletResponse response)
+			throws IOException {
+		PrintWriter out = response.getWriter();
+		DataValue d = referenceRepository.find(key);
+		out.print(d.getDataValue());
+	}
+
+	
 	@RequestMapping(value = "/service/rabbit/{key}", method = RequestMethod.POST)
 	public void rabbit_post(@RequestBody String body, @PathVariable String key,
 			HttpServletResponse response) throws IOException {
