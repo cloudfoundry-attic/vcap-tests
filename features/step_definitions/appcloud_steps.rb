@@ -223,6 +223,16 @@ Given /^I have deployed a simple PHP application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a simple Clojure application$/ do
+  pending_unless_framework_exists(@token, "clojure")
+  @app = create_app SIMPLE_CLOJURE_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a simple Python application$/ do
   pending_unless_framework_exists(@token, "wsgi")
   @app = create_app SIMPLE_PYTHON_APP, @token

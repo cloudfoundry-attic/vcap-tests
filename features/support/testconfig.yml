@@ -121,3 +121,8 @@ simple_php_app:
   framework: "php"
   startup: php
   memory: 64
+
+simple_clojure_app:
+  framework: "clojure"
+  startup: "lein run"
+  memory: 512

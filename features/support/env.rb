@@ -33,6 +33,7 @@ ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
 SIMPLE_DB_APP = "simple_db_app"
 SIMPLE_PHP_APP = "simple_php_app"
+SIMPLE_CLOJURE_APP = "simple_clojure_app"
 BROKEN_APP = "broken_app"
 RAILS3_APP = "rails3_app"
 JPA_APP = "jpa_app"
@@ -135,6 +136,10 @@ end
 
 After("@creates_simple_php_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
+end
+
+After("@creates_simple_clojure_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_CLOJURE_APP
 end
 
 at_exit do
