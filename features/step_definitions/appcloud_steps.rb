@@ -214,6 +214,7 @@ Given /^I have deployed a simple Erlang application$/ do
 end
 
 Given /^I have deployed a simple Python application$/ do
+  pending_unless_framework_exists(@token, "wsgi")
   @app = create_app SIMPLE_PYTHON_APP, @token
   upload_app @app, @token
   start_app @app, @token
@@ -223,6 +224,7 @@ Given /^I have deployed a simple Python application$/ do
 end
 
 Given /^I have deployed a Django application$/ do
+  pending_unless_framework_exists(@token, "django")
   @app = create_app SIMPLE_DJANGO_APP, @token
   upload_app @app, @token
   start_app @app, @token
@@ -232,6 +234,7 @@ Given /^I have deployed a Django application$/ do
 end
 
 Given /^I have deployed a Python application with a dependency$/ do
+  pending_unless_framework_exists(@token, "wsgi")
   @app = create_app PYTHON_APP_WITH_DEPENDENCIES, @token
   upload_app @app, @token
   start_app @app, @token

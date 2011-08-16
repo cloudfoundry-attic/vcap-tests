@@ -568,6 +568,12 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
+  def pending_unless_framework_exists(token, framework)
+    unless get_frameworks(token).include?(framework)
+      pending "Not running #{framework} based test because #{framework} is not available in this Cloud Foundry instance."
+    end
+  end
+
    def provision_rabbitmq_srs_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_srs_app'}rabbitmq_srs"
      @client.create_service('rabbitmq-srs', name)
