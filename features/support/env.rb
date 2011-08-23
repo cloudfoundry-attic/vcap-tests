@@ -43,6 +43,7 @@ ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
+SIMPLE_PHP_APP = "php_app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 
 After do
@@ -107,6 +108,10 @@ end
 
 After("@creates_simple_lift_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
+end
+
+After("@creates_php_app") do
+    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
 end
 
 After("@creates_lift_db_app") do
@@ -548,6 +553,12 @@ class AppCloudHelper
     response = HTTPClient.get "#{@base_uri}/info", nil, auth_hdr(token)
     frameworks = JSON.parse(response.content)
     frameworks['frameworks']
+  end
+
+  def pending_unless_framework_exists(token, framework)
+    unless get_frameworks(token).include?(framework)
+      pending "Not running #{framework} based test because #{framework} is not available in this Cloud Foundry instance."
+    end
   end
 
    def provision_rabbitmq_srs_service token
