@@ -223,6 +223,36 @@ Given /^I have deployed a simple PHP application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a simple Python application$/ do
+  pending_unless_framework_exists(@token, "wsgi")
+  @app = create_app SIMPLE_PYTHON_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed a Django application$/ do
+  pending_unless_framework_exists(@token, "django")
+  @app = create_app SIMPLE_DJANGO_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed a Python application with a dependency$/ do
+  pending_unless_framework_exists(@token, "wsgi")
+  @app = create_app PYTHON_APP_WITH_DEPENDENCIES, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token

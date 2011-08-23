@@ -45,6 +45,9 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 SIMPLE_PHP_APP = "php_app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
+SIMPLE_PYTHON_APP = "simple_wsgi_app"
+PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
+SIMPLE_DJANGO_APP = "simple_django_app"
 
 After do
   AppCloudHelper.instance.cleanup
@@ -122,6 +125,18 @@ After("@creates_tomcat_version_check_app") do
   AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
 end
 
+After("@creates_wsgi_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
+end
+
+After("@creates_wsgi_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
+end
+
+After("@creates_django_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_DJANGO_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -192,6 +207,9 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+    delete_app_internal(SIMPLE_PYTHON_APP)
+    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
+    delete_app_internal(SIMPLE_DJANGO_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the

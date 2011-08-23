@@ -112,3 +112,12 @@ my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
   memory: 64
+
+simple_wsgi_app:
+  framework: "wsgi"
+
+wsgi_app_with_requirements:
+  framework: "wsgi"
+
+simple_django_app:
+  framework: "django"
