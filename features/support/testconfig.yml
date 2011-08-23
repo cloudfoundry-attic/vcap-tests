@@ -77,6 +77,11 @@ lift-db-app:
   startup: "thin start"
   memory: 512
 
+php_app:
+  framework: "php"
+  startup: "php"
+  memory: 256
+
 tomcat-version-check-app:
   framework: "spring_web/1.0"
   startup: "thin start"
