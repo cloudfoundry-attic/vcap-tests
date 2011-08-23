@@ -43,6 +43,7 @@ ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
+SIMPLE_PHP_APP = "php_app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
@@ -110,6 +111,10 @@ end
 
 After("@creates_simple_lift_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
+end
+
+After("@creates_php_app") do
+    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
 end
 
 After("@creates_lift_db_app") do
