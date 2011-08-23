@@ -32,6 +32,7 @@ REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
 SIMPLE_DB_APP = "simple_db_app"
+SIMPLE_PHP_APP = "simple_php"
 BROKEN_APP = "broken_app"
 RAILS3_APP = "rails3_app"
 JPA_APP = "jpa_app"
@@ -117,6 +118,10 @@ After("@creates_tomcat_version_check_app") do
   AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
 end
 
+After("@creates_simple_php_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -187,6 +192,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+    delete_app_internal(SIMPLE_PHP_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the

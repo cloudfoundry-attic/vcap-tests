@@ -107,3 +107,8 @@ my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
   memory: 64
+
+simple_php:
+  framework: "php"
+  startup: php
+  memory: 64
