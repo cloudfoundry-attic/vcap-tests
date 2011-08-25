@@ -1,0 +1,19 @@
+--- 
+conf/server.xml: 
+  :digest: 2a5d6b84929943152c7f8023ae32670f4f2437ae
+  :size: 1768
+conf/context.xml: 
+  :digest: f855881cc437295b78a218f62d05df4d68c30a60
+  :size: 1122
+lib/mysql-connector-java-5.1.12-bin.jar: 
+  :digest: 14ae02cc2adb2aed677080a0c0356e7569e298ec
+  :size: 732695
+lib/postgresql-9.0-801.jdbc4.jar: 
+  :digest: 153f2f92a786f12fc111d0111f709012df87c808
+  :size: 539705
+lib/TomcatStartupListener-1.0.jar: 
+  :digest: e1914248c1e28145910b008b1303821c05bd1533
+  :size: 7027
+tomcat_manifest.yml: 
+  :digest: 698ccd3523dc20f848f8c00ce255afd1a4895d77
+  :size: 552

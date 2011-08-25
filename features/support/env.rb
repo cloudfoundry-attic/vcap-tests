@@ -168,15 +168,9 @@ class AppCloudHelper
     @namespace = ENV['VCAP_BVT_NS'] || ''
     puts "** Using namespace: '#{@namespace}' **\n\n" unless @namespace.empty?
 
-    config_file = File.join(File.dirname(__FILE__), 'testconfig.yml')
-    begin
-      @config = File.open(config_file) do |f|
-        YAML.load(f)
-      end
-    rescue => e
-      puts "Could not read configuration file:  #{e}"
-      exit
-    end
+    @config = load_test_support_file('testconfig.yml')
+    exit unless @config
+
     @testapps_dir = File.join(File.dirname(__FILE__), '../../apps')
     @client = VMC::Client.new(@base_uri)
 
@@ -811,4 +805,20 @@ class AppCloudHelper
   def get_expected_tomcat_version
     @config[@app]['tomcat_version']
   end
+
+  def get_expected_tomcat_digest
+    load_test_support_file 'cf_tomcat.digest'
+  end
+
+  def load_test_support_file file
+    filename = File.join(File.dirname(__FILE__), file)
+    begin
+      contents = File.open(filename) do |f|
+        YAML.load(f)
+      end
+    rescue => e
+      puts "Could not read #{filenamet} file:  #{e}"
+    end
+  end
+
 end
