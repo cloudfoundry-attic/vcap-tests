@@ -12,3 +12,4 @@ ci-working-dir
 *.swp
 .rvmrc
 *.pyc
+.DS_Store

@@ -32,6 +32,7 @@ REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
 SIMPLE_DB_APP = "simple_db_app"
+SIMPLE_PHP_APP = "simple_php_app"
 BROKEN_APP = "broken_app"
 RAILS3_APP = "rails3_app"
 JPA_APP = "jpa_app"
@@ -43,7 +44,6 @@ ROO_APP = "roo_app"
 SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
-SIMPLE_PHP_APP = "php_app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
@@ -113,10 +113,6 @@ After("@creates_simple_lift_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
 end
 
-After("@creates_php_app") do
-    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
-end
-
 After("@creates_lift_db_app") do
   AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
 end
@@ -135,6 +131,10 @@ end
 
 After("@creates_django_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_DJANGO_APP
+end
+
+After("@creates_simple_php_app") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
 end
 
 at_exit do
@@ -210,6 +210,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_PYTHON_APP)
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
+    delete_app_internal(SIMPLE_PHP_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the

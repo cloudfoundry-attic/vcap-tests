@@ -77,11 +77,6 @@ lift-db-app:
   startup: "thin start"
   memory: 512
 
-php_app:
-  framework: "php"
-  startup: "php"
-  memory: 256
-
 tomcat-version-check-app:
   framework: "spring_web/1.0"
   startup: "thin start"
@@ -121,3 +116,8 @@ wsgi_app_with_requirements:
 
 simple_django_app:
   framework: "django"
+
+simple_php_app:
+  framework: "php"
+  startup: php
+  memory: 64

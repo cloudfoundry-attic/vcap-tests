@@ -5,7 +5,7 @@ Feature: Use PHP on AppCloud
   Background: Authentication
     Given I have registered and logged in
 
-  @creates_php_app
+  @creates_simple_php_app
   Scenario: Deploy Simple PHP Application
     Given I have deployed a simple PHP application
     Then it should be available for use
