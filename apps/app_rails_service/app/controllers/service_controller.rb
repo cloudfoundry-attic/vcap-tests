@@ -18,6 +18,8 @@ class ServiceController < ApplicationController
       value = request.raw_post
       if params[:service] == 'redis'
         $redis[params[:key]] = value
+      elsif params[:service] == 'postgresql'
+        DataValue.new(:key => params[:key], :data_value => value).save
       elsif params[:service] == 'mysql'
         DataValue.new(:key => params[:key], :data_value => value).save
       elsif params[:service] == 'mongo'
@@ -32,6 +34,8 @@ class ServiceController < ApplicationController
     else
       if params[:service] == 'redis'
         value = $redis[params[:key]]
+      elsif params[:service] == 'postgresql'
+        value = DataValue.where(:key => params[:key]).first.data_value
       elsif params[:service] == 'mysql'
         value = DataValue.where(:key => params[:key]).first.data_value
       elsif params[:service] == 'mongo'

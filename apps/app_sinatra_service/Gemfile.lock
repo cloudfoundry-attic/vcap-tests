@@ -7,6 +7,7 @@ GEM
     mongo (1.2.4)
       bson (>= 1.2.4)
     mysql2 (0.3.2)
+    pg (0.11.0)
     rack (1.2.2)
     redis (2.2.0)
     sinatra (1.2.6)
@@ -22,5 +23,6 @@ DEPENDENCIES
   json
   mongo
   mysql2
+  pg
   redis
   sinatra

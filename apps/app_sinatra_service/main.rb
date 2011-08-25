@@ -5,6 +5,7 @@ require 'mongo'
 require 'mysql2'
 require 'carrot'
 require 'uri'
+require 'pg'
 
 get '/env' do
   ENV['VMC_SERVICES']
@@ -57,6 +58,21 @@ get '/service/mysql/:key' do
   result.first['data_value']
 end
 
+post '/service/postgresql/:key' do
+  client = load_postgresql
+  value = request.env["rack.input"].read
+  client.query("insert into data_values (id, data_value) values('#{params[:key]}','#{value}');")
+  client.close
+  value
+end
+
+get '/service/postgresql/:key' do
+  client = load_postgresql
+  value = client.query("select data_value from  data_values where id = '#{params[:key]}'").first['data_value']
+  client.close
+  value
+end
+
 post '/service/rabbit/:key' do
   value = request.env["rack.input"].read
   client = rabbit_service
@@ -100,6 +116,15 @@ def load_mongo
   db = conn[mongodb_service['db']]
   coll = db['data_values'] if db.authenticate(mongodb_service['username'], mongodb_service['password'])
 end
+
+
+def load_postgresql
+  postgresql_service = load_service('postgresql')
+  client = PGconn.open(postgresql_service['host'], postgresql_service['port'], :dbname => postgresql_service['name'], :user => postgresql_service['username'], :password => postgresql_service['password'])
+  client.query("create table data_values (id varchar(20), data_value varchar(20));") if client.query("select * from information_schema.tables where table_name = 'data_values';").first.nil?
+  client
+end
+
 
 def load_service(service_name)
   services = JSON.parse(ENV['VMC_SERVICES'])
