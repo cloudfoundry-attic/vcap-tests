@@ -213,6 +213,46 @@ Given /^I have deployed a simple Erlang application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a simple PHP application$/ do
+  pending_unless_framework_exists(@token, "php")
+  @app = create_app SIMPLE_PHP_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed a simple Python application$/ do
+  pending_unless_framework_exists(@token, "wsgi")
+  @app = create_app SIMPLE_PYTHON_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed a Django application$/ do
+  pending_unless_framework_exists(@token, "django")
+  @app = create_app SIMPLE_DJANGO_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed a Python application with a dependency$/ do
+  pending_unless_framework_exists(@token, "wsgi")
+  @app = create_app PYTHON_APP_WITH_DEPENDENCIES, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token
@@ -542,6 +582,7 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
                when "redis" then provision_redis_service @token
                when "mongodb" then provision_mongodb_service @token
                when "rabbitmq" then provision_rabbitmq_service @token
+               when "postgresql" then provision_postgresql_service
                when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
                end
 

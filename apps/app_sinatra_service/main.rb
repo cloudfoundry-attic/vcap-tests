@@ -5,6 +5,7 @@ require 'mongo'
 require 'mysql2'
 require 'carrot'
 require 'uri'
+require 'pg'
 
 get '/env' do
   ENV['VMC_SERVICES']
@@ -57,6 +58,21 @@ get '/service/mysql/:key' do
   result.first['data_value']
 end
 
+post '/service/postgresql/:key' do
+  client = load_postgresql
+  value = request.env["rack.input"].read
+  client.query("insert into data_values (id, data_value) values('#{params[:key]}','#{value}');")
+  client.close
+  value
+end
+
+get '/service/postgresql/:key' do
+  client = load_postgresql
+  value = client.query("select data_value from  data_values where id = '#{params[:key]}'").first['data_value']
+  client.close
+  value
+end
+
 post '/service/rabbit/:key' do
   value = request.env["rack.input"].read
   client = rabbit_service
@@ -69,14 +85,14 @@ get '/service/rabbit/:key' do
   read_from_rabbit(params[:key], client)
 end
 
-post '/service/rabbitsrs/:key' do
+post '/service/rabbitmq/:key' do
   value = request.env["rack.input"].read
   client = rabbit_srs_service
   write_to_rabbit(params[:key], value, client)
   value
 end
 
-get '/service/rabbitsrs/:key' do
+get '/service/rabbitmq/:key' do
   client = rabbit_srs_service
   read_from_rabbit(params[:key], client)
 end
@@ -101,6 +117,15 @@ def load_mongo
   coll = db['data_values'] if db.authenticate(mongodb_service['username'], mongodb_service['password'])
 end
 
+
+def load_postgresql
+  postgresql_service = load_service('postgresql')
+  client = PGconn.open(postgresql_service['host'], postgresql_service['port'], :dbname => postgresql_service['name'], :user => postgresql_service['username'], :password => postgresql_service['password'])
+  client.query("create table data_values (id varchar(20), data_value varchar(20));") if client.query("select * from information_schema.tables where table_name = 'data_values';").first.nil?
+  client
+end
+
+
 def load_service(service_name)
   services = JSON.parse(ENV['VMC_SERVICES'])
   service = services.find {|service| service["vendor"].downcase == service_name}
@@ -113,7 +138,7 @@ def rabbit_service
 end
 
 def rabbit_srs_service
-  service = load_service('rabbitmq-srs')
+  service = load_service('rabbitmq')
   uri = URI.parse(service['url'])
   host = uri.host
   port = uri.port

@@ -158,9 +158,13 @@
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>cloudfoundry-runtime</artifactId>
-			<version>0.6.1</version>
+			<version>0.7.1</version>
 		</dependency>
-
+		<dependency>
+		    <groupId>postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>9.0-801.jdbc4</version>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>

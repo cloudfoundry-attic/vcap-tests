@@ -18,6 +18,8 @@ class ServiceController < ApplicationController
       value = request.raw_post
       if params[:service] == 'redis'
         $redis[params[:key]] = value
+      elsif params[:service] == 'postgresql'
+        DataValue.new(:key => params[:key], :data_value => value).save
       elsif params[:service] == 'mysql'
         DataValue.new(:key => params[:key], :data_value => value).save
       elsif params[:service] == 'mongo'
@@ -25,13 +27,15 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'rabbit'
         client = rabbit_service
         value = write_to_rabbit(params[:key], value, client)
-      elsif params[:service] == 'rabbitsrs'
+      elsif params[:service] == 'rabbitmq'
         client = rabbit_srs_service
         value = write_to_rabbit(params[:key], value, client)
       end
     else
       if params[:service] == 'redis'
         value = $redis[params[:key]]
+      elsif params[:service] == 'postgresql'
+        value = DataValue.where(:key => params[:key]).first.data_value
       elsif params[:service] == 'mysql'
         value = DataValue.where(:key => params[:key]).first.data_value
       elsif params[:service] == 'mongo'
@@ -39,7 +43,7 @@ class ServiceController < ApplicationController
       elsif params[:service] == 'rabbit'
         client = rabbit_service
         value = read_from_rabbit params[:key], client
-      elsif params[:service] == 'rabbitsrs'
+      elsif params[:service] == 'rabbitmq'
         client = rabbit_srs_service
         value = read_from_rabbit params[:key], client
       end
@@ -56,7 +60,7 @@ class ServiceController < ApplicationController
   end
 
   def rabbit_srs_service
-    service = load_service('rabbitmq-srs')
+    service = load_service('rabbitmq')
     uri = URI.parse(service['url'])
     host = uri.host
     port = uri.port

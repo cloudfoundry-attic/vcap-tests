@@ -48,6 +48,21 @@ var app = [
       res.end();
     });
   }],
+  [get(/^\/service\/postgresql\/(\w+)$/), function(req, res, key) {
+    client = postgres_services(res);
+    client.query("select data_value from  data_values where id='" + key  + "'", function(err, results, fields){
+      res.respond(results[0].data_value);
+      client.close();
+    });
+  }],
+  [post(/^\/service\/postgresql\/(\w+)$/), function(req, res, key) {
+    getBody(req, function(body){
+      client = postgres_services(res);
+      client.query("insert into data_values (id, data_value) values('"+key+"','"+body+"');");
+      client.close();
+    });
+    res.end();
+  }],
   [get(/^\/service\/mysql\/(\w+)$/), function(req, res, key) {
     client = mysql_services();
     client.query('select data_value from  data_values where id = \''+ key+'\'', function(err, results, fields){
@@ -102,10 +117,10 @@ var app = [
       res.end();
     });
   }],
-  [get(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+  [get(/^\/service\/rabbitmq\/(\w+)$/), function(req, res, key) {
     res.end(msg_value);
   }],
-  [post(/^\/service\/rabbitsrs\/(\w+)$/), function(req, res, key) {
+  [post(/^\/service\/rabbitmq\/(\w+)$/), function(req, res, key) {
     getBody(req, function(body){
       rabbitsrs(key,body);
       res.end();
@@ -123,7 +138,14 @@ function redis_services(){
   return client;
 }
 
-
+function postgres_services(res){
+  var postgres_service = load_service('postgresql');
+  var sys = require("sys");
+  var pg = require('./lib/postgres-js/lib/postgres-pure');
+  var client = new pg.connect("pgsql://"+postgres_service['user']+":"+postgres_service['password']+"@"+postgres_service['hostname']+":"+postgres_service['port']+"/"+postgres_service['name']);
+  client.query("CREATE TABLE data_values (id varchar(20), data_value varchar(20))", function(err, results, fields){ });
+  return client;
+}
 function mysql_services(){
   var mysql_service = load_service('mysql');
   var Client = require("./lib/node-mysql").Client,
@@ -150,7 +172,7 @@ function load_service(service_name){
 }
 
 function rabbitsrs(key, value, res){
-  var service = load_service('rabbitmq-srs');
+  var service = load_service('rabbitmq');
   var amqp = require('./lib/node-amqp');
   url = require('url').parse(service['url']);
   var hostname = url['hostname'];

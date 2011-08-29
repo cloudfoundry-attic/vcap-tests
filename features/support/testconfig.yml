@@ -82,7 +82,7 @@ tomcat-version-check-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 128
-  tomcat_version: "6.0.26"
+  tomcat_version: "6.0.32"
 
 app_rails_service:
   framework: "rails/1.0"
@@ -113,3 +113,17 @@ neo4j_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby neo4j.rb"
   memory: 256
+
+simple_wsgi_app:
+  framework: "wsgi"
+
+wsgi_app_with_requirements:
+  framework: "wsgi"
+
+simple_django_app:
+  framework: "django"
+
+simple_php_app:
+  framework: "php"
+  startup: php
+  memory: 64
