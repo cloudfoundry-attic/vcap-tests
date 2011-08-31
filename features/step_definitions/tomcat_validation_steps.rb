@@ -1,6 +1,4 @@
 require 'rest_client'
-require 'yaml'
-
 
 Given /^I have deployed a Java servlet to get the web container version$/ do
   @app = create_app TOMCAT_VERSION_CHECK_APP, @token
@@ -26,21 +24,6 @@ Then /^the version should match the version of the Tomcat runtime that is packag
   # The Tomcat version reported by the servlet is of the form
   # 'Apache Tomcat/6.0.xx' for Tomcat 6 based releases.
   @version.split('/')[1].should == packaged_version
-end
-
-Then /^the contents of the digest should match the contents of the digest that is packaged for Cloud Foundry\.$/ do
-  deployed_digest = get_deployed_digest
-  deployed_digest.should_not == nil
-  dd = YAML.load(deployed_digest)
-  expected_digest = get_expected_tomcat_digest
-  expected_digest.should_not == nil
-  expected_digest.should == dd
-end
-
-def get_deployed_digest
-  instance = '0'
-  digest_file = "/tomcat/cf_tomcat.digest"
-  get_app_files @app, instance, digest_file, @token
 end
 
 def get_version

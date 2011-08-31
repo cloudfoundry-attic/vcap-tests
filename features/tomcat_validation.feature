@@ -11,4 +11,3 @@ Feature: Use Tomcat on Cloud Foundry
       When I get the version of the web container from the Java servlet
       Then the version should be that of a Tomcat runtime
       And the version should match the version of the Tomcat runtime that is packaged for Cloud Foundry
-      And the contents of the digest should match the contents of the digest that is packaged for Cloud Foundry.
