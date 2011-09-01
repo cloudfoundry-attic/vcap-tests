@@ -48,6 +48,7 @@ TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
+VCAP_JAVA_TEST_APP="vcap_java_test_app"
 
 After do
   AppCloudHelper.instance.cleanup
@@ -137,6 +138,10 @@ After("@creates_simple_php_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
 end
 
+After("@creates_vcap_java_test_app") do
+  AppCloudHelper.instance.delete_app_internal VCAP_JAVA_TEST_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -211,6 +216,7 @@ class AppCloudHelper
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
     delete_app_internal(SIMPLE_PHP_APP)
+    delete_app_internal(VCAP_JAVA_TEST_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
@@ -753,6 +759,16 @@ class AppCloudHelper
       uri << "/#{relative_path}"
     end
     uri
+  end
+
+  def environment_add app, k, v=nil
+    appname = get_app_name app
+    app = @client.app_info(appname)
+    env = app[:env] || []
+    k,v = k.split('=', 2) unless v
+    env << "#{k}=#{v}"
+    app[:env] = env
+    @client.update_app(appname, app)
   end
 
   def get_app_contents app, relative_path=nil
