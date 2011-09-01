@@ -6,6 +6,16 @@ Feature: Deploy applications that make use of autostaging
   Background: MySQL and PostgreSQL autostaging
     Given I have registered and logged in
 
+	  @creates_vcap_java_test_app @creates_services
+	  Scenario: start Spring Web Application specifying a Cloud Service and Data Source
+	    Given I deploy a Spring application using a Cloud Service and Data Source
+	    Then the Data Source should not be auto-configured
+
+	  @creates_vcap_java_test_app @creates_services
+	  Scenario: start Spring Web Application using Service Scan and a Data Source
+	    Given I deploy a Spring application using Service Scan and a Data Source
+	    Then the Data Source should not be auto-configured
+      
       @creates_jpa_app @creates_jpa_db_adapter
       Scenario: start Spring Web application using JPA and add some records
         Given I deploy a Spring JPA application using the MySQL DB service
