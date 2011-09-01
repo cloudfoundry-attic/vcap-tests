@@ -99,7 +99,6 @@ end
 
 Given /^I have deployed a Rails 3 application$/ do
   expected_health = 1.0
-  @service = provision_db_service @token
   health = create_and_start_app RAILS3_APP, expected_health
   health.should == expected_health
 end
