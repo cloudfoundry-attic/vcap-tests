@@ -70,3 +70,13 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring Hibernate application using the created PostgreSQL service
         Then I should have the same 3 records on retrieving all records from the application
+
+      @creates_vcap_java_test_app @creates_services
+      Scenario: start Spring Web Application specifying a Cloud Service and Data Source
+        Given I deploy a Spring application using a Cloud Service and Data Source
+        Then the Data Source should not be auto-configured
+
+      @creates_vcap_java_test_app @creates_services
+      Scenario: start Spring Web Application using Service Scan and a Data Source
+        Given I deploy a Spring application using Service Scan and a Data Source
+        Then the Data Source should not be auto-configured

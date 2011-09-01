@@ -2,6 +2,35 @@ require 'curb'
 require 'nokogiri'
 require 'pp'
 
+Given /^I deploy a Spring application using a Cloud Service and Data Source$/ do
+  expected_health = 1.0
+  create_and_upload_app VCAP_JAVA_TEST_APP
+  mongosvc = provision_mongodb_service @token
+  attach_provisioned_service @app, mongosvc, @token
+  mysqlsvc = provision_db_service @token
+  attach_provisioned_service @app, mysqlsvc, @token
+  environment_add @app,'TEST_PROFILE','auto-staging-off-using-cloud-service'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Given /^I deploy a Spring application using Service Scan and a Data Source$/ do
+  expected_health = 1.0
+  create_and_upload_app VCAP_JAVA_TEST_APP
+  mysqlsvc = provision_db_service @token
+  attach_provisioned_service @app, mysqlsvc, @token
+  environment_add @app,'TEST_PROFILE','auto-staging-off-using-service-scan'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the Data Source should not be auto-configured$/ do
+  response = get_app_contents @app, "mysql"
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should == 'jdbc:mysql://localhost:3306/vcap-java-test-app'
+end
+
 Given /^I deploy a Spring JPA application using the MySQL DB service$/ do
   expected_health = 1.0
   health = create_and_start_app JPA_APP, expected_health
@@ -141,6 +170,17 @@ def record_present record, list
   nil
 end
 
+def create_and_upload_app app
+  @app = create_app app, @token
+  upload_app @app, @token
+end
+
+def start_app_check_health expected_health
+  start_app @app, @token
+  health = poll_until_done @app, expected_health, @token
+  health
+end
+
 def create_and_start_app app, expected_health, service=nil
   @app = create_app app, @token
   if service == nil
@@ -234,6 +274,10 @@ Then /^I should have the same (\d+) records on retrieving all records from the R
   response.response_code.should == 200
   # The Roo page returns an extra row for the footer in the table .. hence the "+ 1"
   verify_contents arg1.to_i + 1, response.body_str, "//table/tr"
+end
+
+After("@creates_services") do |scenario|
+  delete_app_services
 end
 
 After("@creates_jpa_db_adapter") do |scenario|
