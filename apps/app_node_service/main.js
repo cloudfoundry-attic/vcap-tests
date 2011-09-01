@@ -143,7 +143,9 @@ function postgres_services(res){
   var sys = require("sys");
   var pg = require('./lib/postgres-js/lib/postgres-pure');
   var client = new pg.connect("pgsql://"+postgres_service['user']+":"+postgres_service['password']+"@"+postgres_service['hostname']+":"+postgres_service['port']+"/"+postgres_service['name']);
-  client.query("CREATE TABLE data_values (id varchar(20), data_value varchar(20))", function(err, results, fields){ });
+
+  client.query("CREATE OR REPLACE FUNCTION create_data_values_if_doesnot_exists() RETURNS void AS $$\n BEGIN\n IF NOT EXISTS(SELECT table_name FROM information_schema.tables where table_name = 'data_values') THEN\n CREATE TABLE data_values (id varchar(20), data_value varchar(20));\n END IF;\n RETURN;\n END;\n $$ LANGUAGE plpgsql; ", function(err, results, fields){ });
+  client.query("select create_data_values_if_doesnot_exists(); ", function(err, results, fields){ });
   return client;
 }
 function mysql_services(){
