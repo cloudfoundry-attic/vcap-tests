@@ -76,17 +76,17 @@ Then /^all (\d+) instances should participate$/ do |arg1|
 end
 
 Then /^all (\d+) instances should do within (\d+) percent of their fair share of the (\d+) operations$/ do |arg1, arg2, arg3|
-  @target = arg3.to_i / arg1.to_i
-  @slop = @target * (arg2.to_i/100.0)
+  @perf_target = arg3.to_i / arg1.to_i
+  @perf_slop = @perf_target * (arg2.to_i/100.0)
 
   response = get_app_contents @app, 'getstats'
   response.should_not == nil
   response.response_code.should == 200
-  @counters = JSON.parse(response.body_str)
+  counters = JSON.parse(response.body_str)
   response.close
 
-  @counters.each do |k,v|
-    v.to_i.should be_close(@target, @slop)
+  counters.each do |k,v|
+    v.to_i.should be_close(@perf_target, @perf_slop)
   end
 end
 
@@ -248,7 +248,7 @@ After("@lb_check") do |scenario|
       puts "The scenario failed due to unexpected load balance distribution from the router"
       puts "The following hash shows the per-instance counts along with the target and allowable deviation"
       pp @counters
-      puts "target: #{@target}, allowable deviation: #{@slop}"
+      puts "target: #{@perf_target}, allowable deviation: #{@perf_slop}"
     end
   end
 end

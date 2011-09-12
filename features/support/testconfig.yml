@@ -127,3 +127,8 @@ simple_php_app:
   framework: "php"
   startup: php
   memory: 64
+
+spring-env-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
