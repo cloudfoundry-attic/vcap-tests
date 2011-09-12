@@ -49,6 +49,7 @@ NEO4J_APP = "neo4j_app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
+SPRING_ENV_APP = "spring-env-app"
 
 After do
   AppCloudHelper.instance.cleanup
@@ -142,6 +143,10 @@ After("@creates_simple_php_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
 end
 
+After("@creates_spring_env_app") do
+  AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -217,6 +222,7 @@ class AppCloudHelper
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
     delete_app_internal(SIMPLE_PHP_APP)
+    delete_app_internal(SPRING_ENV_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
