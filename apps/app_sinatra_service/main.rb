@@ -30,14 +30,16 @@ post '/service/redis/:key' do
 end
 
 post '/service/mongo/:key' do
-  coll = load_mongo
+  db_data = load_mongo
+  coll = db_data.first
   value = request.env["rack.input"].read
   coll.insert( { '_id' => params[:key], 'data_value' => value } )
   value
 end
 
 get '/service/mongo/:key' do
-  coll = load_mongo
+  db_data = load_mongo
+  coll = db_data.first
   coll.find('_id' => params[:key]).to_a.first['data_value']
 end
 
@@ -49,13 +51,16 @@ post '/service/mysql/:key' do
   client = load_mysql
   value = request.env["rack.input"].read
   result = client.query("insert into data_values (id, data_value) values('#{params[:key]}','#{value}');")
+  client.close
   value
 end
 
 get '/service/mysql/:key' do
   client = load_mysql
   result = client.query("select data_value from  data_values where id = '#{params[:key]}'")
-  result.first['data_value']
+  value = result.first['data_value']
+  client.close
+  value
 end
 
 post '/service/postgresql/:key' do
@@ -115,6 +120,7 @@ def load_mongo
   conn = Mongo::Connection.new(mongodb_service['hostname'], mongodb_service['port'])
   db = conn[mongodb_service['db']]
   coll = db['data_values'] if db.authenticate(mongodb_service['username'], mongodb_service['password'])
+  [coll, db]
 end
 
 
