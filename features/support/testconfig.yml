@@ -132,3 +132,12 @@ spring-env-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+
+
+simple_kv_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+
+brokered_service_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
