@@ -137,7 +137,7 @@ Then /^it should be started$/ do
   status.should_not == nil
   status['state'].should == 'STARTED'
   expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 200, @token
   health.should == expected_health
 end
 
@@ -159,7 +159,7 @@ Then /^it should be stopped$/ do
   status.should_not == nil
   status['state'].should == 'STOPPED'
   expected_health = 0.0
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 404, @token
   health.should == expected_health
 end
 
@@ -176,7 +176,7 @@ Given /^I have deployed a simple application$/ do
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 200, @token
   health.should == expected_health
 end
 
@@ -198,7 +198,7 @@ Given /^I have deployed a simple Erlang application$/ do
   upload_app @app, @token, "rel/mochiweb_test"
   start_app @app, @token
   expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 200, @token
   health.should == expected_health
 end
 
@@ -207,7 +207,7 @@ Given /^I have deployed a tiny Java application$/ do
   upload_app @java_app, @token
   start_app @java_app, @token
   expected_health = 1.0
-  health = poll_until_done @java_app, expected_health, @token
+  health = poll_until_done @java_app, expected_health, 200, @token
   health.should == expected_health
 end
 
@@ -447,7 +447,7 @@ When /^I upload a modified simple application to AppCloud$/ do
 end
 
 When /^I update my application on AppCloud$/ do
-  @response = poll_until_update_app_done @app, @token
+  @response = poll_until_update_app_done @app, 200, @token
 end
 
 Then /^my update should succeed$/ do
@@ -479,7 +479,7 @@ Given /^I deploy my simple application that is backed by the MySql database serv
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 200, @token
   health.should == expected_health
 end
 

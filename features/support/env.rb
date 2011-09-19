@@ -1,6 +1,8 @@
 
 require 'rubygems'
 require 'bundler'
+require 'curb'
+
 Bundler.setup
 
 $:.unshift(File.join(File.dirname(__FILE__), '../../lib/client/lib'))
@@ -298,18 +300,20 @@ class AppCloudHelper
     raise "Problem starting application #{appname}." if response.status != 200
   end
 
-  def poll_until_done app, expected_health, token
+  def poll_until_done app, expected_health, expected_resp, token
     secs_til_timeout = @config['timeout_secs']
     health = nil
     sleep_time = 0.5
-    while secs_til_timeout > 0 && health != expected_health
+    http_resp = 404
+    until secs_til_timeout < 0 || ( health == expected_health && http_resp == expected_resp)
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
       status = get_app_status app, token
-      runningInstances = status['runningInstances'] || 0
-      health = runningInstances/status['instances'].to_f
+      runningInstances = status[:runningInstances] || 0
+      health = runningInstances/status[:instances].to_f
       # to mark? Not sure why this change, but breaks simple stop tests
       #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      http_resp = check_http app
     end
     health
   end
@@ -358,7 +362,7 @@ class AppCloudHelper
     response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
     raise "Problem setting instance count for application #{appname}." if response.status != 200
     expected_health = 1.0
-    poll_until_done app, expected_health, token
+    poll_until_done app, expected_health, 200, token
     new_instance_count
   end
 
@@ -388,7 +392,7 @@ class AppCloudHelper
     response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
     raise "Problem adding uri #{uri} to application #{appname}." if response.status != 200
     expected_health = 1.0
-    poll_until_done app, expected_health, token
+    poll_until_done app, expected_health, 200, token
   end
 
   def remove_app_uri app, uri, token
@@ -404,7 +408,7 @@ class AppCloudHelper
     response = @client.update_app_state_internal @droplets_uri, appname, app_manifest, auth_hdr(token)
     raise "Problem removing uri #{uri} from application #{appname}." if response.status != 200
     expected_health = 1.0
-    poll_until_done app, expected_health, token
+    poll_until_done app, expected_health, 200, token
   end
 
   def modify_and_upload_app app,token

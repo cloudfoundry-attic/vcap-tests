@@ -143,7 +143,7 @@ def create_and_start_app app, expected_health, service=nil
   attach_provisioned_service @app, @service, @token
   upload_app @app, @token
   start_app @app, @token
-  health = poll_until_done @app, expected_health, @token
+  health = poll_until_done @app, expected_health, 200, @token
   health
 end
 
