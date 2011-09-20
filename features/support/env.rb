@@ -51,6 +51,7 @@ PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
 SPRING_ENV_APP = "spring-env-app"
 VCAP_JAVA_TEST_APP="vcap_java_test_app"
+MISSING_DEPS_TEST_APP="missing_deps_test_app"
 
 
 After do
@@ -153,6 +154,10 @@ After("@creates_vcap_java_test_app") do
   AppCloudHelper.instance.delete_app_internal VCAP_JAVA_TEST_APP
 end
 
+After("@creates_missing_deps_test_app") do
+  AppCloudHelper.instance.delete_app_internal MISSING_DEPS_TEST_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -230,6 +235,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_PHP_APP)
     delete_app_internal(SPRING_ENV_APP)
     delete_app_internal(VCAP_JAVA_TEST_APP)
+    delete_app_internal(MISSING_DEPS_TEST_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
