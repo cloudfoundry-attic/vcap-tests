@@ -74,7 +74,7 @@ namespace :bvt_rpt do
     puts "  with output to #{bvt_env.artifacts_dir}"
     root = File.join(CoreComponents.root, "tests")
     # Allow user to specify cucumber switches, e.g. --tagname some-tag-name
-    cucumber_options = ENV['CUCUMBER_OPTIONS'] || ""
+    cucumber_options = ENV['CUCUMBER_OPTIONS'] || "--tags ~@bvt_upgrade"
     cmd = BuildConfig.bundle_cmd("bundle exec cucumber --format junit -o #{bvt_env.artifacts_dir} #{cucumber_options}")
     sh "\tcd #{root}; #{cmd}" do |success, exit_code|
       if success

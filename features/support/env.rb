@@ -333,6 +333,11 @@ class AppCloudHelper
     "#{@namespace}my-test-app-#{app}".gsub("_", "-")
   end
 
+  def strip_app_name long_app
+    # Strip compund CF app name of namespace and "my-test-app-"
+    app_name = long_app.split("#{@namespace}my-test-app-")[1]
+  end
+
   def upload_app app, token
     if @config[app]['path']
        upload_app_help("#{@root_dir}/#{@config[app]['path']}",app)
