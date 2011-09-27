@@ -213,46 +213,6 @@ Given /^I have deployed a simple Erlang application$/ do
   health.should == expected_health
 end
 
-Given /^I have deployed a simple PHP application$/ do
-  pending_unless_framework_exists(@token, "php")
-  @app = create_app SIMPLE_PHP_APP, @token
-  upload_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
-end
-
-Given /^I have deployed a simple Python application$/ do
-  pending_unless_framework_exists(@token, "wsgi")
-  @app = create_app SIMPLE_PYTHON_APP, @token
-  upload_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
-end
-
-Given /^I have deployed a Django application$/ do
-  pending_unless_framework_exists(@token, "django")
-  @app = create_app SIMPLE_DJANGO_APP, @token
-  upload_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
-end
-
-Given /^I have deployed a Python application with a dependency$/ do
-  pending_unless_framework_exists(@token, "wsgi")
-  @app = create_app PYTHON_APP_WITH_DEPENDENCIES, @token
-  upload_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
-end
-
 Given /^I have deployed a tiny Java application$/ do
   @java_app = create_app TINY_JAVA_APP, @token
   upload_app @java_app, @token
@@ -273,7 +233,7 @@ Then /^I should get status on the simple app as well as the tiny Java applicatio
   simple_app.should_not == nil
   tiny_java_app.should_not == nil
 end
-
+ 
 # Get app files
 When /^I list files associated with my application$/ do
   @instance = '0'
@@ -325,6 +285,15 @@ Given /^I that my application has a crash$/ do
     contents.close
   rescue
   end
+end
+
+Given /^I can access my application named (\w+)$/ do |app_name|
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
 end
 
 When /^I get crash information for my application$/ do
@@ -525,9 +494,12 @@ Then /^I should be able to get from (\w+) service with key (\w+), and I should s
     contents = get_app_contents @app, "service/#{service}/#{key}"
     contents.should_not == nil
     contents.body_str.should_not == nil
+    puts "contents " + contents.body_str
     contents.response_code.should == 200
     contents.body_str.should == value
     contents.close
+  else
+    puts "In app " + @app + " @service for " + service + " is nil"
   end
 end
 
@@ -544,6 +516,7 @@ Then /^I delete all my service$/ do
 end
 
 Then /^I should be able to access crash and it should crash$/ do
+  puts "@app is " + @app
   contents = get_app_contents @app, 'crash'
   contents.should_not == nil
   contents.response_code.should >= 500
@@ -552,6 +525,7 @@ Then /^I should be able to access crash and it should crash$/ do
 end
 
 Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
+  puts "@app is " + @app
   contents = get_app_contents @app
   contents.should_not == nil
   contents.body_str.should_not == nil
@@ -582,10 +556,9 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
                when "redis" then provision_redis_service @token
                when "mongodb" then provision_mongodb_service @token
                when "rabbitmq" then provision_rabbitmq_service @token
-               when "postgresql" then provision_postgresql_service
+               when "postgresql" then provision_postgresql_service @token
                when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
                end
-
     attach_provisioned_service @app, @service, @token
     upload_app @app, @token
     stop_app @app, @token
@@ -684,7 +657,6 @@ end
 
 Then /^I should be able to retrieve entries from Guestbook$/ do
   uri = get_uri @app
-
   easy = Curl::Easy.new
   easy.url = uri
   easy.http_get
@@ -694,3 +666,54 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
 
   number.should >= 1
 end
+
+Given /^I have my running application named (\w+)$/ do |app_name|
+  status = get_app_status app_name, @token
+  status.should_not == nil
+  if status
+    puts "State is " + status[:state]
+    @app = app_name
+    puts "@app is " + @app
+  end
+end
+
+Then /^I should get on application (\w+) the persisted data from (\w+) service with key (\w+), and I should see (\w+)$/ do |app_name, service, key, value|  
+  app_manifest = get_app_status app_name, @token
+  app_manifest.should_not == nil
+  @app.should == app_name
+  provisioned_services = app_manifest[:services]
+  if provisioned_services.nil?
+    puts "There are no services provisioned for application " + app_name
+  end
+  provisioned_services.should_not == nil
+  long_app_name = get_app_name app_name
+  long_service_name = "#{@namespace}#{@app}#{service}"
+  if provisioned_services.include?("#{long_service_name}") 
+    puts "Service " + long_service_name + " is provisioned to app " + long_app_name 
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.should_not == nil
+    contents.body_str.should_not == nil
+    puts "contents " + contents.body_str
+    contents.response_code.should == 200
+    contents.body_str.should == value
+    contents.close
+  else
+    puts "Service " + service + " is not provisioned for app " + @app
+  end
+end
+
+Then /^I delete all services and apps$/ do
+  @app_list.each do |item|
+    app = strip_app_name item[:name]
+    services = item[:services]
+    if services.length.to_i > 0
+      services.each do |s|
+        puts "Deleting service " + s
+        delete_service(s)
+      end
+    end
+    puts "Deleting app " + app
+    delete_app_internal app
+  end
+end
+

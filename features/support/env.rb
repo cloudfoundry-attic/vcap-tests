@@ -32,7 +32,6 @@ REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
 SIMPLE_DB_APP = "simple_db_app"
-SIMPLE_PHP_APP = "simple_php_app"
 BROKEN_APP = "broken_app"
 RAILS3_APP = "rails3_app"
 JPA_APP = "jpa_app"
@@ -45,13 +44,6 @@ SIMPLE_ERLANG_APP = "mochiweb_test"
 SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
-NEO4J_APP = "neo4j_app"
-SIMPLE_PYTHON_APP = "simple_wsgi_app"
-PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
-SIMPLE_DJANGO_APP = "simple_django_app"
-SPRING_ENV_APP = "spring-env-app"
-VCAP_JAVA_TEST_APP="vcap_java_test_app"
-
 
 After do
   AppCloudHelper.instance.cleanup
@@ -125,34 +117,6 @@ After("@creates_tomcat_version_check_app") do
   AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
 end
 
-After("@creates_neo4j_app") do
-  AppCloudHelper.instance.delete_app_internal NEO4J_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_django_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_DJANGO_APP
-end
-
-After("@creates_simple_php_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
-end
-
-After("@creates_spring_env_app") do
-  AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
-end
-
-After("@creates_vcap_java_test_app") do
-  AppCloudHelper.instance.delete_app_internal VCAP_JAVA_TEST_APP
-end
-
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -223,13 +187,6 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_LIFT_APP)
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
-    delete_app_internal(NEO4J_APP)
-    delete_app_internal(SIMPLE_PYTHON_APP)
-    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
-    delete_app_internal(SIMPLE_DJANGO_APP)
-    delete_app_internal(SIMPLE_PHP_APP)
-    delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(VCAP_JAVA_TEST_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
@@ -317,6 +274,11 @@ class AppCloudHelper
     # URLs synthesized from app names containing '_' are not handled well by the Lift framework.
     # So we used '-' instead of '_'
     "#{@namespace}my-test-app-#{app}"
+  end
+
+  def strip_app_name long_app
+    # Strip compund CF app name of namespace and "my-test-app-"
+    app_name = long_app.split("#{@namespace}my-test-app-")[1]
   end
 
   def upload_app app, token
@@ -593,12 +555,6 @@ class AppCloudHelper
     frameworks['frameworks']
   end
 
-  def pending_unless_framework_exists(token, framework)
-    unless get_frameworks(token).include?(framework)
-      pending "Not running #{framework} based test because #{framework} is not available in this Cloud Foundry instance."
-    end
-  end
-
    def provision_rabbitmq_srs_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_srs_app'}rabbitmq_srs"
      @client.create_service('rabbitmq-srs', name)
@@ -641,30 +597,19 @@ class AppCloudHelper
        service_manifest
      end
 
-  def provision_neo4j_service token
-    name = "#{@namespace}#{@app || 'simple_neo4j_app'}neo4j"
-    @client.create_service(:neo4j, name)
-    service_manifest = {
-     :vendor=>"neo4j",
-     :tier=>"free",
-     :version=>"1.4",
-     :name=>name
-    }
-  end
-
-  def provision_postgresql_service
-    name = "#{@namespace}#{@app || 'simple_db_app'}postgresql"
-    @client.create_service(:postgresql, name)
-    service_manifest = {
-      :type=>"database",
-      :vendor=>"postgresql",
-      :tier=>"free",
-      :version=>"9.0",
-      :name=>name,
-      :options=>{"size"=>"256MiB"},
-    }
-  end
-
+  def provision_postgresql_service token
+     name = "#{@namespace}#{@app || 'simple_db_app'}postgresql"
+     @client.create_service(:postgresql, name)
+     service_manifest = {
+       :type=>"database",
+       :vendor=>"postgresql",
+       :tier=>"free",
+       :version=>"9.0",
+       :name=>name,
+       :options=>{"size"=>"256MiB"},
+     }
+   end
+ 
   def provision_db_service token
     name = "#{@namespace}#{@app || 'simple_db_app'}mysql"
     @client.create_service(:mysql, name)
@@ -785,16 +730,6 @@ class AppCloudHelper
     uri
   end
 
-  def environment_add app, k, v=nil
-    appname = get_app_name app
-    app = @client.app_info(appname)
-    env = app[:env] || []
-    k,v = k.split('=', 2) unless v
-    env << "#{k}=#{v}"
-    app[:env] = env
-    @client.update_app(appname, app)
-  end
-
   def get_app_contents app, relative_path=nil
     uri = get_uri app, relative_path
     get_uri_contents uri
@@ -819,15 +754,10 @@ class AppCloudHelper
     easy
   end
 
-  def post_record_no_close uri, data_hash
+  def post_record uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
     easy.http_post(data_hash.to_json)
-    easy
-  end
-
-  def post_record uri, data_hash
-    easy = post_record_no_close(uri,data_hash)
     easy.close
   end
 
@@ -856,5 +786,4 @@ class AppCloudHelper
   def get_expected_tomcat_version
     @config[@app]['tomcat_version']
   end
-
 end
