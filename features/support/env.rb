@@ -319,6 +319,11 @@ class AppCloudHelper
     "#{@namespace}my-test-app-#{app}"
   end
 
+  def strip_app_name long_app
+    # Strip compund CF app name of namespace and "my-test-app-"
+    app_name = long_app.split("#{@namespace}my-test-app-")[1]
+  end
+
   def upload_app app, token
     upload_app_help("#{@testapps_dir}/#{app}", app)
   end
