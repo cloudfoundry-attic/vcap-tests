@@ -694,3 +694,55 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
 
   number.should >= 1
 end
+
+Given /^I have my running application named (\w+)$/ do |app_name|
+  status = get_app_status app_name, @token
+  status.should_not == nil
+  if status
+    puts "State is " + status[:state]
+    @app = app_name
+    puts "@app is " + @app
+  end
+end
+
+Then /^I should get on application (\w+) the persisted data from (\w+) service with key (\w+), and I should see (\w+)$/ do |app_name, service, key, value|
+  app_manifest = get_app_status app_name, @token
+  app_manifest.should_not == nil
+  @app.should == app_name
+  provisioned_services = app_manifest[:services]
+  if provisioned_services.nil?
+    puts "There are no services provisioned for application " + app_name
+  end
+  provisioned_services.should_not == nil
+  long_app_name = get_app_name app_name
+  long_service_name = "#{@namespace}#{@app}#{service}"
+  if provisioned_services.include?("#{long_service_name}")
+    puts "Service " + long_service_name + " is provisioned to app " + long_app_name
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.should_not == nil
+    contents.body_str.should_not == nil
+    puts "contents " + contents.body_str
+    contents.response_code.should == 200
+    contents.body_str.should == value
+    contents.close
+  else
+    puts "Service " + service + " is not provisioned for app " + @app
+  end
+end
+
+Then /^I delete all services and apps$/ do
+  @app_list.each do |item|
+    app = strip_app_name item[:name]
+    services = item[:services]
+    if services.length.to_i > 0
+      services.each do |s|
+        puts "Deleting service " + s
+        delete_service(s)
+      end
+    end
+    puts "Deleting app " + app
+    delete_app_internal app
+  end
+end
+
+
