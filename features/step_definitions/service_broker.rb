@@ -46,8 +46,7 @@ Then /^I create a brokered service and bind it to (\w+)$/ do |app|
   @brokered_service_instance.should_not == nil
 
   attach_provisioned_service @app, @brokered_service_instance, @token
-  upload_app @app, @token
-  start_app @app, @token
+  restart_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
   health.should == expected_health
