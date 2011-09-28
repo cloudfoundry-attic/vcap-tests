@@ -306,8 +306,12 @@ class AppCloudHelper
     "#{@namespace}my-test-app-#{app}"
   end
 
-  def upload_app app, token
-    upload_app_help("#{@testapps_dir}/#{app}", app)
+  def upload_app app, token, rel_path=nil
+    # If a rel_path is given the app should be uploaded from that relative path in the application directory.
+    # Don't start rel_path with a slash!.
+    deploy_from = "#{@testapps_dir}/#{app}"
+    deploy_from = "#{deploy_from}/#{rel_path}" if rel_path
+    upload_app_help(deploy_from, app)
   end
 
   def upload_app_help(app_dir, app)
