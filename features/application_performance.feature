@@ -56,5 +56,7 @@ Feature: Measure various performance features of an application
         Given The spring framework is supported on appcloud
         Given The grails framework is supported on appcloud
         Given The sinatra framework is supported on appcloud
+        Given The java_web framework is supported on appcloud
+        Given The lift framework is supported on appcloud
         When I upload my foo-based ruby18 application it should fail
         When I upload my sinatra ruby2010 application it should fail
