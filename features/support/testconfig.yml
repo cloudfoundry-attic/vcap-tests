@@ -8,7 +8,7 @@ simple_app:
   startup: "ruby foo.rb"
 
 tiny_java_app:
-  framework: "spring_web/1.0"
+  framework: "java_web/1.0"
   startup: "thin start"
 
 simple_db_app:
