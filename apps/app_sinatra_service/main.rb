@@ -49,13 +49,16 @@ post '/service/mysql/:key' do
   client = load_mysql
   value = request.env["rack.input"].read
   result = client.query("insert into data_values (id, data_value) values('#{params[:key]}','#{value}');")
+  client.close
   value
 end
 
 get '/service/mysql/:key' do
   client = load_mysql
   result = client.query("select data_value from  data_values where id = '#{params[:key]}'")
-  result.first['data_value']
+  value = result.first['data_value']
+  client.close
+  value
 end
 
 post '/service/postgresql/:key' do
