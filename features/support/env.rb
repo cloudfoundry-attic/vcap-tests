@@ -50,7 +50,7 @@ SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
 SPRING_ENV_APP = "spring-env-app"
-VCAP_JAVA_TEST_APP="vcap_java_test_app"
+AUTO_RECONFIG_TEST_APP="auto-reconfig-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 
@@ -150,8 +150,8 @@ After("@creates_spring_env_app") do
   AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
 end
 
-After("@creates_vcap_java_test_app") do
-  AppCloudHelper.instance.delete_app_internal VCAP_JAVA_TEST_APP
+After("@creates_auto_reconfig_test_app") do
+  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_TEST_APP
 end
 
 at_exit do
@@ -197,6 +197,7 @@ class AppCloudHelper
       exit
     end
     @testapps_dir = File.join(File.dirname(__FILE__), '../../apps')
+    @testassets_dir = File.join(File.dirname(__FILE__), '../../assets')
     @client = VMC::Client.new(@base_uri)
 
     # Make sure we cleanup if we had a failed run..
@@ -232,7 +233,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_DJANGO_APP)
     delete_app_internal(SIMPLE_PHP_APP)
     delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(VCAP_JAVA_TEST_APP)
+    delete_app_internal(AUTO_RECONFIG_TEST_APP)
     delete_app_internal(SIMPLE_KV_APP)
     delete_app_internal(BROKERED_SERVICE_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
