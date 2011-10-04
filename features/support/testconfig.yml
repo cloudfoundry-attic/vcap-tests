@@ -133,10 +133,11 @@ spring-env-app:
   startup: "thin start"
   memory: 256
 
-vcap_java_test_app:
+auto-reconfig-test-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/auto-reconfig-test-app/target"
 
 simple_kv_app:
   framework: "http://b20nine.com/unknown"

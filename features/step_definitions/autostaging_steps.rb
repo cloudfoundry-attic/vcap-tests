@@ -4,7 +4,7 @@ require 'pp'
 
 Given /^I deploy a Spring application using a Cloud Service and Data Source$/ do
   expected_health = 1.0
-  create_and_upload_app VCAP_JAVA_TEST_APP
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
   mongosvc = provision_mongodb_service @token
   attach_provisioned_service @app, mongosvc, @token
   mysqlsvc = provision_db_service @token
@@ -16,7 +16,7 @@ end
 
 Given /^I deploy a Spring application using Service Scan and a Data Source$/ do
   expected_health = 1.0
-  create_and_upload_app VCAP_JAVA_TEST_APP
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
   mysqlsvc = provision_db_service @token
   attach_provisioned_service @app, mysqlsvc, @token
   environment_add @app,'TEST_PROFILE','auto-staging-off-using-service-scan'
