@@ -69,6 +69,15 @@ post '/service/postgresql/:key' do
   value
 end
 
+get '/service/postgresql' do
+  client = load_postgresql
+  value = client.query("select * from  data_values ")
+  client.close
+  str=""
+  value.each{ |v| str << "#{v['id']}, #{v['data_value']} <br/> "}
+  str
+end
+
 get '/service/postgresql/:key' do
   client = load_postgresql
   value = client.query("select data_value from  data_values where id = '#{params[:key]}'").first['data_value']

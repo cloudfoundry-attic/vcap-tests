@@ -2,6 +2,7 @@ package org.cloudfoundry.canonical.apps;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import org.cloudfoundry.runtime.env.AbstractServiceInfo;
 import org.cloudfoundry.runtime.env.CloudEnvironment;
@@ -38,8 +39,13 @@ public class ReferenceDataRepository {
 	}
 
 	public DataValue find(String id) {
-		return (DataValue) hibernateTemplate.find(
-				"from DataValue where id='" + id + "'").get(0);
+		List values =hibernateTemplate.find("from DataValue where id='" + id + "'");
+		if(!values.isEmpty()){
+			return  (DataValue) values.get(0);
+		}else {
+			return null;
+		}
+
 	}
 
 	public void write_to_rabbitmq(String key, String value) throws IOException {

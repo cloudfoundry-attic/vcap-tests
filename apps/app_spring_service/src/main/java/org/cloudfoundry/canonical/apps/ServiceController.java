@@ -83,7 +83,13 @@ public class ServiceController {
 			throws IOException {
 		PrintWriter out = response.getWriter();
 		DataValue d = referenceRepository.find(key);
-		out.print(d.getDataValue());
+		String value = "";
+		if(d != null){
+			value = d.getDataValue();
+    } else {
+      response.sendErro(HttpServletResponse.SC_NOT_FOUND);
+    }
+		out.print(value);
 	}
 
 	@RequestMapping(value = "/service/postgresql/{key}", method = RequestMethod.POST)
@@ -102,7 +108,13 @@ public class ServiceController {
 			throws IOException {
 		PrintWriter out = response.getWriter();
 		DataValue d = referenceRepository.find(key);
-		out.print(d.getDataValue());
+		String value = "";
+		if(d != null){
+			value = d.getDataValue();
+    } else {
+      response.sendErro(HttpServletResponse.SC_NOT_FOUND);
+    }
+		out.print(value);
 	}
 
 	
