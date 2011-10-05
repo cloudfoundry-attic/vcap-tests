@@ -32,7 +32,7 @@ def tests_path
 end
 TESTS_PATH = tests_path
 
-BUILD_ARTIFACT = File.join(Dir.pwd, "assets/.build")
+BUILD_ARTIFACT = File.join(Dir.pwd, ".build")
 
 TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app"]

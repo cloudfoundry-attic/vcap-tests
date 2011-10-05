@@ -139,6 +139,12 @@ auto-reconfig-test-app:
   memory: 256
   path: "assets/spring/auto-reconfig-test-app/target"
 
+auto-reconfig-missing-deps-test-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/auto-reconfig-missing-deps-test-app/target"
+
 simple_kv_app:
   framework: "http://b20nine.com/unknown"
   startup: "thin start"

@@ -51,6 +51,7 @@ PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
 SPRING_ENV_APP = "spring-env-app"
 AUTO_RECONFIG_TEST_APP="auto-reconfig-test-app"
+AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 
@@ -154,6 +155,10 @@ After("@creates_auto_reconfig_test_app") do
   AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_TEST_APP
 end
 
+After("@creates_auto_reconfig_missing_deps_test_app") do
+  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_MISSING_DEPS_TEST_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -234,6 +239,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_PHP_APP)
     delete_app_internal(SPRING_ENV_APP)
     delete_app_internal(AUTO_RECONFIG_TEST_APP)
+    delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
     delete_app_internal(SIMPLE_KV_APP)
     delete_app_internal(BROKERED_SERVICE_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
