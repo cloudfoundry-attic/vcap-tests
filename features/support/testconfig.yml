@@ -88,21 +88,25 @@ app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/app_rails_service"
 
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
   memory: 64
+  path: "assets/sinatra/app_sinatra_service"
 
 app_node_service:
   framework: "node"
   startup: node
   memory: 64
+  path: "assets/node/app_node_service"
 
 app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/app_spring_service/target"
 
 my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"

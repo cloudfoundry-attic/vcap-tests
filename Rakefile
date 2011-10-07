@@ -35,7 +35,7 @@ TESTS_PATH = tests_path
 BUILD_ARTIFACT = File.join(Dir.pwd, ".build")
 
 TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
-             "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app"]
+             "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app", "#{TESTS_PATH}/spring/app_spring_service"]
 
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
 task :build, [:force] do |t, args|
