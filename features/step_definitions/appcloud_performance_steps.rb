@@ -76,17 +76,17 @@ Then /^all (\d+) instances should participate$/ do |arg1|
 end
 
 Then /^all (\d+) instances should do within (\d+) percent of their fair share of the (\d+) operations$/ do |arg1, arg2, arg3|
-  @target = arg3.to_i / arg1.to_i
-  @slop = @target * (arg2.to_i/100.0)
+  @perf_target = arg3.to_i / arg1.to_i
+  @perf_slop = @perf_target * (arg2.to_i/100.0)
 
   response = get_app_contents @app, 'getstats'
   response.should_not == nil
   response.response_code.should == 200
-  @counters = JSON.parse(response.body_str)
+  counters = JSON.parse(response.body_str)
   response.close
 
-  @counters.each do |k,v|
-    v.to_i.should be_close(@target, @slop)
+  counters.each do |k,v|
+    v.to_i.should be_close(@perf_target, @perf_slop)
   end
 end
 
@@ -248,7 +248,7 @@ After("@lb_check") do |scenario|
       puts "The scenario failed due to unexpected load balance distribution from the router"
       puts "The following hash shows the per-instance counts along with the target and allowable deviation"
       pp @counters
-      puts "target: #{@target}, allowable deviation: #{@slop}"
+      puts "target: #{@perf_target}, allowable deviation: #{@perf_slop}"
     end
   end
 end
@@ -282,24 +282,8 @@ Given /^The foo framework is not supported on appcloud$/ do
   @frameworks_list.include?('foo').should == false
 end
 
-Given /^The rails3 framework is supported on appcloud$/ do
-  @frameworks_list.include?('rails3').should == true
-end
-
-Given /^The node framework is supported on appcloud$/ do
-  @frameworks_list.include?('node').should == true
-end
-
-Given /^The spring framework is supported on appcloud$/ do
-  @frameworks_list.include?('spring').should == true
-end
-
-Given /^The grails framework is supported on appcloud$/ do
-  @frameworks_list.include?('grails').should == true
-end
-
-Given /^The sinatra framework is supported on appcloud$/ do
-  @frameworks_list.include?('sinatra').should == true
+Given /^The (\w+) framework is supported on appcloud$/ do |framework|
+  @frameworks_list.include?(framework).should == true
 end
 
 When /^I upload my foo-based ruby18 application it should fail$/ do

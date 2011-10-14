@@ -8,7 +8,7 @@ simple_app:
   startup: "ruby foo.rb"
 
 tiny_java_app:
-  framework: "spring_web/1.0"
+  framework: "java_web/1.0"
   startup: "thin start"
 
 simple_db_app:
@@ -88,21 +88,25 @@ app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/app_rails_service"
 
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
   memory: 64
+  path: "assets/sinatra/app_sinatra_service"
 
 app_node_service:
   framework: "node"
   startup: node
   memory: 64
+  path: "assets/node/app_node_service"
 
 app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/app_spring_service/target"
 
 my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
@@ -127,3 +131,28 @@ simple_php_app:
   framework: "php"
   startup: php
   memory: 64
+
+spring-env-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+
+auto-reconfig-test-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/auto-reconfig-test-app/target"
+
+auto-reconfig-missing-deps-test-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/auto-reconfig-missing-deps-test-app/target"
+
+simple_kv_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+
+brokered_service_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
