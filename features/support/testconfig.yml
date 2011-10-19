@@ -1,7 +1,9 @@
 ---
 # Timeout value after we which we give up on AppCloud operations that are long running.
-# Within this value, we poll for completion status of the operations.
+# Within this value, we poll for completion status of the operations with the
+# sleep interval between successive poll requests specified below.
 timeout_secs: 60
+sleep_secs: 1
 
 simple_app:
   framework: "http://b20nine.com/unknown"
@@ -156,3 +158,9 @@ simple_kv_app:
 brokered_service_app:
   framework: "http://b20nine.com/unknown"
   startup: "thin start"
+
+java_app_with_startup_delay:
+  framework: "java_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/java_web/app_with_startup_delay/target"

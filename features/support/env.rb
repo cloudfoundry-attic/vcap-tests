@@ -54,6 +54,7 @@ AUTO_RECONFIG_TEST_APP="auto-reconfig-test-app"
 AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
+JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 
 After do
   AppCloudHelper.instance.cleanup
@@ -159,6 +160,10 @@ After("@creates_auto_reconfig_missing_deps_test_app") do
   AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_MISSING_DEPS_TEST_APP
 end
 
+After("@creates_java_app_with_delay") do
+  AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -242,6 +247,7 @@ class AppCloudHelper
     delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
     delete_app_internal(SIMPLE_KV_APP)
     delete_app_internal(BROKERED_SERVICE_APP)
+    delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
@@ -451,7 +457,7 @@ class AppCloudHelper
   def poll_until_done app, expected_health, token
     secs_til_timeout = @config['timeout_secs']
     health = nil
-    sleep_time = 0.5
+    sleep_time = @config['sleep_secs']
     while secs_til_timeout > 0 && health != expected_health
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
@@ -839,9 +845,12 @@ class AppCloudHelper
     get_uri_contents uri
   end
 
-  def get_uri_contents uri
+  def get_uri_contents uri, timeout=0
     easy = Curl::Easy.new
     easy.url = uri
+    if timeout != 0
+      easy.timeout = timeout
+    end
     easy.http_get
     easy
   end
