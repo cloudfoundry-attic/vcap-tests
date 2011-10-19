@@ -733,3 +733,12 @@ Then /^I delete all services and apps$/ do
     delete_app_internal app
   end
 end
+
+Then /^I should be able to immediately access the Java application through its url$/ do
+  uri = get_uri @app
+  contents = get_uri_contents uri, 20
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should =~ /I am up and running/
+  contents.close
+end
