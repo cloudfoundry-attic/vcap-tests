@@ -105,6 +105,7 @@ namespace :bvt_rpt do
   def bvt_summary(results_dir_path, git_root_path, verbose = true)
     summary = "Target " + ENV['VCAP_BVT_TARGET'] + "\n"
     total_errs = 0
+    total_skipped = 0
     total_count = 0
     total_time = 0
     results_dir = Dir.new(results_dir_path)
@@ -115,15 +116,17 @@ namespace :bvt_rpt do
         doc = Nokogiri::XML(File.open(File.join(results_dir_path, f)))
         suite_node = doc.root
         suite_failures = suite_node.attribute("failures")
+        suite_skipped = suite_node.attribute("skipped")
         suite_tests = suite_node.attribute("tests")
         suite_errors = suite_node.attribute("errors")
         suite_description = suite_node.attribute("name")
         suite_time = suite_node.attribute("time")
         total_errs += suite_failures.value.to_i
         total_errs += suite_errors.value.to_i
+        total_skipped += suite_skipped.value.to_i
         total_count += suite_tests.value.to_i
         total_time += suite_time.value.to_f
-        summary += "#{f}: tests=#{suite_tests}, errors=#{suite_errors}, failures=#{suite_failures}, time=#{suite_time}\n"
+        summary += "#{f}: tests=#{suite_tests}, errors=#{suite_errors}, failures=#{suite_failures}, skipped=#{suite_skipped}, time=#{suite_time}\n"
       end
     end
     # if verbose output requested, then append each output file
@@ -145,22 +148,23 @@ namespace :bvt_rpt do
     return_summary = "SUMMARY OF BVT EXECUTION\n"
     return_summary += "total tests = #{total_count}\n"
     return_summary += "total errors+failures = #{total_errs}\n"
+    return_summary += "total skipped = #{total_skipped}\n"
     return_summary += "total time = #{total_time} (#{total_time_string})\n"
     return_summary += summary
-    return return_summary, total_errs, total_count
+    return return_summary, total_errs, total_skipped, total_count
   end
 
   desc "Summarize BVT results"
   task :brief_bvt_summary do
     puts "Summarizing BVT results in #{bvt_env.artifacts_dir}"
-    summary, total_errs, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), false)
+    summary, total_errs, total_skipped, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), false)
     puts summary
   end
 
   desc "Summarize BVT results with test output"
   task :full_bvt_summary do
     puts "Summarizing BVT results in #{bvt_env.artifacts_dir}"
-    summary, total_errs, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), true)
+    summary, total_errs, total_skippd, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), true)
     puts summary
   end
 
@@ -186,10 +190,10 @@ END_OF_MESSAGE
   task :email_bvt_summary  do
     puts "Emailing BVT results in #{bvt_env.artifacts_dir}"
     # Get pass/fail status, and full text of results files
-    summary, total_errs, total_tests  = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir))
+    summary, total_errs, total_skipped, total_tests  = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir))
     recipients = ENV['EMAIL_RECIPIENTS'] || bvt_env.email_recipients
     from = ENV['USER'] + "@vmware.com"
-    subject = "bvt summary #{ENV['VCAP_BVT_TARGET']} #{total_tests} run, #{total_errs} errors"
+    subject = "bvt summary #{ENV['VCAP_BVT_TARGET']} #{total_tests} run, #{total_errs} errors, #{total_skipped} skipped"
     send_email(from, recipients, subject, summary)
   end
 
