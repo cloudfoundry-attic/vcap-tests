@@ -68,6 +68,7 @@ end
 Given /^I deploy a Spring application using a local RabbitConnectionFactory$/ do
   expected_health = 1.0
   create_and_upload_app AUTO_RECONFIG_TEST_APP
+  pending unless find_service 'rabbitmq'
   rabbitsvc = provision_rabbitmq_service @token
   attach_provisioned_service @app, rabbitsvc, @token
   environment_add @app,'TEST_PROFILE','rabbit-auto-staging'
