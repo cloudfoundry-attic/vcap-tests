@@ -1,3 +1,4 @@
+@smoke
 Feature: Control the life-cycle of an application on AppCloud
 
   As a user of AppCloud

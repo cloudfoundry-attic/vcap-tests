@@ -5,7 +5,7 @@ Feature: Use Spring 3.1 Environment on AppCloud
   Background: Validate account
     Given I have registered and logged in
 
-  @creates_spring_env_app
+  @creates_spring_env_app @smoke
   Scenario: deploy Spring 3.1 Environment Application
     Given I have deployed a Spring 3.1 application
     Then the cloud profile should be active
