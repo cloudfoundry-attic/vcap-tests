@@ -156,3 +156,8 @@ simple_kv_app:
 brokered_service_app:
   framework: "http://b20nine.com/unknown"
   startup: "thin start"
+
+blob_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby blob.rb"
+  memory: 256
