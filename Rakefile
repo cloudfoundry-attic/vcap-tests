@@ -50,6 +50,7 @@ TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/roo-guestbook",
              "#{TESTS_PATH}/spring/jpa-guestbook",
              "#{TESTS_PATH}/spring/hibernate-guestbook",
+             "#{TESTS_PATH}/spring/spring-env",
              "#{TESTS_PATH}/java_web/java_tiny_app",
              "#{TESTS_PATH}/lift/hello_lift",
              "#{TESTS_PATH}/lift/lift-db-app"
