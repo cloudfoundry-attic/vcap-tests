@@ -13,6 +13,9 @@ import "#{vcap}/rakelib/bundler.rake"
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
+desc "Run a faster subset of Basic Viability Tests"
+task :smoke_tests => ['build','bvt:run_smoke']
+
 ci_steps = ['ci:version_check',
             'build',
             'bundler:install:production',
