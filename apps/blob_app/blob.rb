@@ -15,10 +15,10 @@ end
 
 begin
 AWS::S3::Base.establish_connection!(
-    :access_key_id     => blob_gw[0]['credentials']['username'],#'AKIAI66EX3XVAPLWBSJA',
-    :secret_access_key => blob_gw[0]['credentials']['password'],#'pdi6J98YiIryP7okPBkpGN6vD7hFIsrWBpBHpM/s',
-    :port => blob_gw[0]['credentials']['port'],#8080,
-    :server => blob_gw[0]['credentials']['host']#'127.0.0.1'
+    :access_key_id     => blob_gw[0]['credentials']['username'],
+    :secret_access_key => blob_gw[0]['credentials']['password'],
+    :port => blob_gw[0]['credentials']['port'],
+    :server => blob_gw[0]['credentials']['host']
   ) unless blob_gw == nil
 rescue => e
   puts "#{e}"

@@ -699,7 +699,7 @@ class AppCloudHelper
     service_manifest = {
      :vendor=>"blob",
      :tier=>"free",
-     :version=>"0.4",
+     :version=>"1.0",
      :name=>name
     }
   end
