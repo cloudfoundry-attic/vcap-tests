@@ -13,9 +13,6 @@ import "#{vcap}/rakelib/bundler.rake"
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
-desc "Run a faster subset of Basic Viability Tests"
-task :smoke_tests => ['build','bvt:run_smoke']
-
 ci_steps = ['ci:version_check',
             'build',
             'bundler:install:production',
@@ -45,7 +42,15 @@ BUILD_ARTIFACT = File.join(Dir.pwd, ".build")
 TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app",
              "#{TESTS_PATH}/spring/app_spring_service",
-             "#{TESTS_PATH}/java_web/app_with_startup_delay"
+             "#{TESTS_PATH}/java_web/app_with_startup_delay",
+             "#{TESTS_PATH}/java_web/tomcat-version-check-app",
+             "#{TESTS_PATH}/spring/roo-guestbook",
+             "#{TESTS_PATH}/spring/jpa-guestbook",
+             "#{TESTS_PATH}/spring/hibernate-guestbook",
+             "#{TESTS_PATH}/java_web/java_tiny_app",
+             "#{TESTS_PATH}/lift/hello_lift",
+             "#{TESTS_PATH}/lift/lift-db-app"
+
 ]
 
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
