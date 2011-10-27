@@ -47,11 +47,11 @@ Then /^the Lift app should be available for use$/ do
   response.should_not == nil
   response.code.should == 200
   response.body.should_not == nil
-  response.body.should =~ /hello_lift/
+  response.body.should =~ /scala_lift/
 #  contents = get_app_contents @app
 #  contents.should_not == nil
 #  contents.body_str.should_not == nil
-#  contents.body_str.should =~ /hello_lift/
+#  contents.body_str.should =~ /scala_lift/
 #  contents.close
 end
 
