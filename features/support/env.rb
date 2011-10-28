@@ -182,7 +182,7 @@ class AppCloudHelper
     @service_broker_url = ENV['SERVICE_BROKER_URL']
     @service_broker_token = ENV['SERVICE_BROKER_TOKEN']
     @base_uri = "http://api.#{@target}"
-    @droplets_uri = "#{@base_uri}/apps"
+    @droplets_uri = "#{@base_uri}/assets"
     @resources_uri = "#{@base_uri}/resources"
     @services_uri = "#{@base_uri}/services"
     @suggest_url = @target
@@ -206,7 +206,7 @@ class AppCloudHelper
       puts "Could not read configuration file:  #{e}"
       exit
     end
-    @testapps_dir = File.join(File.dirname(__FILE__), '../../apps')
+    @testapps_dir = File.join(File.dirname(__FILE__), '../../assets')
     @root_dir = File.join(File.dirname(__FILE__), '../..')
     @client = VMC::Client.new(@base_uri)
 
@@ -567,12 +567,12 @@ class AppCloudHelper
   end
 
   def modify_and_upload_app app,token
-    upload_app_help("#{@testapps_dir}/modified_#{app}", app)
+    upload_app_help("#{@testapps_dir}/sinatra/modified_#{app}", app)
     restart_app app, token
   end
 
   def modify_and_upload_bad_app app,token
-    upload_app_help("#{@testapps_dir}/#{BROKEN_APP}", app)
+    upload_app_help("#{@testapps_dir}/sinatra/#{BROKEN_APP}", app)
   end
 
   def poll_until_update_app_done app, token
