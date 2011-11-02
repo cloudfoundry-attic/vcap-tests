@@ -293,6 +293,7 @@ def delete_app_services_check
 end
 
 Given /^I deploy a Spring Grails application using the MySQL DB service$/ do
+  pending "no automated build mechanism for grails app yet"
   expected_health = 1.0
   health = create_and_start_app GRAILS_APP, expected_health
   health.should == expected_health
@@ -375,7 +376,7 @@ After("@creates_hibernate_postgresql_adapter") do |scenario|
 end
 
 After("@creates_grails_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services if @grailsdef
 end
 
 After("@creates_roo_db_adapter") do |scenario|
