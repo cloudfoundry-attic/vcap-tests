@@ -93,6 +93,7 @@ Feature: Deploy all canonical apps and check their services
       When I delete my application
       Then it should not be on AppCloud
 
+    @smoke
     Scenario: rails test services
       Given I have deployed my application named app_rails_service
       When I query status of my application

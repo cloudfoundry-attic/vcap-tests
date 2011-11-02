@@ -1,3 +1,4 @@
+@smoke
 Feature: Control the life-cycle of an application on AppCloud
 
   As a user of AppCloud
@@ -32,3 +33,9 @@ Feature: Control the life-cycle of an application on AppCloud
         Given I have my simple application on AppCloud
         When I delete my application
         Then it should not be on AppCloud
+
+      @creates_java_app_with_delay
+      Scenario: start java application and be able to access its contents immediately thereafter
+        Given I have deployed my application named java_app_with_startup_delay
+        Then it should be started
+        And I should be able to immediately access the Java application through its url
