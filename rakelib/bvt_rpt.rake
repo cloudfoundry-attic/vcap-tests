@@ -21,7 +21,7 @@ class BvtEnv
   def initialize
     # Root dir will be the tests dir (parent of rakelib)
     @root_dir        = File.expand_path("..", File.dirname(__FILE__))
-    @vcap_dir        = File.dirname(@root_dir)
+    @vcap_dir        = ENV['VCAP'] || File.dirname(@root_dir)
     @config_dir      = File.expand_path("config", @root_dir)
 
     # Pull in all property values from yml file, defaulting values when missing
@@ -54,8 +54,7 @@ namespace :bvt_rpt do
 
   desc "Delete/recreate artifacts dir"
   task :clean_artifacts_dir do
-    FileUtils.rm_rf(bvt_env.artifacts_dir)
-    Dir.mkdir(bvt_env.artifacts_dir)
+    FileUtils.rm Dir.glob("#{bvt_env.artifacts_dir}/TEST*.xml")
   end
 
   desc "Run BVT tests, and continue if error"
@@ -108,6 +107,20 @@ namespace :bvt_rpt do
     total_count = 0
     total_time = 0
     results_dir = Dir.new(results_dir_path)
+    # if verbose output requested, then append each output file
+    # to the summary, and some git repo state info
+    if verbose
+      results_dir.entries.sort.each do | f |
+        if f.match("TEST.*\.xml")
+          summary += "\n\n === #{f} === \n"
+          summary += IO.read(File.join(results_dir_path, f))
+        end
+      end
+      # append some basic information on the git repo state
+      vcap_parent = Dir.new(git_root_path)
+      summary += "\n\n" + repo_info(vcap_parent) + "\n"
+    end
+
     # Start building a summary, with just the pass/fail/time values
     # at first.
     results_dir.entries.sort.each do | f |
@@ -126,27 +139,14 @@ namespace :bvt_rpt do
         summary += "#{f}: tests=#{suite_tests}, errors=#{suite_errors}, failures=#{suite_failures}, time=#{suite_time}\n"
       end
     end
-    # if verbose output requested, then append each output file
-    # to the summary, and some git repo state info
-    if verbose
-      results_dir.entries.sort.each do | f |
-        if f.match("TEST.*\.xml")
-          summary += "\n\n === #{f} === \n"
-          summary += IO.read(File.join(results_dir_path, f))
-        end
-      end
-      # append some basic information on the git repo state
-      vcap_parent = Dir.new(git_root_path)
-      summary += "\n\n" + repo_info(vcap_parent)
-    end
     minutes = (total_time/60).to_i.to_s
     seconds = "%02d" % (total_time%60).to_i.to_s
     total_time_string = "" + minutes + ":" + seconds
-    return_summary = "SUMMARY OF BVT EXECUTION\n"
+    return_summary = summary
+    return_summary += "\nSUMMARY OF BVT EXECUTION\n"
     return_summary += "total tests = #{total_count}\n"
     return_summary += "total errors+failures = #{total_errs}\n"
     return_summary += "total time = #{total_time} (#{total_time_string})\n"
-    return_summary += summary
     return return_summary, total_errs, total_count
   end
 
