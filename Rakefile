@@ -51,10 +51,10 @@ TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/jpa-guestbook",
              "#{TESTS_PATH}/spring/hibernate-guestbook",
              "#{TESTS_PATH}/spring/spring-env",
+             "#{TESTS_PATH}/grails/guestbook",
              "#{TESTS_PATH}/java_web/java_tiny_app",
              "#{TESTS_PATH}/lift/hello_lift",
              "#{TESTS_PATH}/lift/lift-db-app"
-
 ]
 
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
@@ -66,6 +66,16 @@ task :build, [:force] do |t, args|
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
       Dir.chdir test do
+        if (test == "#{TESTS_PATH}/grails/guestbook")
+          sh('grails create-app tmp') do |success, exit_code|
+            if success
+              puts "\tInstall grails dependencies in ivy cache successfully"
+            else
+              puts "\tUnable to populate require dependencies in ivy cache using 'grails create-app'"
+            end
+            sh('rm -rf tmp') 
+          end
+        end
         sh('mvn package -DskipTests') do |success, exit_code|
           unless success
             clear_build_artifact
