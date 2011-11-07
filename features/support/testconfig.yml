@@ -161,3 +161,4 @@ blob_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby blob.rb"
   memory: 256
+  path: assets/sinatra/blob_app
