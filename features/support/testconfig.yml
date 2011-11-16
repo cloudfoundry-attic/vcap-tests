@@ -1,139 +1,191 @@
 ---
 # Timeout value after we which we give up on AppCloud operations that are long running.
-# Within this value, we poll for completion status of the operations.
+# Within this value, we poll for completion status of the operations with the
+# sleep interval between successive poll requests specified below.
 timeout_secs: 60
+sleep_secs: 1
 
 simple_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
+  path: "assets/sinatra/hello_vcap"
 
 tiny_java_app:
-  framework: "spring_web/1.0"
+  framework: "java_web/1.0"
   startup: "thin start"
+  path: "assets/java_web/java_tiny_app/target"
 
 simple_db_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby simple_db_app.rb"
+  path: "assets/sinatra/simple_db_app"
 
 redis_lb_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby redis_lb.rb"
+  path: "assets/sinatra/redis_lb_app"
 
 env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby env_test.rb"
+  path: "assets/sinatra/env_test_app"
 
 broken_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby broken.rb"
+  path: "assets/sinatra/broken_app"
 
 rails3_app:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/rails3_app"
 
 jpa_app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/jpa-guestbook/target"
 
 hibernate_app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/hibernate-guestbook/target"
 
 dbrails_app:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/dbrails_app"
 
 dbrails_broken_app:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/dbrails_broken_app"
 
 grails_app:
   framework: "grails/1.0"
   startup: "thin start"
   memory: 512
+  path: "assets/grails/guestbook/target"
 
 roo_app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
-
+  path: "assets/spring/roo-guestbook/target"
 
 mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
+  path: "assets/mochiweb/mochiweb_test"
 
 simple-lift-app:
   framework: "lift/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/lift/hello_lift/target"
 
 lift-db-app:
   framework: "lift/1.0"
   startup: "thin start"
   memory: 512
+  path: "assets/lift/lift-db-app/target"
 
 tomcat-version-check-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 128
   tomcat_version: "6.0.32"
+  path: "assets/java_web/tomcat-version-check-app/target"
 
 app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/rails3/app_rails_service"
 
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
   memory: 64
+  path: "assets/sinatra/app_sinatra_service"
 
 app_node_service:
   framework: "node"
   startup: node
   memory: 64
+  path: "assets/node/app_node_service"
 
 app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/app_spring_service/target"
 
 my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
   memory: 64
+  path: "assets/sinatra/hello_vcap"
 
 neo4j_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby neo4j.rb"
   memory: 256
+  path: "assets/sinatra/neo4j_app"
 
 simple_wsgi_app:
   framework: "wsgi"
+  path: "assets/django/simple_wsgi_app"
 
 wsgi_app_with_requirements:
   framework: "wsgi"
+  path: "assets/django/wsgi_app_with_requirements"
 
 simple_django_app:
   framework: "django"
+  path: "assets/django/simple_django_app"
 
 simple_php_app:
   framework: "php"
   startup: php
   memory: 64
+  path: "assets/php/simple_php_app"
 
 spring-env-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/spring-env/target"
 
-vcap_java_test_app:
+auto-reconfig-test-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/spring/auto-reconfig-test-app/target"
+
+auto-reconfig-missing-deps-test-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/auto-reconfig-missing-deps-test-app/target"
+
+simple_kv_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+  path: "assets/sinatra/simple_kv_app"
+
+brokered_service_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+  path: "assets/sinatra/brokered_service_app"
+
+java_app_with_startup_delay:
+  framework: "java_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/java_web/app_with_startup_delay/target"
