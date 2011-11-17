@@ -46,21 +46,6 @@ Feature: Deploy applications that make use of autostaging
         And I deploy a Spring Roo application using the created MySQL service
         Then I should have the same 3 records on retrieving all records from the Roo application
 
-      @creates_rails3_app, @creates_rails3_db_adapter
-      Scenario: start application and write data
-        Given I have deployed a Rails 3 application
-        Then I can add a Widget to the database
-
-      @creates_dbrails_app, @creates_dbrails_db_adapter
-      Scenario: start and test a rails db app with Gemfile that includes mysql2 gem
-        Given I deploy a dbrails application using the MySQL DB service
-        Then The dbrails app should work
-
-      @creates_dbrails_broken_app, @creates_dbrails_broken_db_adapter
-      Scenario: start and test a rails db app with Gemfile that DOES NOT include mysql2 or sqllite gems
-        Given I deploy a broken dbrails application  using the MySQL DB service
-        Then The broken dbrails application should fail
-
       @creates_hibernate_app @creates_hibernate_postgresql_adapter
       Scenario: start Spring Web application using Hibernate and add some records
         Given I deploy a hibernate application that is backed by the PostgreSQL database service on AppCloud

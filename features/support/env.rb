@@ -337,8 +337,9 @@ class AppCloudHelper
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :model => @config[app]['framework'],
-        :stack => @config[app]['startup']
+        :framework => @config[app]['framework'],
+        :stack => @config[app]['startup'],
+        :runtime => @config[app]['runtime']
       },
       :resources=> {
           :memory => @config[app]['memory'] || 64
@@ -618,6 +619,10 @@ class AppCloudHelper
 
   def get_services token
     @client.services_info
+  end
+
+  def all_services
+    @client.services
   end
 
   def services_list(opts={})
