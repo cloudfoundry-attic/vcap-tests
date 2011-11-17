@@ -108,11 +108,29 @@ app_rails_service:
   memory: 256
   path: "assets/rails3/app_rails_service"
 
+app_rails_service_autoconfig:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/app_rails_service_autoconfig"
+
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
   memory: 64
   path: "assets/sinatra/app_sinatra_service"
+
+app_sinatra_service_autoconfig:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/app_sinatra_service_autoconfig"
+
+autoconfig_unsupported_redis:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_unsupported_redis"
 
 app_node_service:
   framework: "node"
