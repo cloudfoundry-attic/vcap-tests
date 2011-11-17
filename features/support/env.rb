@@ -620,6 +620,10 @@ class AppCloudHelper
     @client.services_info
   end
 
+  def all_services
+    @client.services
+  end
+
   def services_list(opts={})
     refresh = opts[:refresh]
     return @services_list if !refresh and @services_list
