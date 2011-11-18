@@ -157,6 +157,11 @@ def install_grailsdep test
         else
           is_grailsdep_installed = false
           puts "\tUnable to populate require dependencies in ivy cache using 'grails create-app'"
+          puts "\tUnable to auto-install grails components. You may have to install grails in your environment manually"
+          puts "\tIn your BVT shell> grails --version"
+          puts "\t\t command not found -> You have to manually install grails"
+          puts "\t\t Security Exception etc -> You have to remove the setting of CLASSPATH variable"
+          fail "***** Please make sure grails is installed and configured properly before building BVT"
         end
         sh('rm -rf tmp') do |success, exit_code|
         end
