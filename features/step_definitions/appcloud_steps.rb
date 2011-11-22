@@ -193,13 +193,15 @@ end
 
 Given /^I have built a simple Erlang application$/ do
   # Try to find an appropriate Erlang
-  erlang_path = '/var/vcap/runtimes/erlang-R14B02/bin'
-  unless File.exists?(erlang_path)
+  begin
+    installed_erlang = `erl -version`
+  rescue
+  end
+  if $? != 0
     pending "Not running Erlang test because the Erlang runtime is not installed"
   else
-    Dir.chdir("#{@testapps_dir}/#{SIMPLE_ERLANG_APP}")
-    make_prefix = "PATH=#{erlang_path}:$PATH"
-    rel_build_result = `#{make_prefix} make relclean rel`
+    Dir.chdir("#{@testapps_dir}/mochiweb/#{SIMPLE_ERLANG_APP}")
+    rel_build_result = `make relclean rel`
     raise "Erlang application build failed: #{rel_build_result}" if $? != 0
   end
 end
