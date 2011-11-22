@@ -56,6 +56,10 @@ SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 
+Before do
+  AppCloudHelper.instance.check_admin_user
+end
+
 After do
   AppCloudHelper.instance.cleanup
 end
@@ -218,6 +222,25 @@ class AppCloudHelper
     rescue
     end
     cleanup
+  end
+
+  def check_admin_user
+    # Run test only as non-admin user
+    # Check if the test_user is admin and exit the BVT if the user is admin
+    begin
+      @client.users
+      puts "Admin user can not run BVTs. Please try running as non-admin user"
+      Cucumber.wants_to_quit = true
+      # Make sure that RuntimeError 'Operation not permitted' is caught for the non-admin user
+      # when running the vmc 'users' command
+    rescue RuntimeError => e
+      if !e.message.eql?("Error 200: Operation not permitted") then
+      # Exits the BVT if there is an error other than 'Operation not permitted'
+        puts "ERROR when VMC client tries to fetch app cloud users: #{e.message}"
+        puts "It is possible that target cloud is not up and running."
+        Cucumber.wants_to_quit = true
+      end
+    end
   end
 
   def cleanup
