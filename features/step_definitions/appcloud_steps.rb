@@ -196,8 +196,7 @@ Given /^I have built a simple Erlang application$/ do
   erlang_ready = true
 
   # figure out if cloud has erlang runtime
-  vmc = VMC::Client.new
-  runtimes = vmc.runtimes_info().to_a.join()
+  runtimes = @client.info().to_a().join()
   if (runtimes =~ /erlang/)
     puts "target cloud has Erlang runtime"
   else
