@@ -56,6 +56,14 @@ SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 
+Before do
+  class Fixnum
+    def to_json(options = nil)
+      to_s
+    end
+  end
+end
+
 After do
   AppCloudHelper.instance.cleanup
 end
