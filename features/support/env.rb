@@ -55,6 +55,10 @@ AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
+NODE_SERVICES_APP = "app_node_service"
+RAILS_SERVICES_APP = "app_rails_service"
+SINATRA_SERVICES_APP = "app_sinatra_service"
+SPRING_SERVICES_APP = "app_spring_service"
 
 After do
   AppCloudHelper.instance.cleanup
@@ -267,6 +271,10 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_KV_APP)
     delete_app_internal(BROKERED_SERVICE_APP)
     delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+    delete_app_internal(NODE_SERVICES_APP)
+    delete_app_internal(RAILS_SERVICES_APP)
+    delete_app_internal(SINATRA_SERVICES_APP)
+    delete_app_internal(SPRING_SERVICES_APP)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
