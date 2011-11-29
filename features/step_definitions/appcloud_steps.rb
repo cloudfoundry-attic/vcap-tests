@@ -614,6 +614,8 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
     expected_health = 1.0
     health = poll_until_done @app, expected_health, @token
     health.should == expected_health
+  else
+    pending "Not running test because #{requested_service} service is not available"
   end
 end
 
