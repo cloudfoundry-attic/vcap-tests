@@ -234,11 +234,13 @@ class AppCloudHelper
       # Make sure that RuntimeError 'Operation not permitted' is caught for the non-admin user
       # when running the vmc 'users' command
     rescue RuntimeError => e
-      if !e.message.eql?("Error 200: Operation not permitted") then
-      # Exits the BVT if there is an error other than 'Operation not permitted'
-        puts "ERROR when VMC client tries to fetch app cloud users: #{e.message}"
-        puts "It is possible that target cloud is not up and running."
-        Cucumber.wants_to_quit = true
+      unless e.message.eql?("Error 200: Operation not permitted")
+        unless test_user = TEST_AUTOMATION_USER_ID 
+          # Exits the BVT if there is an error other than 'Operation not permitted'
+          puts "ERROR when VMC client tries to fetch app cloud users: #{e.message}"
+          puts "It is possible that target cloud is not up and running."
+          Cucumber.wants_to_quit = true
+        end
       end
     end
   end
