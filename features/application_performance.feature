@@ -6,7 +6,7 @@ Feature: Measure various performance features of an application
 	 Background: Application creation
 	   Given I have registered and logged in
 
-       @creates_redis_lb_app @lb_check @smoke
+       @creates_redis_lb_app @lb_check @smoke @sanity
        Scenario: start application
          Given I have my redis lb app on AppCloud
          When I upload my application
