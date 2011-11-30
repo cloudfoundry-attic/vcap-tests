@@ -5,7 +5,7 @@ Feature: Create a simple key-value brokered service and test it using applicatio
 
   Background: create brokered service
 
-  @creates_simple_kv_app  @creates_brokered_service @creates_brokered_service_app @smoke
+  @creates_simple_kv_app  @creates_brokered_service @creates_brokered_service_app @smoke @ruby
   Scenario: Create a brokered service
     When I have the service broker url and token
     Given I have registered and logged in

@@ -9,12 +9,34 @@ vcap = ENV['VCAP'] || ".."
 import "#{vcap}/rakelib/core_components.rake"
 import "#{vcap}/rakelib/bundler.rake"
 
+task :default => [:help]
+
+desc "List help commands"
+task :help do
+  puts "Usage: rake [command]"
+  puts "  tests\t\trun all bvts"
+  puts "  smoke_tests\trun a smaller subset of bvts"
+  puts "  sanity\trun only the most fundamental bvts"
+  puts "  ruby\t\trun ruby-based bvts"
+  puts "  jvm\t\trun jvm-based bvts"
+  puts "  ci-tests\tset up a test cloud, run the bvts, and then tear it down"
+  puts "  help\t\tlist help commands"
+end
 
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
 desc "Run a faster subset of Basic Viability Tests"
 task :smoke_tests => ['build','bvt:run_smoke']
+
+desc "Run a fast essential basic set of tests"
+task :sanity => ['bvt:run_sanity']
+
+desc "Run all ruby runtime tests"
+task :ruby => ['bvt:run_ruby']
+
+desc "Run all jvm runtime tests"
+task :jvm => ['bvt:run_jvm']
 
 ci_steps = ['ci:version_check',
             'build',

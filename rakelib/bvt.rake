@@ -7,6 +7,18 @@ namespace :bvt do
     sh "bundle exec cucumber --tags @smoke"
   end
 
+  task :run_sanity do
+    sh "bundle exec cucumber --tags @sanity"
+  end
+
+  task :run_ruby do
+    sh "bundle exec cucumber --tags @ruby"
+  end
+
+  task :run_jvm do
+    sh "bundle exec cucumber --tags @jvm"
+  end
+
   desc "Run the Basic Viability Tests with jUnit output"
   task :run_for_ci do
     # Don't fail the Rake run if a test fails.

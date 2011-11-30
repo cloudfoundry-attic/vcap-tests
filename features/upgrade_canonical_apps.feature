@@ -13,7 +13,7 @@ Feature: Check canonical app services
 	Background: logging in
 	  Given I have registered and logged in
 
-  @sinatra
+  @sinatra 
   Scenario: check persistent data
      Given I have my running application named app_sinatra_service
      Then I should get on application app_sinatra_service the persisted data from redis service with key abc, and I should see redisabc
@@ -40,7 +40,7 @@ Feature: Check canonical app services
      Then I should get on application app_spring_service the persisted data from mysql service with key abc, and I should see mysqlabc
      Then I should get on application app_spring_service the persisted data from rabbitmq service with key abc, and I should see rabbitabc
 
-  @rails
+  @rails 
   Scenario: check persistent data
      Given I have my running application named app_rails_service
 

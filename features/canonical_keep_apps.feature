@@ -16,7 +16,7 @@ Feature: Deploy canonical apps and check their service
 	Background: deploying canonical service
 	  Given I have registered and logged in
 
-    @sinatra
+    @sinatra 
     Scenario: sinatra_keep_app test services
       Given I have deployed my application named app_sinatra_service
       When I query status of my application
@@ -60,7 +60,7 @@ Feature: Deploy canonical apps and check their service
       Then I post postgresqlabc to postgresql service with key abc
       Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
 
-    @spring
+    @spring 
     Scenario: spring_keep_app test services
       Given I have deployed my application named app_spring_service
       When I query status of my application
@@ -82,7 +82,7 @@ Feature: Deploy canonical apps and check their service
       Then I post postgresqlabc to postgresql service with key abc
       Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
 
-    @rails
+    @rails 
     Scenario: rails_keep_app test services
       Given I have deployed my application named app_rails_service
       When I query status of my application
