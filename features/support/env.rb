@@ -694,10 +694,10 @@ class AppCloudHelper
   end
 
   def provision_blob_service token
-    name = "#{@namespace}#{@app || 'simple_blob_app'}atmos"
-    @client.create_service(:blob, name)
+    name = "#{@namespace}#{@app || 'simple_blob_app'}vblob"
+    @client.create_service(:vblob, name)
     service_manifest = {
-     :vendor=>"blob",
+     :vendor=>"vblob",
      :tier=>"free",
      :version=>"1.0",
      :name=>name

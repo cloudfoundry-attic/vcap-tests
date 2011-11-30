@@ -1,5 +1,5 @@
 Given /^I have provisioned a blob service$/ do
-  pending unless find_service 'blob'
+  pending unless find_service 'vblob'
   @blob_service = provision_blob_service @token
   @blob_service.should_not == nil
 end
