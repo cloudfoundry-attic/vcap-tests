@@ -15,7 +15,7 @@ class BvtEnv
   DEFAULT_ARTIFACTS_DIR   = "./ci-artifacts-dir"
 
   attr_reader :root_dir, :config_dir,
-              :vcap_dir,
+              :vcap_dir, :git_root_dir,
               :artifacts_dir, :email_recipients
 
   def initialize
@@ -23,6 +23,8 @@ class BvtEnv
     @root_dir        = File.expand_path("..", File.dirname(__FILE__))
     @vcap_dir        = ENV['VCAP'] || File.dirname(@root_dir)
     @config_dir      = File.expand_path("config", @root_dir)
+    # git_root_dir is applicable to full reporting with git repo version info
+    @git_root_dir    = ENV['BVTRPT_GIT_ROOT_DIR'] || @vcap_dir
 
     # Pull in all property values from yml file, defaulting values when missing
     config_file = ENV['BVT_BOSH_CONFIG_FILE'] || File.join(@config_dir, "bvt_bosh.yml")
@@ -84,21 +86,23 @@ namespace :bvt_rpt do
     end
   end
 
-  # Returns output on git version strings
+  # Reports ALL git sub-repos, in case some are soft-links
+  # to head.
   def repo_info(root_dir)
     return_log = " ==== REPOSITORY INFORMATION ====\n"
-    root_dir.entries.sort.each do | fname  |
-      fpath = File.join(root_dir.path, fname)
-      if File.directory?(fpath) && File.exists?(fpath + "/.git/config")
-        begin
-          this_repo_log = `cd #{fpath}; git log -1 --oneline`
-          return_log += fname + ": " + this_repo_log
-        rescue
-          puts "WARNING: failed collecting git repository version info"
-        end
+    base = File.basename(root_dir)
+    gitfiles=`find -L #{root_dir} -name .git 2>/dev/null`
+    if gitfiles == "" 
+      return_log += "  No repositories found under #{root_dir}"
+    else 
+      gitfiles.each_line.sort.each do | gitfile |
+        gitdir = File.dirname(gitfile).chomp
+        this_repo_log = `cd #{gitdir}; git log -1 --oneline`
+        return_log += "#{gitdir.gsub(root_dir, base)} : #{this_repo_log}"
       end
     end
-    return return_log
+    return_log += "\n"
+    return_log
   end
 
   def bvt_summary(results_dir_path, git_root_path, verbose = true)
@@ -118,8 +122,7 @@ namespace :bvt_rpt do
         end
       end
       # append some basic information on the git repo state
-      vcap_parent = Dir.new(git_root_path)
-      summary += "\n\n" + repo_info(vcap_parent) + "\n"
+      summary += "\n\n" + repo_info(git_root_path) + "\n"
     end
 
     # Start building a summary, with just the pass/fail/time values
@@ -155,16 +158,16 @@ namespace :bvt_rpt do
   end
 
   desc "Summarize BVT results"
-  task :brief_bvt_summary do
+  task :brief_bvt_summary => :bvt_setenv do
     puts "Summarizing BVT results in #{bvt_env.artifacts_dir}"
-    summary, total_errs, total_skipped, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), false)
+    summary, total_errs, total_skipped, total_count = bvt_summary(bvt_env.artifacts_dir, bvt_env.git_root_dir, false)
     puts summary
   end
 
   desc "Summarize BVT results with test output"
-  task :full_bvt_summary do
+  task :full_bvt_summary => :bvt_setenv do
     puts "Summarizing BVT results in #{bvt_env.artifacts_dir}"
-    summary, total_errs, total_skipped, total_count = bvt_summary(bvt_env.artifacts_dir, File.dirname(bvt_env.vcap_dir), true)
+    summary, total_errs, total_skipped, total_count = bvt_summary(bvt_env.artifacts_dir, bvt_env.git_root_dir, true)
     puts summary
   end
 
