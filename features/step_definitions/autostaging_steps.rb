@@ -375,7 +375,7 @@ After("@creates_hibernate_postgresql_adapter") do |scenario|
 end
 
 After("@creates_grails_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_roo_db_adapter") do |scenario|

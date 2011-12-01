@@ -1,3 +1,4 @@
+@smoke
 Feature: Retrieve information on an application on AppCloud
 
 	 As a user with an application deployed on AppCloud

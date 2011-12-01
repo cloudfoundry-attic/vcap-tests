@@ -6,7 +6,7 @@ Feature: Measure various performance features of an application
 	 Background: Application creation
 	   Given I have registered and logged in
 
-       @creates_redis_lb_app @lb_check
+       @creates_redis_lb_app @lb_check @smoke
        Scenario: start application
          Given I have my redis lb app on AppCloud
          When I upload my application
@@ -29,7 +29,7 @@ Feature: Measure various performance features of an application
 		 And all 5 instances should do within 55 percent of their fair share of the 150 operations
 		 And after resetting all counters it should return OK and no data
 
-      @creates_env_test_app @env_test_check
+      @creates_env_test_app @env_test_check @smoke
       Scenario: start application
         Given I have my env_test app on AppCloud
         When I upload my application
@@ -48,6 +48,7 @@ Feature: Measure various performance features of an application
         Then it should be bound to an atmos service
         And env_test's health_check entrypoint should return OK
 
+      @smoke
       Scenario: start application
         Given The appcloud instance has a set of available frameworks
         Given The foo framework is not supported on appcloud

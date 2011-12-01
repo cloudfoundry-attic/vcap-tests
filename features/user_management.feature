@@ -1,3 +1,4 @@
+@smoke
 Feature: User registration with and establishment of an authentication token with AppCloud
 
 	 In order to track service and resource usage

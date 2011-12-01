@@ -13,6 +13,9 @@ import "#{vcap}/rakelib/bundler.rake"
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
+desc "Run a faster subset of Basic Viability Tests"
+task :smoke_tests => ['build','bvt:run_smoke']
+
 ci_steps = ['ci:version_check',
             'build',
             'bundler:install:production',
@@ -40,7 +43,19 @@ TESTS_PATH = tests_path
 BUILD_ARTIFACT = File.join(Dir.pwd, ".build")
 
 TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
-             "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app", "#{TESTS_PATH}/spring/app_spring_service"]
+             "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app",
+             "#{TESTS_PATH}/spring/app_spring_service",
+             "#{TESTS_PATH}/java_web/app_with_startup_delay",
+             "#{TESTS_PATH}/java_web/tomcat-version-check-app",
+             "#{TESTS_PATH}/spring/roo-guestbook",
+             "#{TESTS_PATH}/spring/jpa-guestbook",
+             "#{TESTS_PATH}/spring/hibernate-guestbook",
+             "#{TESTS_PATH}/spring/spring-env",
+             "#{TESTS_PATH}/grails/guestbook",
+             "#{TESTS_PATH}/java_web/java_tiny_app",
+             "#{TESTS_PATH}/lift/hello_lift",
+             "#{TESTS_PATH}/lift/lift-db-app"
+]
 
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
 task :build, [:force] do |t, args|
@@ -48,9 +63,13 @@ task :build, [:force] do |t, args|
   sh('git submodule update --init')
   if build_required? args.force
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
+    is_grailsdep_installed = false
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
       Dir.chdir test do
+        unless is_grailsdep_installed
+          is_grailsdep_installed = install_grailsdep test
+        end
         sh('mvn package -DskipTests') do |success, exit_code|
           unless success
             clear_build_artifact
@@ -89,6 +108,67 @@ def build_required? (force_build=nil)
     git_hash = `git rev-parse --short=8 --verify HEAD`
     saved_git_hash.to_s.strip != git_hash.to_s.strip
   end
+end
+
+def install_grails
+  puts "\tOne-time install of grails modules to enable build/run of grails apps"
+  sh('sudo apt-get install python-software-properties') do |success, exit_code|
+    unless success
+      puts "\tUnable to install python-software-properties"
+    end
+  end
+  sh('sudo add-apt-repository ppa:groovy-dev/grails') do |success, exit_code|
+    unless success
+      puts "\tUnable to add grails repository"
+    end
+  end
+  sh('sudo apt-get update') do |success, exit_code|
+    unless success
+      puts "\tUnable to execute apt-get update"
+    end
+  end
+  sh('sudo apt-get install grails') do |success, exit_code|
+    unless success
+      puts "\tUnable to install grails. BVT may fail to build."
+    end
+  end
+end
+
+def install_grailsdep test
+  is_grailsdep_installed = false
+  is_grails_installed = false
+  if (test =~ /\/grails\//)
+    sh('grails create-app tmp') do |success, exit_code|
+      if success
+        is_grailsdep_installed = true
+        is_grails_installed = true
+        puts "\tInstall grails dependencies in ivy cache successfully"
+        sh('rm -rf tmp') do |success, exit_code|
+        end
+      else
+        install_grails
+      end
+    end
+    unless is_grailsdep_installed
+      sh('grails create-app tmp') do |success, exit_code|
+        if success
+          is_grailsdep_installed = true
+          puts "\tInstall grails dependencies in ivy cache successfully"
+        else
+          is_grailsdep_installed = false
+          puts "\tUnable to populate require dependencies in ivy cache using 'grails create-app'"
+          puts "\tUnable to auto-install grails components. You may have to install grails in your environment manually"
+          puts "\tIn your BVT shell> grails --version"
+          puts "\t\t command not found -> You have to manually install grails"
+          puts "\t\t Security Exception etc -> You have to remove the setting of CLASSPATH variable"
+          fail "***** Please make sure grails is installed and configured properly before building BVT"
+        end
+        sh('rm -rf tmp') do |success, exit_code|
+        end
+      end 
+    end
+  end
+  is_grailsdep_installed
 end
 
 def save_git_hash
