@@ -7,7 +7,6 @@ namespace :bvt_upgrade do
   results_dir = File.expand_path("../../../ci-artifacts-dir", File.dirname(__FILE__))
   tests_dir = File.join(CoreComponents.root, "tests")
   FileUtils.mkdir_p(results_dir)
-  cucumber_options = ENV['CUCUMBER_OPTIONS'] || "--tags @bvt_upgrade --tags ~@rails"
 
   desc "Execute specific feature  tests"
   task :exec_feature_tests, :feature_name, :format do |t, args|
@@ -19,7 +18,12 @@ namespace :bvt_upgrade do
     else
       output = "#{results_dir}/TEST-#{args.feature_name}.log"
     end
-    cmd = BuildConfig.bundle_cmd(" bundle exec cucumber features/#{args.feature_name}.feature --require features #{cucumber_options} --format #{args.format} -o #{output}")
+    if "#{args.feature_name}".match("upgrade_canonical_apps")
+      cucumber_options = ENV['CUCUMBER_OPTIONS'] || "--tags @bvt_upgrade --tags ~@rails"
+    else
+      cucumber_options = ENV['CUCUMBER_OPTIONS'] || "--tags @canonical --tags ~@delete --tags ~@rails --tags ~@bvt_upgrade"
+    end
+    cmd = BuildConfig.bundle_cmd(" bundle exec cucumber features/#{args.feature_name}* --require features #{cucumber_options} --format #{args.format} -o #{output}")
     sh "\tcd #{tests_dir}; #{cmd}" do |success, exit_code|
       if success
         puts " #{args.feature_name} completed successfully"
@@ -31,7 +35,7 @@ namespace :bvt_upgrade do
 
   desc "Run BVT: deploy and keep canonical apps running"
   task :run_bvt_canonical_keep_apps do
-    Rake::Task['bvt_upgrade:exec_feature_tests'].invoke("canonical_keep_apps", "pretty")
+    Rake::Task['bvt_upgrade:exec_feature_tests'].invoke("canonical_apps", "pretty")
   end
 
   desc "Run BVT expecting canonical apps running"
@@ -41,7 +45,7 @@ namespace :bvt_upgrade do
 
   desc "Run BVT: deploy and keep canonical apps running"
   task :junit_bvt_canonical_keep_apps do
-    Rake::Task['bvt_upgrade:exec_feature_tests'].invoke("canonical_keep_apps", "junit")
+    Rake::Task['bvt_upgrade:exec_feature_tests'].invoke("canonical_apps", "junit")
   end
 
   desc "Run BVT expecting canonical apps running"
