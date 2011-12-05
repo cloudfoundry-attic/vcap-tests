@@ -1,17 +1,19 @@
-# These tests can only be run after the tests in canonical_keep_apps.feature have run
-# They expect the apps to be running and the services provisioned
-# The tests cleanup after themselves, so no apps or services should be left at the end of the run
+# These tests can only be run after the tests in canonical_apps_*.feature
+# have run, explicitly omitting to run the scenarios tagged with @delete.
+# They expect the apps to be running and the services provisioned.
+# The tests cleanup after themselves, so no apps and services
+# should be left at the end of the run unless --tags ~@delete is explicitly set.
 # This feature should be excluded via cucumber --tags ~@bvt_upgrade from the
-# regular BVT run
+# regular BVT run.
 
 @bvt_upgrade
 Feature: Check canonical app services
 
-	As a user with all canonical apps.
-	I want to check all canonical apps and use all their service
+  As a user with all canonical apps.
+  I want to check all canonical apps and use all their service
 
-	Background: logging in
-	  Given I have registered and logged in
+  Background: logging in
+    Given I have registered and logged in
 
   @sinatra
   Scenario: check persistent data
@@ -50,6 +52,7 @@ Feature: Check canonical app services
      Then I should get on application app_rails_service the persisted data from mysql service with key abc, and I should see mysqlabc
      Then I should get on application app_rails_service the persisted data from rabbitmq service with key abc, and I should see rabbitabc
 
+  @delete
   Scenario: delete services and canonical apps
      When I list my applications
      Then I delete all services and apps
