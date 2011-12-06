@@ -10,6 +10,16 @@ simple_app:
   startup: "ruby foo.rb"
   path: "assets/sinatra/hello_vcap"
 
+simple_app2:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby foo.rb"
+  path: "assets/sinatra/hello_vcap"
+
+simple_app3:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby foo.rb"
+  path: "assets/sinatra/hello_vcap"
+
 tiny_java_app:
   framework: "java_web/1.0"
   startup: "thin start"

@@ -14,37 +14,42 @@ task :default => [:help]
 desc "List help commands"
 task :help do
   puts "Usage: rake [command]"
-  puts "  tests\t\trun all bvts"
-  puts "  smoke_tests\trun a smaller subset of bvts"
-  puts "  sanity\trun only the most fundamental bvts"
-  puts "  ruby\t\trun ruby-based bvts (rails3, sinatra)"
-  puts "  jvm\t\trun jvm-based bvts (spring, java_web, grails, lift)"
-  puts "  java\t\trun java-based bvts (spring, java_web)"
-  puts "  services\trun services-based bvts"
-  puts "  ci-tests\tset up a test cloud, run the bvts, and then tear it down"
-  puts "  help\t\tlist help commands"
+  puts "  tests\t\t\trun all bvts"
+  puts "  p_tests\t\trun bvts in parallel"
+  puts "  p_tests [tests]\trun specified comma-delimited bvts in parallel (features/a.feature,features/b.feature)"
+  puts "  smoke_tests\t\trun a smaller subset of bvts"
+  puts "  sanity\t\trun only the most fundamental bvts"
+  puts "  ruby\t\t\trun ruby-based bvts (rails3, sinatra)"
+  puts "  jvm\t\t\trun jvm-based bvts (spring, java_web, grails, lift)"
+  puts "  java\t\t\trun java-based bvts (spring, java_web)"
+  puts "  services\t\trun services-based bvts"
+  puts "  ci-tests\t\tset up a test cloud, run the bvts, and then tear it down"
+  puts "  help\t\t\tlist help commands"
 end
 
 desc "Run the Basic Viability Tests"
-task :tests => ['build','bvt:run']
+task :tests => ['build', 'bvt:init', 'bvt:run']
+
+desc "Run BVTs in parallel"
+task :p_tests => ['build', 'bvt:init', 'bvt:run_parallel']
 
 desc "Run a faster subset of Basic Viability Tests"
-task :smoke_tests => ['build','bvt:run_smoke']
+task :smoke_tests => ['build', 'bvt:init', 'bvt:run_smoke']
 
 desc "Run a fast essential basic set of tests"
-task :sanity => ['build','bvt:run_sanity']
+task :sanity => ['build', 'bvt:init', 'bvt:run_sanity']
 
 desc "Run ruby-based tests"
-task :ruby => ['bvt:run_ruby']
+task :ruby => ['bvt:init', 'bvt:run_ruby']
 
 desc "Run jvm-based tests"
-task :jvm => ['build','bvt:run_jvm']
+task :jvm => ['build', 'bvt:init', 'bvt:run_jvm']
 
 desc "Run java-based tests"
-task :java => ['build','bvt:run_java']
+task :java => ['build', 'bvt:init', 'bvt:run_java']
 
 desc "Run services-based tests"
-task :services => ['build','bvt:run_services']
+task :services => ['build', 'bvt:init', 'bvt:run_services']
 
 ci_steps = ['ci:version_check',
             'build',
