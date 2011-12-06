@@ -28,6 +28,8 @@ require 'digest/sha1'
 TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
+SIMPLE_APP2 = "simple_app2"
+SIMPLE_APP3 = "simple_app3"
 REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
@@ -68,6 +70,14 @@ end
 
 After("@creates_simple_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_APP
+end
+
+After("@creates_simple_app2") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_APP2
+end
+
+After("@creates_simple_app3") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_APP3
 end
 
 After("@creates_tiny_java_app") do
@@ -174,7 +184,13 @@ at_exit do
   AppCloudHelper.instance.cleanup
 end
 
-['TERM', 'INT'].each { |s| trap(s) { AppCloudHelper.instance.cleanup; Process.exit! } }
+['TERM', 'INT'].each do |s|
+  trap(s) do
+    ENV['parallel_tests'] = 'false'
+    AppCloudHelper.instance.cleanup
+    Process.exit!
+  end
+end
 
 class AppCloudHelper
   include Singleton
@@ -241,37 +257,41 @@ class AppCloudHelper
   end
 
   def cleanup
-    delete_app_internal(SIMPLE_APP)
-    delete_app_internal(TINY_JAVA_APP)
-    delete_app_internal(REDIS_LB_APP)
-    delete_app_internal(ENV_TEST_APP)
-    delete_app_internal(SIMPLE_DB_APP)
-    delete_app_internal(BROKEN_APP)
-    delete_app_internal(RAILS3_APP)
-    delete_app_internal(JPA_APP)
-    delete_app_internal(HIBERNATE_APP)
-    delete_app_internal(DBRAILS_APP)
-    delete_app_internal(DBRAILS_BROKEN_APP)
-    delete_app_internal(GRAILS_APP)
-    delete_app_internal(ROO_APP)
-    delete_app_internal(SIMPLE_LIFT_APP)
-    delete_app_internal(LIFT_DB_APP)
-    delete_app_internal(TOMCAT_VERSION_CHECK_APP)
-    delete_app_internal(NEO4J_APP)
-    delete_app_internal(SIMPLE_PYTHON_APP)
-    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
-    delete_app_internal(SIMPLE_DJANGO_APP)
-    delete_app_internal(SIMPLE_PHP_APP)
-    delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(AUTO_RECONFIG_TEST_APP)
-    delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
-    delete_app_internal(SIMPLE_KV_APP)
-    delete_app_internal(BROKERED_SERVICE_APP)
-    delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
-    delete_services(all_my_services) unless @registered_user or !get_login_token
-    # This used to delete the entire user, but that now requires admin
-    # privs so it was removed, as was the delete_user method.  See the
-    # git history if it needs to be revived.
+    unless ENV['parallel_tests'] == 'true'
+      delete_app_internal(SIMPLE_APP)
+      delete_app_internal(SIMPLE_APP2)
+      delete_app_internal(SIMPLE_APP3)
+      delete_app_internal(TINY_JAVA_APP)
+      delete_app_internal(REDIS_LB_APP)
+      delete_app_internal(ENV_TEST_APP)
+      delete_app_internal(SIMPLE_DB_APP)
+      delete_app_internal(BROKEN_APP)
+      delete_app_internal(RAILS3_APP)
+      delete_app_internal(JPA_APP)
+      delete_app_internal(HIBERNATE_APP)
+      delete_app_internal(DBRAILS_APP)
+      delete_app_internal(DBRAILS_BROKEN_APP)
+      delete_app_internal(GRAILS_APP)
+      delete_app_internal(ROO_APP)
+      delete_app_internal(SIMPLE_LIFT_APP)
+      delete_app_internal(LIFT_DB_APP)
+      delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+      delete_app_internal(NEO4J_APP)
+      delete_app_internal(SIMPLE_PYTHON_APP)
+      delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
+      delete_app_internal(SIMPLE_DJANGO_APP)
+      delete_app_internal(SIMPLE_PHP_APP)
+      delete_app_internal(SPRING_ENV_APP)
+      delete_app_internal(AUTO_RECONFIG_TEST_APP)
+      delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
+      delete_app_internal(SIMPLE_KV_APP)
+      delete_app_internal(BROKERED_SERVICE_APP)
+      delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+      delete_services(all_my_services) unless @registered_user or !get_login_token
+      # This used to delete the entire user, but that now requires admin
+      # privs so it was removed, as was the delete_user method.  See the
+      # git history if it needs to be revived.
+    end
   end
 
   def create_uri name
@@ -482,10 +502,12 @@ class AppCloudHelper
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
       status = get_app_status app, token
-      runningInstances = status[:runningInstances] || 0
-      health = runningInstances/status[:instances].to_f
-      # to mark? Not sure why this change, but breaks simple stop tests
-      #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      if (status)
+        runningInstances = status[:runningInstances] || 0
+        health = runningInstances/status[:instances].to_f
+        # to mark? Not sure why this change, but breaks simple stop tests
+        #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      end
     end
     health
   end

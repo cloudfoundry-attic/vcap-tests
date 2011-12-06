@@ -25,6 +25,9 @@ GEM
       eventmachine (>= 0.12.10)
       json_pure (>= 1.5.1)
     nokogiri (1.4.4)
+    parallel (0.5.9)
+    parallel_tests (0.6.11)
+      parallel
     rake (0.8.7)
     rest-client (1.6.7)
       mime-types (>= 1.16)
@@ -35,7 +38,7 @@ GEM
     terminal-table (1.4.3)
     vmc (0.3.13.beta.4)
       json_pure (~> 1.5.1)
-      rest-client (< 1.7.0, >= 1.6.1)
+      rest-client (>= 1.6.1, < 1.7.0)
       rubyzip2 (~> 2.0.1)
       terminal-table (~> 1.4.2)
 
@@ -51,6 +54,7 @@ DEPENDENCIES
   json
   nats
   nokogiri
+  parallel_tests
   rake
   rest-client
   rspec (= 1.3.0)
