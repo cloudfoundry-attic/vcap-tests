@@ -1,0 +1,58 @@
+require 'rake'
+
+desc "Run specs"
+
+task "spec" => ["bundler:install:test","test:spec"]
+
+desc "Run specs using RCov"
+task "spec:rcov" => ["bundler:install:test", "test:spec:rcov"]
+
+namespace "bundler" do
+  desc "Install gems"
+  task "install" do
+    sh("bundle install")
+  end
+
+  desc "Install gems for test"
+  task "install:test" do
+    sh("bundle install --without development production")
+  end
+
+  desc "Install gems for production"
+  task "install:production" do
+    sh("bundle install --without development test")
+  end
+
+  desc "Install gems for development"
+  task "install:development" do
+    sh("bundle install --without test production")
+  end
+end
+
+namespace "test" do
+  task "spec" do |t|
+    Dir.foreach('.') do |item|
+      next if item == '.' || item == '..'
+      if File.directory?(item) && File.exists?(item + '/Rakefile')
+        Dir.chdir(item)
+        puts "Executing rspec tests for #{item}"
+        sh("rake spec") do |success, exit_code|
+        end
+        Dir.chdir('../')
+      end
+    end
+  end
+
+  task "spec:rcov" do |t|
+    Dir.foreach('.') do |item|
+      next if item == '.' || item == '..'
+      if File.directory?(item) && File.exists?(item + '/Rakefile')
+        Dir.chdir(item)
+        puts "Executing rspec tests for #{item}"
+        sh("rake spec:rcov") do |success, exit_code|
+        end
+        Dir.chdir('../')
+      end
+    end
+  end
+end
