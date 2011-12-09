@@ -28,6 +28,9 @@ end
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
+desc "Run the Basic Viability Tests but spit junit format results"
+task :junit_tests => ['build','bvt:run_junit_format']
+
 desc "Run a faster subset of Basic Viability Tests"
 task :smoke_tests => ['build','bvt:run_smoke']
 

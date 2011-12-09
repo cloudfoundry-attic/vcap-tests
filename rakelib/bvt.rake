@@ -3,6 +3,10 @@ namespace :bvt do
     sh "bundle exec cucumber --tags ~@bvt_upgrade"
   end
 
+  task :run_junit_format do
+    sh "bundle exec cucumber --tags ~@bvt_upgrade --format junit -o #{BuildConfig.test_result_dir}"
+  end
+
   task :run_smoke do
     sh "bundle exec cucumber --tags @smoke"
   end
