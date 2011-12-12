@@ -46,6 +46,7 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 NEO4J_APP = "neo4j_app"
+MVSTORE_APP = "mvstore_app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
@@ -129,6 +130,10 @@ end
 
 After("@creates_neo4j_app") do
   AppCloudHelper.instance.delete_app_internal NEO4J_APP
+end
+
+After("@creates_mvstore_app") do
+  AppCloudHelper.instance.delete_app_internal MVSTORE_APP
 end
 
 After("@creates_wsgi_app") do
@@ -233,6 +238,7 @@ class AppCloudHelper
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
     delete_app_internal(NEO4J_APP)
+    delete_app_internal(MVSTORE_APP)
     delete_app_internal(SIMPLE_PYTHON_APP)
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
@@ -679,6 +685,18 @@ class AppCloudHelper
      :name=>name
     }
   end
+
+  def provision_mvstore_service token
+    name = "#{@namespace}#{@app || 'simple_mvstore_app'}mvstore"
+    @client.create_service(:mvstore, name)
+    service_manifest = {
+      :vendor=>"mvstore",
+      :tier=>"free",
+      :version=>"1.0",
+      :name=>name}
+      #puts "Provisioned service #{service_manifest}"
+      service_manifest
+    end
 
   def provision_brokered_service token
     name = "#{@namespace}#{@app || 'brokered_service_app'}_#{@brokered_service_name}"

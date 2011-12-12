@@ -118,6 +118,12 @@ neo4j_app:
   startup: "ruby neo4j.rb"
   memory: 256
 
+mvstore_app:
+  framework: "node"
+  startup: node
+  memory: 64
+  path: "assets/node/mvstore_bvt"
+
 simple_wsgi_app:
   framework: "wsgi"
 
