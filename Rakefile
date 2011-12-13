@@ -167,6 +167,15 @@ def install_grails
   end
 end
 
+def install_grails_mac
+  puts "\tOne-time install of grails on mac"
+  sh('brew install grails') do |success, exit_code|
+    unless success
+      puts "\tUnable to install grails using 'brew install grails'. You need to manually install grails on your mac"
+    end
+  end
+end
+
 def install_grailsdep test
   is_grailsdep_installed = false
   is_grails_installed = false
@@ -179,7 +188,16 @@ def install_grailsdep test
         sh('rm -rf tmp') do |success, exit_code|
         end
       else
-        install_grails
+        puts "platform: #{RUBY_PLATFORM}"
+        if (RUBY_PLATFORM =~ /darwin/)
+          puts "Assuming brew is installed on Mac OSX, executing 'brew install grails' to install grails on your system"
+          install_grails_mac
+        elsif (RUBY_PLATFORM =~ /win32/)
+          puts "Please install grails manually in your windows environment before running BVT"
+        else
+          puts "Assuming a debian-based OS. Automatically installing grails..."
+          install_grails
+        end
       end
     end
     unless is_grailsdep_installed
