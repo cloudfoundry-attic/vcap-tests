@@ -1,8 +1,8 @@
 require File.expand_path('../lib/build_config.rb', __FILE__)
 ENV['BUNDLE_PATH'] = BuildConfig.bundle_path
 
-import "../rakelib/core_components.rake"
-import "../rakelib/bundler.rake"
+#import "../rakelib/core_components.rake"
+#import "../rakelib/bundler.rake"
 
 desc "Run the Basic Viability Tests"
 task :tests => 'bvt:run'
