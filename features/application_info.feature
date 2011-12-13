@@ -57,4 +57,8 @@ Feature: Retrieve information on an application on AppCloud
          Then I should be able to get a list of files associated with my application on AppCloud
          And I should be able to retrieve any of the listed files
 
-
+      @creates_simple_app
+      Scenario: get a zipfile for an application
+         Given I have deployed a simple application
+         When I export it
+         Then I should get a zipfile for my application

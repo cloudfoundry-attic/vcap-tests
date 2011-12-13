@@ -256,6 +256,15 @@ Then /^I should be able to retrieve any of the listed files$/ do
   response.should_not == nil
 end
 
+# Get zipped files
+When /^I export it/ do
+  @filename = get_app_zipfile @app
+end
+
+Then /^I should get a zipfile for my application/ do
+  File.exists?(@filename).should_not be_nil
+end
+
 # Get instances info
 Given /^I have (\d+) instances of a simple application$/ do |arg1|
   @instances = set_app_instances @app, arg1.to_i, @token

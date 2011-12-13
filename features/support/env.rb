@@ -1,4 +1,3 @@
-
 require 'rubygems'
 require 'bundler'
 require 'httpclient'
@@ -417,6 +416,12 @@ class AppCloudHelper
   def get_app_files app, instance, path, token
     appname = get_app_name app
     @client.app_files(appname, path, instance)
+  end
+
+  def get_app_zipfile app
+    appname = get_app_name app
+    @client.export_app(appname, Dir.tmpdir)
+    "#{Dir.tmpdir}/#{appname}.zip"
   end
 
   def get_instances_info app, token
