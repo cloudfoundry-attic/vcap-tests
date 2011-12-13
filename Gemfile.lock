@@ -1,6 +1,12 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    af (0.3.13.beta.5)
+      highline (~> 1.6.1)
+      json_pure (~> 1.5.1)
+      rest-client (>= 1.6.1, < 1.7.0)
+      rubyzip2 (~> 2.0.1)
+      terminal-table (~> 1.4.2)
     builder (2.1.2)
     cucumber (0.9.0)
       builder (~> 2.1.2)
@@ -30,21 +36,16 @@ GEM
     rest-client (1.6.1)
       mime-types (>= 1.16)
     rspec (1.3.0)
-    rubyzip2 (2.0.1)
+    rubyzip2 (2.0.2)
     term-ansicolor (1.0.5)
     terminal-table (1.4.2)
     trollop (1.16.2)
-    vmc (0.3.10)
-      highline (~> 1.6.1)
-      json_pure (~> 1.5.1)
-      rest-client (< 1.7.0, >= 1.6.1)
-      rubyzip2 (~> 2.0.1)
-      terminal-table (~> 1.4.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  af
   cucumber (= 0.9.0)
   curb
   gherkin (= 2.2.4)
@@ -58,4 +59,3 @@ DEPENDENCIES
   rspec (= 1.3.0)
   rubyzip2
   terminal-table
-  vmc
