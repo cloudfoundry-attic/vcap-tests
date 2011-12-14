@@ -96,13 +96,9 @@ task :build, [:force] do |t, args|
   sh('git submodule update --init')
   if build_required? args.force
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
-    is_grailsdep_installed = false
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
       Dir.chdir test do
-        unless is_grailsdep_installed
-          is_grailsdep_installed = install_grailsdep test
-        end
         sh('mvn package -DskipTests') do |success, exit_code|
           unless success
             clear_build_artifact
@@ -141,67 +137,6 @@ def build_required? (force_build=nil)
     git_hash = `git rev-parse --short=8 --verify HEAD`
     saved_git_hash.to_s.strip != git_hash.to_s.strip
   end
-end
-
-def install_grails
-  puts "\tOne-time install of grails modules to enable build/run of grails apps"
-  sh('sudo apt-get install python-software-properties') do |success, exit_code|
-    unless success
-      puts "\tUnable to install python-software-properties"
-    end
-  end
-  sh('sudo add-apt-repository ppa:groovy-dev/grails') do |success, exit_code|
-    unless success
-      puts "\tUnable to add grails repository"
-    end
-  end
-  sh('sudo apt-get update') do |success, exit_code|
-    unless success
-      puts "\tUnable to execute apt-get update"
-    end
-  end
-  sh('sudo apt-get install grails') do |success, exit_code|
-    unless success
-      puts "\tUnable to install grails. BVT may fail to build."
-    end
-  end
-end
-
-def install_grailsdep test
-  is_grailsdep_installed = false
-  is_grails_installed = false
-  if (test =~ /\/grails\//)
-    sh('grails create-app tmp') do |success, exit_code|
-      if success
-        is_grailsdep_installed = true
-        is_grails_installed = true
-        puts "\tInstall grails dependencies in ivy cache successfully"
-        sh('rm -rf tmp') do |success, exit_code|
-        end
-      else
-        install_grails
-      end
-    end
-    unless is_grailsdep_installed
-      sh('grails create-app tmp') do |success, exit_code|
-        if success
-          is_grailsdep_installed = true
-          puts "\tInstall grails dependencies in ivy cache successfully"
-        else
-          is_grailsdep_installed = false
-          puts "\tUnable to populate require dependencies in ivy cache using 'grails create-app'"
-          puts "\tUnable to auto-install grails components. You may have to install grails in your environment manually"
-          puts "\tIn your BVT shell> grails --version"
-          puts "\t\t command not found -> You have to manually install grails"
-          puts "\t\t Security Exception etc -> You have to remove the setting of CLASSPATH variable"
-          fail "***** Please make sure grails is installed and configured properly before building BVT"
-        end
-        sh('rm -rf tmp') do |success, exit_code|
-        end
-      end 
-    end
-  end
-  is_grailsdep_installed
 end
 
 def save_git_hash
