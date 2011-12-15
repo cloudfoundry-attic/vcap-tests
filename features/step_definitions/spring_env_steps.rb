@@ -50,7 +50,7 @@ Then /^the cloud service properties should be correct for a (\S+) service named 
   # adjust service name to add test prefix
   service_name =  eval("#{service_type}_name service_name")
   type = http_get_body "properties/sources/property/cloud.services.#{service_name}.type"
-  type.should satisfy {|arg| arg.starts_with service_type}
+  type.should satisfy {|arg| arg.start_with? service_type}
   plan = http_get_body "properties/sources/property/cloud.services.#{service_name}.plan"
   plan.should == 'free'
   password = http_get_body "properties/sources/property/cloud.services.#{service_name}.connection.password"
