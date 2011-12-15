@@ -1,10 +1,12 @@
-# These tests can only be run after the tests in canonical_apps_*.feature
-# have run, explicitly omitting to run the scenarios tagged with @delete.
-# They expect the apps to be running and the services provisioned.
+# These tests are meant to be executed as part of the bvt_upgrade run and should
+# be excluded from a regular BVT run.
+# They expect the canonical apps to be running and the services provisioned.
 # The tests cleanup after themselves, so no apps and services
-# should be left at the end of the run unless --tags ~@delete is explicitly set.
-# This feature should be excluded via cucumber --tags ~@bvt_upgrade from the
-# regular BVT run.
+# should be left at the end of the run.
+# If BVTs are run via rake tasks like "rake tests" or "rake bvt:run", the tasks 
+# have already been modified to exclude them.
+# If BVTs are run as "bundle exec cucumber" please add "--tags ~@bvt_upgrade" 
+# to exclude them.
 
 @bvt_upgrade
 Feature: Check canonical app services
