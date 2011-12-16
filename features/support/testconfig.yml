@@ -421,4 +421,9 @@ standalone_erlang_app:
   path: "assets/standalone/erlang_app"
   no_url: true
 
+jruby18_sinatra_simple_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+  runtime: "jruby18"
+  path: "assets/jruby_sinatra/simple_app"
 
