@@ -427,3 +427,26 @@ jruby18_sinatra_simple_app:
   runtime: "jruby18"
   path: "assets/jruby_sinatra/simple_app"
 
+jruby19_sinatra_simple_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+  runtime: "jruby19"
+  path: "assets/jruby_sinatra/simple_app"
+
+jruby19_sinatra_mysql_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "thin start"
+  runtime: "jruby19"
+  path: "assets/jruby_sinatra/mysql_app"
+
+jruby18_rails3_simple_app:
+  framework: "rails/1.0"
+  startup: "thin start"
+  runtime: "jruby18"
+  path: "assets/jruby_rails3/simple_app"
+
+jruby18_rails3_mysql_app:
+  framework: "rails/1.0"
+  startup: "thin start"
+  runtime: "jruby18"
+  path: "assets/jruby_rails3/mysql_app"

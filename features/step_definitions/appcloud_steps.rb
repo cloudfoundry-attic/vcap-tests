@@ -885,13 +885,3 @@ Then /^I should be able to immediately access the Java application through its u
   contents.body_str.should =~ /I am up and running/
   contents.close
 end
-
-Given /^I have deployed a simple JRuby 1.8 Sinatra application$/ do
-  pending_unless_runtime_exists(@token, "jruby18")
-  @app = create_app JRUBY18_SINATRA_SIMPLE_APP, @token
-  upload_app @app, @token
-  start_app @app, @token
-  expected_health = 1.0
-  health = poll_until_done @app, expected_health, @token
-  health.should == expected_health
-end
