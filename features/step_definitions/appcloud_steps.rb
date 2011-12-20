@@ -593,6 +593,8 @@ Then /^I delete my service$/ do
   if @service
     s = delete_service @service[:name]
   end
+
+  @service_id = nil
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|
