@@ -39,3 +39,11 @@ Feature: Control the life-cycle of an application on AppCloud
         Given I have deployed my application named java_app_with_startup_delay
         Then it should be started
         And I should be able to immediately access the Java application through its url
+
+      @creates_node_chat_app
+      Scenario: start an application and be able to update the app successfully even when the update is an empty update
+        Given I have deployed my application named node_chat_app
+        Then it should be started
+        When I upload an unmodified version of the node_chat_app to AppCloud
+        And I update my application on AppCloud
+        Then my update should succeed

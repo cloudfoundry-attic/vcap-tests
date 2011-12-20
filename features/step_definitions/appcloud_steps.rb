@@ -524,6 +524,11 @@ When /^I upload a modified simple application to AppCloud$/ do
   modify_and_upload_app @app, @token
 end
 
+When /^I upload an unmodified version of the node_chat_app to AppCloud$/ do
+  upload_app_help("#{@testapps_dir}/node/node_chat", @app)
+  restart_app @app, @token
+end
+
 When /^I update my application on AppCloud$/ do
   @response = poll_until_update_app_done @app, @token
 end

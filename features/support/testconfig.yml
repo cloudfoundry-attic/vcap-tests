@@ -189,3 +189,9 @@ java_app_with_startup_delay:
   startup: "thin start"
   memory: 256
   path: "assets/java_web/app_with_startup_delay/target"
+
+node_chat_app:
+  framework: "node"
+  startup: node
+  memory: 64
+  path: "assets/node/node_chat"
