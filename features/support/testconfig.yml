@@ -3,6 +3,7 @@
 # Within this value, we poll for completion status of the operations with the
 # sleep interval between successive poll requests specified below.
 timeout_secs: 60
+job_timeout_secs: 30
 sleep_secs: 1
 
 simple_app:
