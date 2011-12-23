@@ -9,6 +9,6 @@ Feature: blob service binding and app deployment
     Given I have registered and logged in
     Given I have provisioned a blob service
     Given I have deployed a blob application that is bound to this service
-    Given I create a bucket in my blob service through my application
-    When I create an object in my blob service through my application
-    Then I should be able to get the object
+    Given I create a container in my blob service through my application
+    When I create an file in my blob service through my application
+    Then I should be able to get the file

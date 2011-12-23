@@ -14,22 +14,22 @@ Given /^I have deployed a blob application that is bound to this service$/ do
   health.should == expected_health
 end
 
-Given /^I create a bucket in my blob service through my application$/ do
-  uri = get_uri(@app, 'bucket1')
+Given /^I create a container in my blob service through my application$/ do
+  uri = get_uri(@app, 'container1')
   r = post_uri(uri,'dummy') # here post_uri requires payload, but our service safely ignores the payload, thus really some dummy data to make post_uri happy
   r.response_code.should == 200
   r.close
 end
 
-When /^I create an object in my blob service through my application$/ do
-  uri = get_uri(@app, 'bucket1/object1')
+When /^I create an file in my blob service through my application$/ do
+  uri = get_uri(@app, 'container1/file1')
   r = post_uri(uri, 'abc')
   r.response_code.should == 200
   r.close
 end
 
-Then /^I should be able to get the object$/ do
-  uri = get_uri @app, "bucket1/object1"
+Then /^I should be able to get the file$/ do
+  uri = get_uri @app, "container1/file1"
   r = get_uri_contents uri
   r.should_not == nil
   r.response_code.should == 200
