@@ -78,6 +78,7 @@ BUILD_ARTIFACT = File.join(Dir.pwd, ".build")
 TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/auto-reconfig-missing-deps-test-app",
              "#{TESTS_PATH}/spring/app_spring_service",
+             "#{TESTS_PATH}/spring/javaee-namespace-app",
              "#{TESTS_PATH}/java_web/app_with_startup_delay",
              "#{TESTS_PATH}/java_web/tomcat-version-check-app",
              "#{TESTS_PATH}/spring/roo-guestbook",

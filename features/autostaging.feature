@@ -106,3 +106,8 @@ Feature: Deploy applications that make use of autostaging
         Given I deploy a Spring Web Application that has no packaged mongo, redis, rabbit, or datasource dependencies
         Then the application should start with no errors
 
+      @creates_javaee_namespace_app @java
+      Scenario: Start Spring Web Application using javaee namespace
+        Given I deploy a Spring Web Application that uses the javaee namespace
+        Then the application should start with no errors
+

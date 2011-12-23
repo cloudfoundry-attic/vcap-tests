@@ -357,6 +357,13 @@ Then /^I should have the same (\d+) records on retrieving all records from the R
   verify_contents arg1.to_i + 1, response.body_str, "//table/tr"
 end
 
+Given /^I deploy a Spring Web Application that uses the javaee namespace$/ do
+  expected_health = 1.0
+  create_and_upload_app SPRING_APP_WITH_JAVAEE_NS
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
 After("@creates_services") do |scenario|
   delete_app_services
 end

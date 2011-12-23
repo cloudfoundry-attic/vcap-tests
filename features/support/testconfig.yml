@@ -189,3 +189,9 @@ java_app_with_startup_delay:
   startup: "thin start"
   memory: 256
   path: "assets/java_web/app_with_startup_delay/target"
+
+javaee-namespace-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/javaee-namespace-app/target"

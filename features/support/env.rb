@@ -55,6 +55,7 @@ AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
+SPRING_APP_WITH_JAVAEE_NS = "javaee-namespace-app"
 
 class Fixnum
   def to_json(options = nil)
@@ -170,6 +171,10 @@ After("@creates_java_app_with_delay") do
   AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
 end
 
+After("@creates_javaee_namespace_app") do
+  AppCloudHelper.instance.delete_app_internal SPRING_APP_WITH_JAVAEE_NS
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -268,6 +273,7 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_KV_APP)
     delete_app_internal(BROKERED_SERVICE_APP)
     delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+    delete_app_internal(SPRING_APP_WITH_JAVAEE_NS)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
