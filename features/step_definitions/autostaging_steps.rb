@@ -4,7 +4,7 @@ require 'pp'
 
 Given /^I deploy a Spring application using a Cloud Service and Data Source$/ do
   expected_health = 1.0
-  create_and_upload_app VCAP_JAVA_TEST_APP
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
   mongosvc = provision_mongodb_service @token
   attach_provisioned_service @app, mongosvc, @token
   mysqlsvc = provision_db_service @token
@@ -16,7 +16,7 @@ end
 
 Given /^I deploy a Spring application using Service Scan and a Data Source$/ do
   expected_health = 1.0
-  create_and_upload_app VCAP_JAVA_TEST_APP
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
   mysqlsvc = provision_db_service @token
   attach_provisioned_service @app, mysqlsvc, @token
   environment_add @app,'TEST_PROFILE','auto-staging-off-using-service-scan'
@@ -29,6 +29,88 @@ Then /^the Data Source should not be auto-configured$/ do
   response.should_not == nil
   response.response_code.should == 200
   response.body_str.should == 'jdbc:mysql://localhost:3306/vcap-java-test-app'
+end
+
+Given /^I deploy a Spring application using a local MongoDBFactory$/ do
+  expected_health = 1.0
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
+  mongosvc = provision_mongodb_service @token
+  attach_provisioned_service @app, mongosvc, @token
+  environment_add @app,'TEST_PROFILE','mongo-auto-staging'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the MongoDBFactory should be auto-configured$/ do
+  response = get_app_contents @app, "mongo"
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should_not == 'localhost:1234'
+end
+
+Given /^I deploy a Spring application using a local RedisConnectionFactory$/ do
+  expected_health = 1.0
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
+  redissvc = provision_redis_service @token
+  attach_provisioned_service @app, redissvc, @token
+  environment_add @app,'TEST_PROFILE','redis-auto-staging'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the RedisConnectionFactory should be auto-configured$/ do
+  response = get_app_contents @app, "redis/host"
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should_not == 'localhost:1345'
+end
+
+Given /^I deploy a Spring application using a local RabbitConnectionFactory$/ do
+  expected_health = 1.0
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
+  pending unless find_service 'rabbitmq'
+  rabbitsvc = provision_rabbitmq_service @token
+  attach_provisioned_service @app, rabbitsvc, @token
+  environment_add @app,'TEST_PROFILE','rabbit-auto-staging'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the RabbitConnectionFactory should be auto-configured$/ do
+  response = get_app_contents @app, "rabbit"
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should_not == 'localhost:1238'
+end
+
+Given /^I deploy a Spring Web Application that has no packaged mongo, redis, rabbit, or datasource dependencies$/ do
+  expected_health = 1.0
+  create_and_upload_app AUTO_RECONFIG_MISSING_DEPS_TEST_APP
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the application should start with no errors$/ do
+  response = get_app_contents @app
+  response.should_not == nil
+  response.response_code.should == 200
+end
+
+Given /^I deploy a Spring 3.1 Hibernate application using a local DataSource$/ do
+  expected_health = 1.0
+  create_and_upload_app AUTO_RECONFIG_TEST_APP
+  mysqlsvc = provision_db_service @token
+  attach_provisioned_service @app, mysqlsvc, @token
+  environment_add @app,'TEST_PROFILE','hibernate-auto-staging'
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Then /^the Hibernate SessionFactory should be auto-configured$/ do
+  response = get_app_contents @app, "hibernate"
+  response.should_not == nil
+  response.response_code.should == 200
+  response.body_str.should == 'org.hibernate.dialect.MySQLDialect'
 end
 
 Given /^I deploy a Spring JPA application using the MySQL DB service$/ do
@@ -293,7 +375,7 @@ After("@creates_hibernate_postgresql_adapter") do |scenario|
 end
 
 After("@creates_grails_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_roo_db_adapter") do |scenario|

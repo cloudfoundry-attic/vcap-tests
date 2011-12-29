@@ -193,20 +193,41 @@ end
 
 Given /^I have built a simple Erlang application$/ do
   # Try to find an appropriate Erlang
-  erlang_path = '/var/vcap/runtimes/erlang-R14B02/bin'
-  unless File.exists?(erlang_path)
+  erlang_ready = true
+
+  # figure out if cloud has erlang runtime
+  runtimes = @client.info().to_a().join()
+  if (runtimes =~ /erlang/)
+    puts "target cloud has Erlang runtime"
+  else
+    puts "target cloud does not support Erlang"
+    erlang_ready = false
+  end
+
+  # figure out if BVT environment has Erlang installed
+  begin
+    installed_erlang = `erl -version`
+  rescue
+  end
+  if $? != 0
+    puts "BVT environment does not have Erlang installed. Please install manually."
+    erlang_ready = false
+  else
+    puts "BVT environment has Erlang runtime installed"
+  end
+
+  if !erlang_ready
     pending "Not running Erlang test because the Erlang runtime is not installed"
   else
-    Dir.chdir("#{@testapps_dir}/#{SIMPLE_ERLANG_APP}")
-    make_prefix = "PATH=#{erlang_path}:$PATH"
-    rel_build_result = `#{make_prefix} make relclean rel`
+    Dir.chdir("#{@testapps_dir}/mochiweb/#{SIMPLE_ERLANG_APP}")
+    rel_build_result = `make relclean rel`
     raise "Erlang application build failed: #{rel_build_result}" if $? != 0
   end
 end
 
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
-  upload_app @app, @token
+  upload_app @app, @token, "rel/mochiweb_test"
   start_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
@@ -572,6 +593,8 @@ Then /^I delete my service$/ do
   if @service
     s = delete_service @service[:name]
   end
+
+  @service_id = nil
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|
@@ -693,4 +716,52 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
   easy.close
 
   number.should >= 1
+end
+
+Given /^I have my running application named (\w+)$/ do |app_name|
+  status = get_app_status app_name, @token
+  status.should_not == nil
+  if status
+    @app = app_name
+  end
+end
+
+Then /^I should get on application (\w+) the persisted data from (\w+) service with key (\w+), and I should see (\w+)$/ do |app_name, service, key, value|
+  app_manifest = get_app_status app_name, @token
+  app_manifest.should_not == nil
+  @app.should == app_name
+  provisioned_services = app_manifest[:services]
+  provisioned_services.should_not == nil
+  long_app_name = get_app_name app_name
+  long_service_name = "#{@namespace}#{@app}#{service}"
+  if provisioned_services.include?("#{long_service_name}")
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.should_not == nil
+    contents.body_str.should_not == nil
+    contents.response_code.should == 200
+    contents.body_str.should == value
+    contents.close
+  end
+end
+
+Then /^I delete all services and apps$/ do
+  @app_list.each do |item|
+    app = strip_app_name item[:name]
+    services = item[:services]
+    if services.length.to_i > 0
+      services.each do |s|
+        delete_service(s)
+      end
+    end
+    delete_app_internal app
+  end
+end
+
+Then /^I should be able to immediately access the Java application through its url$/ do
+  uri = get_uri @app
+  contents = get_uri_contents uri, 20
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should =~ /I am up and running/
+  contents.close
 end

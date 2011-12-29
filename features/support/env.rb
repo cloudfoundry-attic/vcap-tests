@@ -51,8 +51,17 @@ SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
 SPRING_ENV_APP = "spring-env-app"
-VCAP_JAVA_TEST_APP="vcap_java_test_app"
+AUTO_RECONFIG_TEST_APP="auto-reconfig-test-app"
+AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
+SIMPLE_KV_APP = "simple_kv_app"
+BROKERED_SERVICE_APP = "brokered_service_app"
+JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 
+class Fixnum
+  def to_json(options = nil)
+    to_s
+  end
+end
 
 After do
   AppCloudHelper.instance.cleanup
@@ -150,8 +159,16 @@ After("@creates_spring_env_app") do
   AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
 end
 
-After("@creates_vcap_java_test_app") do
-  AppCloudHelper.instance.delete_app_internal VCAP_JAVA_TEST_APP
+After("@creates_auto_reconfig_test_app") do
+  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_TEST_APP
+end
+
+After("@creates_auto_reconfig_missing_deps_test_app") do
+  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_MISSING_DEPS_TEST_APP
+end
+
+After("@creates_java_app_with_delay") do
+  AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
 end
 
 at_exit do
@@ -169,8 +186,10 @@ class AppCloudHelper
     @target = ENV['VCAP_BVT_TARGET'] || 'vcap.me'
     @registered_user = ENV['VCAP_BVT_USER']
     @registered_user_passwd = ENV['VCAP_BVT_USER_PASSWD']
+    @service_broker_url = ENV['SERVICE_BROKER_URL']
+    @service_broker_token = ENV['SERVICE_BROKER_TOKEN']
     @base_uri = "http://api.#{@target}"
-    @droplets_uri = "#{@base_uri}/apps"
+    @droplets_uri = "#{@base_uri}/assets"
     @resources_uri = "#{@base_uri}/resources"
     @services_uri = "#{@base_uri}/services"
     @suggest_url = @target
@@ -194,7 +213,8 @@ class AppCloudHelper
       puts "Could not read configuration file:  #{e}"
       exit
     end
-    @testapps_dir = File.join(File.dirname(__FILE__), '../../apps')
+    @testapps_dir = File.join(File.dirname(__FILE__), '../../assets')
+    @root_dir = File.join(File.dirname(__FILE__), '../..')
     @client = VMC::Client.new(@base_uri)
 
     # Make sure we cleanup if we had a failed run..
@@ -204,7 +224,21 @@ class AppCloudHelper
       @last_registered_user = test_user
     rescue
     end
+    check_admin_user
     cleanup
+  end
+
+  def check_admin_user
+    # Run test only as non-admin user
+    # Check if the test_user is admin and exit the BVT if the user is admin
+    begin
+      @client.users
+      puts "Admin user can not run BVTs. Please try running as non-admin user"
+      Cucumber.wants_to_quit = true
+      # Make sure that RuntimeError 'Operation not permitted' is caught for the non-admin user
+      # when running the vmc 'users' command
+    rescue RuntimeError => e
+    end
   end
 
   def cleanup
@@ -231,7 +265,11 @@ class AppCloudHelper
     delete_app_internal(SIMPLE_DJANGO_APP)
     delete_app_internal(SIMPLE_PHP_APP)
     delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(VCAP_JAVA_TEST_APP)
+    delete_app_internal(AUTO_RECONFIG_TEST_APP)
+    delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
+    delete_app_internal(SIMPLE_KV_APP)
+    delete_app_internal(BROKERED_SERVICE_APP)
+    delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
     delete_services(all_my_services) unless @registered_user or !get_login_token
     # This used to delete the entire user, but that now requires admin
     # privs so it was removed, as was the delete_user method.  See the
@@ -318,11 +356,26 @@ class AppCloudHelper
   def get_app_name app
     # URLs synthesized from app names containing '_' are not handled well by the Lift framework.
     # So we used '-' instead of '_'
-    "#{@namespace}my-test-app-#{app}"
+    # '_' is not a valid character for hostname according to RFC 822,
+    # use '-' to replace it.
+    "#{@namespace}my-test-app-#{app}".gsub("_", "-")
   end
 
-  def upload_app app, token
-    upload_app_help("#{@testapps_dir}/#{app}", app)
+  def strip_app_name long_app
+    # Strip compund CF app name of namespace and "my-test-app-"
+    app_name = long_app.split("#{@namespace}my-test-app-")[1]
+  end
+
+  def upload_app app, token, rel_path=nil
+    if @config[app]['path']
+       upload_app_help("#{@root_dir}/#{@config[app]['path']}",app)
+    else
+      # If a rel_path is given the app should be uploaded from that relative path in the application directory.
+      # Don't start rel_path with a slash!.
+      deploy_from = "#{@testapps_dir}/#{app}"
+      deploy_from = "#{deploy_from}/#{rel_path}" if rel_path
+      upload_app_help(deploy_from, app)
+    end
   end
 
   def upload_app_help(app_dir, app)
@@ -426,7 +479,7 @@ class AppCloudHelper
   def poll_until_done app, expected_health, token
     secs_til_timeout = @config['timeout_secs']
     health = nil
-    sleep_time = 0.5
+    sleep_time = @config['sleep_secs']
     while secs_til_timeout > 0 && health != expected_health
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
@@ -536,12 +589,12 @@ class AppCloudHelper
   end
 
   def modify_and_upload_app app,token
-    upload_app_help("#{@testapps_dir}/modified_#{app}", app)
+    upload_app_help("#{@testapps_dir}/sinatra/modified_#{app}", app)
     restart_app app, token
   end
 
   def modify_and_upload_bad_app app,token
-    upload_app_help("#{@testapps_dir}/#{BROKEN_APP}", app)
+    upload_app_help("#{@testapps_dir}/sinatra/#{BROKEN_APP}", app)
   end
 
   def poll_until_update_app_done app, token
@@ -566,8 +619,9 @@ class AppCloudHelper
     @client.services_info
   end
 
-  def services_list
-    return @services_list if @services_list
+  def services_list(opts={})
+    refresh = opts[:refresh]
+    return @services_list if !refresh and @services_list
 
     # flatten
     @services_list = []
@@ -661,6 +715,17 @@ class AppCloudHelper
      :vendor=>"atmos",
      :tier=>"free",
      :version=>"1.4.1",
+     :name=>name
+    }
+  end
+
+  def provision_brokered_service token
+    name = "#{@namespace}#{@app || 'brokered_service_app'}_#{@brokered_service_name}"
+    @client.create_service(@brokered_service_name.to_sym, name)
+    service_manifest = {
+     :vendor=>"brokered_service",
+     :tier=>"free",
+     :version=>"1.0",
      :name=>name
     }
   end
@@ -813,9 +878,12 @@ class AppCloudHelper
     get_uri_contents uri
   end
 
-  def get_uri_contents uri
+  def get_uri_contents uri, timeout=0
     easy = Curl::Easy.new
     easy.url = uri
+    if timeout != 0
+      easy.timeout = timeout
+    end
     easy.http_get
     easy
   end

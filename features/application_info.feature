@@ -1,3 +1,4 @@
+@smoke
 Feature: Retrieve information on an application on AppCloud
 
 	 As a user with an application deployed on AppCloud
@@ -13,7 +14,7 @@ Feature: Retrieve information on an application on AppCloud
 	     Then I should get the state of my application
 
 	   @creates_simple_app
-       @creates_tiny_java_app
+       @creates_tiny_java_app @java
 	   Scenario: list applications
          Given I have deployed a simple application
 	     And I have deployed a tiny Java application
@@ -49,7 +50,7 @@ Feature: Retrieve information on an application on AppCloud
          And I should be able to get a list of files associated with my application on AppCloud
          And I should be able to retrieve any of the listed files
 
-       @creates_broken_app
+       @creates_broken_app @ruby
        Scenario: get crash information for a broken application
          Given I have registered and logged in
          And I have deployed a broken application
