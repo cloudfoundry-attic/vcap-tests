@@ -49,6 +49,45 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
   Scenario: sinatra test delete service
     Then I delete my service
 
+  @mongodb @snapshot
+  Scenario: Take mongodb snapshot and rollback to a certain snapshot
+    Given I have my running application named app_sinatra_service
+    When I provision mongodb service
+    Then I check snapshot extension is enabled
+    Then I post mongodbabc to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+    When I create a snapshot of mongodb service
+    Then I should be able to query snapshots for mongodb service
+    Then I post mongodbabc2 to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
+    When I rollback to previous snapshot for mongodb service
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+
+  @mongodb @delete @snapshot
+  Scenario: sinatra test delete service
+    Then I delete my service
+
+  @mongodb @serialized
+  Scenario: Import and export serialized data for mongodb service
+    Given I have my running application named app_sinatra_service
+    When I provision mongodb service
+    Then I post mongodbabc to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+    When I create a serialized URL of mongodb service
+    Then I should be able to download data from serialized URL
+    Then I post mongodbabc2 to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
+    When I import serialized data from URL of mongodb service
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+    Then I post mongodbabc2 to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
+    When I import serialized data from request of mongodb service
+    Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+
+  @mongodb @delete @serialized
+  Scenario: sinatra test delete service
+    Then I delete my service
+
   @delete @delete_app
   Scenario: sinatra test delete app
     Given I have my running application named app_sinatra_service
