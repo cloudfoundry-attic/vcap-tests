@@ -49,6 +49,45 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
   Scenario: sinatra test delete service
     Then I delete my service
 
+  @redis @snapshot
+  Scenario: Take redis snapshot and rollback to a certain snapshot
+    Given I have my running application named app_sinatra_service
+    When I provision redis service
+    Then I check snapshot extension is enabled
+    Then I post redisabc to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc
+    When I create a snapshot of redis service
+    Then I should be able to query snapshots for redis service
+    Then I post redisabc2 to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc2
+    When I rollback to previous snapshot for redis service
+    Then I should be able to get from redis service with key abc, and I should see redisabc
+
+  @redis @delete @snapshot
+  Scenario: sinatra test delete service
+    Then I delete my service
+
+  @redis @serialized
+  Scenario: Import and export serialized data for redis service
+    Given I have my running application named app_sinatra_service
+    When I provision redis service
+    Then I post redisabc to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc
+    When I create a serialized URL of redis service
+    Then I should be able to download data from serialized URL
+    Then I post redisabc2 to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc2
+    When I import serialized data from URL of redis service
+    Then I should be able to get from redis service with key abc, and I should see redisabc
+    Then I post redisabc2 to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc2
+    When I import serialized data from request of redis service
+    Then I should be able to get from redis service with key abc, and I should see redisabc
+
+  @redis @delete @serialized
+  Scenario: sinatra test delete service
+    Then I delete my service
+
   @delete @delete_app
   Scenario: sinatra test delete app
     Given I have my running application named app_sinatra_service
