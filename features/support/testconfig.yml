@@ -179,6 +179,7 @@ atmos_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby server.rb"
   memory: 256
+  path: "assets/sinatra/atmos_app"
 
 simple_kv_app:
   framework: "http://b20nine.com/unknown"
