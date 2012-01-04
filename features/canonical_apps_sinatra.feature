@@ -32,6 +32,8 @@ Feature: Deploy the sinatra canonical app and check its services
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
+    Then I post mysql123 to mysql service with key 123
+    Then I post mysqldef to mysql service with key def
 
   @mysql @delete
   Scenario: sinatra test delete service
@@ -43,6 +45,8 @@ Feature: Deploy the sinatra canonical app and check its services
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
+    Then I post redis123 to redis service with key 123
+    Then I post redisdef to redis service with key def
 
   @redis @delete
   Scenario: sinatra test delete service
@@ -54,6 +58,8 @@ Feature: Deploy the sinatra canonical app and check its services
     When I provision mongodb service
     Then I post mongoabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc
+    Then I post mongo123 to mongo service with key 123
+    Then I post mongodef to mongo service with key def
 
   @mongodb @delete
   Scenario: sinatra test delete service
@@ -66,6 +72,8 @@ Feature: Deploy the sinatra canonical app and check its services
     Then I post rabbitabc to rabbitmq service with key abc
     Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
     Then I post rabbitabc to rabbitmq service with key abc
+    Then I post rabbit123 to rabbitmq service with key 123
+    Then I post rabbitdef to rabbitmq service with key def
 
   @rabbitmq @delete
   Scenario: sinatra test delete service
@@ -77,6 +85,8 @@ Feature: Deploy the sinatra canonical app and check its services
     When I provision postgresql service
     Then I post postgresqlabc to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    Then I post postgresql123 to postgresql service with key 123
+    Then I post postgresqldef to postgresql service with key def
 
   @postgresql @delete
   Scenario: sinatra test delete service
