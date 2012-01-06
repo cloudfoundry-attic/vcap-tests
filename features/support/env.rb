@@ -546,6 +546,14 @@ class AppCloudHelper
   end
 
   def get_app_crashes app, token
+    # FIXME: this is a temporary hack.  What really should happen here
+    # is that we should poll to make sure the crash logs have been
+    # generated, and limit the polling to 2s.
+    #
+    # Wait for the DEA to save the crash logs.  On a dev/prod instance
+    # this happens very quickly, but on a loaded dev laptop, the test
+    # is able to proceed faster than the DEA can save the logs
+    sleep 0.5
     appname = get_app_name app
     response = @client.app_crashes(appname)
 
