@@ -46,6 +46,7 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 NEO4J_APP = "neo4j_app"
+ATMOS_APP = "atmos_app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
@@ -258,6 +259,7 @@ class AppCloudHelper
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
     delete_app_internal(NEO4J_APP)
+    delete_app_internal(ATMOS_APP)
     delete_app_internal(SIMPLE_PYTHON_APP)
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
@@ -544,6 +546,14 @@ class AppCloudHelper
   end
 
   def get_app_crashes app, token
+    # FIXME: this is a temporary hack.  What really should happen here
+    # is that we should poll to make sure the crash logs have been
+    # generated, and limit the polling to 2s.
+    #
+    # Wait for the DEA to save the crash logs.  On a dev/prod instance
+    # this happens very quickly, but on a loaded dev laptop, the test
+    # is able to proceed faster than the DEA can save the logs
+    sleep 0.5
     appname = get_app_name app
     response = @client.app_crashes(appname)
 
@@ -702,6 +712,17 @@ class AppCloudHelper
      :vendor=>"neo4j",
      :tier=>"free",
      :version=>"1.4",
+     :name=>name
+    }
+  end
+
+  def provision_atmos_service token
+    name = "#{@namespace}#{@app || 'simple_atmos_app'}atmos"
+    @client.create_service(:atmos, name)
+    service_manifest = {
+     :vendor=>"atmos",
+     :tier=>"free",
+     :version=>"1.4.1",
      :name=>name
     }
   end
