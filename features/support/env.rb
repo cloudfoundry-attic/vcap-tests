@@ -892,6 +892,7 @@ class AppCloudHelper
     if timeout != 0
       easy.timeout = timeout
     end
+    easy.resolve_mode =:ipv4
     easy.http_get
     easy
   end
@@ -904,6 +905,7 @@ class AppCloudHelper
   def post_uri uri, data
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data)
     easy
   end
@@ -911,6 +913,7 @@ class AppCloudHelper
   def post_record_no_close uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data_hash.to_json)
     easy
   end
@@ -920,15 +923,35 @@ class AppCloudHelper
     easy.close
   end
 
+  def put_to_app app, relative_path, data
+    uri = get_uri app, relative_path
+    put_uri uri, data
+  end
+
+  def put_uri uri, data
+    easy = Curl::Easy.new
+    easy.url = uri
+    easy.resolve_mode =:ipv4
+    easy.http_put(data)
+    easy
+  end
+
   def put_record uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_put(data_hash.to_json)
     easy.close
   end
 
+  def delete_from_app app, relative_path
+    uri = get_uri app, relative_path
+    delete_record uri
+  end
+
   def delete_record uri
     easy = Curl::Easy.new
+    easy.resolve_mode =:ipv4
     easy.url = uri
     easy.http_delete
     easy.close
