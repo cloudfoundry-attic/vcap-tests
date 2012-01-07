@@ -46,7 +46,6 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 NEO4J_APP = "neo4j_app"
-ATMOS_APP = "atmos_app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
@@ -259,7 +258,6 @@ class AppCloudHelper
     delete_app_internal(LIFT_DB_APP)
     delete_app_internal(TOMCAT_VERSION_CHECK_APP)
     delete_app_internal(NEO4J_APP)
-    delete_app_internal(ATMOS_APP)
     delete_app_internal(SIMPLE_PYTHON_APP)
     delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
     delete_app_internal(SIMPLE_DJANGO_APP)
@@ -367,12 +365,12 @@ class AppCloudHelper
   end
 
   def upload_app app, token, rel_path=nil
-    if @config[app]['path'] && rel_path == nil
+    if @config[app]['path']
        upload_app_help("#{@root_dir}/#{@config[app]['path']}",app)
     else
       # If a rel_path is given the app should be uploaded from that relative path in the application directory.
       # Don't start rel_path with a slash!.
-      deploy_from = "#{@root_dir}/#{@config[app]['path']}"
+      deploy_from = "#{@testapps_dir}/#{app}"
       deploy_from = "#{deploy_from}/#{rel_path}" if rel_path
       upload_app_help(deploy_from, app)
     end
@@ -546,14 +544,6 @@ class AppCloudHelper
   end
 
   def get_app_crashes app, token
-    # FIXME: this is a temporary hack.  What really should happen here
-    # is that we should poll to make sure the crash logs have been
-    # generated, and limit the polling to 2s.
-    #
-    # Wait for the DEA to save the crash logs.  On a dev/prod instance
-    # this happens very quickly, but on a loaded dev laptop, the test
-    # is able to proceed faster than the DEA can save the logs
-    sleep 0.5
     appname = get_app_name app
     response = @client.app_crashes(appname)
 
@@ -712,17 +702,6 @@ class AppCloudHelper
      :vendor=>"neo4j",
      :tier=>"free",
      :version=>"1.4",
-     :name=>name
-    }
-  end
-
-  def provision_atmos_service token
-    name = "#{@namespace}#{@app || 'simple_atmos_app'}atmos"
-    @client.create_service(:atmos, name)
-    service_manifest = {
-     :vendor=>"atmos",
-     :tier=>"free",
-     :version=>"1.4.1",
      :name=>name
     }
   end
@@ -887,13 +866,14 @@ class AppCloudHelper
   end
 
   def get_uri_contents uri, timeout=0
-    easy = Curl::Easy.new
-    easy.url = uri
-    if timeout != 0
-      easy.timeout = timeout
-    end
-    easy.http_get
-    easy
+   easy = Curl::Easy.new
+   easy.url = uri
+   if timeout != 0
+     easy.timeout = timeout
+   end
+   easy.resolve_mode =:ipv4
+   easy.http_get
+   easy
   end
 
   def post_to_app app, relative_path, data
@@ -904,6 +884,7 @@ class AppCloudHelper
   def post_uri uri, data
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data)
     easy
   end
@@ -911,6 +892,7 @@ class AppCloudHelper
   def post_record_no_close uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data_hash.to_json)
     easy
   end
@@ -920,15 +902,35 @@ class AppCloudHelper
     easy.close
   end
 
+  def put_to_app app, relative_path, data
+    uri = get_uri app, relative_path
+    put_uri uri, data
+  end
+
+  def put_uri uri, data
+    easy = Curl::Easy.new
+    easy.url = uri
+    easy.resolve_mode =:ipv4
+    easy.http_put(data)
+    easy
+  end
+
   def put_record uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_put(data_hash.to_json)
     easy.close
   end
 
+  def delete_from_app app, relative_path
+    uri = get_uri app, relative_path
+    delete_record uri
+  end
+
   def delete_record uri
     easy = Curl::Easy.new
+    easy.resolve_mode =:ipv4
     easy.url = uri
     easy.http_delete
     easy.close

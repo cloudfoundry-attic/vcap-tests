@@ -32,6 +32,10 @@ Feature: Deploy the node canonical app and check its services
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
+    Then I put mysqlabc_updated to mysql service with key abc
+    Then I should be able to get from mysql service with key abc, and I should see mysqlabc_updated
+    Then I delete from mysql service with key abc
+    Then I should not be able to get from mysql service with key abc
 
   @mysql @delete
   Scenario: node test delete service
@@ -43,6 +47,10 @@ Feature: Deploy the node canonical app and check its services
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
+    Then I put redisabc_updated to redis service with key abc
+    Then I should be able to get from redis service with key abc, and I should see redisabc_updated
+    Then I delete from redis service with key abc
+    Then I should not be able to get from redis service with key abc
 
   @redis @delete
   Scenario: node test delete service
@@ -54,6 +62,10 @@ Feature: Deploy the node canonical app and check its services
     When I provision mongodb service
     Then I post mongoabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc
+    Then I put mongoabc_updated to mongo service with key abc
+    Then I should be able to get from mongo service with key abc, and I should see mongoabc_updated
+    Then I delete from mongo service with key abc
+    Then I should not be able to get from mongo service with key abc
 
   @mongodb @delete
   Scenario: node test delete service
@@ -65,7 +77,11 @@ Feature: Deploy the node canonical app and check its services
     When I provision rabbitmq service
     Then I post rabbitabc to rabbitmq service with key abc
     Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
+    Then I put rabbitabc_updated to rabbitmq service with key abc
+    Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc_updated
     Then I post rabbitabc to rabbitmq service with key abc
+    Then I delete from rabbitmq service with key abc
+    Then I should not be able to get from rabbitmq service with key abc
 
   @rabbitmq @delete
   Scenario: node test delete service
@@ -77,6 +93,10 @@ Feature: Deploy the node canonical app and check its services
     When I provision postgresql service
     Then I post postgresqlabc to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    Then I put pgresqlabc_updated to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see pgresqlabc_updated
+    Then I delete from postgresql service with key abc
+    Then I should not be able to get from postgresql service with key abc
 
   @postgresql @delete
   Scenario: node test delete service

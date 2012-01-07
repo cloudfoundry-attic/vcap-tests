@@ -552,6 +552,28 @@ Then /^I should be able to get from (\w+) service with key (\w+), and I should s
   end
 end
 
+Then /^I put (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
+  if @service
+    contents = put_to_app @app, "service/#{service}/#{key}", body
+    contents.response_code.should == 200
+    contents.close
+  end
+end
+
+Then /^I delete from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    delete_from_app @app, "service/#{service}/#{key}"
+  end
+end
+
+Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.response_code.should_not == 200
+    contents.close
+  end
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
@@ -593,8 +615,6 @@ Then /^I delete my service$/ do
   if @service
     s = delete_service @service[:name]
   end
-
-  @service_id = nil
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|
