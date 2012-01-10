@@ -3,6 +3,7 @@
 # Within this value, we poll for completion status of the operations with the
 # sleep interval between successive poll requests specified below.
 timeout_secs: 60
+job_timeout_secs: 30
 sleep_secs: 1
 
 simple_app:
@@ -81,7 +82,7 @@ mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
-  path: "assets/mochiweb/mochiweb_test"
+  path: "assets/mochiweb/mochiweb_test/rel/mochiweb_test"
 
 simple-lift-app:
   framework: "lift/1.0"
@@ -99,7 +100,7 @@ tomcat-version-check-app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 128
-  tomcat_version: "6.0.32"
+  tomcat_version: "6.0.35"
   path: "assets/java_web/tomcat-version-check-app/target"
 
 app_rails_service:
@@ -173,6 +174,12 @@ auto-reconfig-missing-deps-test-app:
   startup: "thin start"
   memory: 256
   path: "assets/spring/auto-reconfig-missing-deps-test-app/target"
+
+atmos_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby server.rb"
+  memory: 256
+  path: "assets/sinatra/atmos_app"
 
 simple_kv_app:
   framework: "http://b20nine.com/unknown"

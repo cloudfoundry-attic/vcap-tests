@@ -193,20 +193,41 @@ end
 
 Given /^I have built a simple Erlang application$/ do
   # Try to find an appropriate Erlang
-  erlang_path = '/var/vcap/runtimes/erlang-R14B02/bin'
-  unless File.exists?(erlang_path)
+  erlang_ready = true
+
+  # figure out if cloud has erlang runtime
+  runtimes = @client.info().to_a().join()
+  if (runtimes =~ /erlang/)
+    puts "target cloud has Erlang runtime"
+  else
+    puts "target cloud does not support Erlang"
+    erlang_ready = false
+  end
+
+  # figure out if BVT environment has Erlang installed
+  begin
+    installed_erlang = `erl -version`
+  rescue
+  end
+  if $? != 0
+    puts "BVT environment does not have Erlang installed. Please install manually."
+    erlang_ready = false
+  else
+    puts "BVT environment has Erlang runtime installed"
+  end
+
+  if !erlang_ready
     pending "Not running Erlang test because the Erlang runtime is not installed"
   else
-    Dir.chdir("#{@testapps_dir}/#{SIMPLE_ERLANG_APP}")
-    make_prefix = "PATH=#{erlang_path}:$PATH"
-    rel_build_result = `#{make_prefix} make relclean rel`
+    Dir.chdir("#{@testapps_dir}/mochiweb/#{SIMPLE_ERLANG_APP}")
+    rel_build_result = `make relclean rel`
     raise "Erlang application build failed: #{rel_build_result}" if $? != 0
   end
 end
 
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
-  upload_app @app, @token, "rel/mochiweb_test"
+  upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
@@ -531,6 +552,28 @@ Then /^I should be able to get from (\w+) service with key (\w+), and I should s
   end
 end
 
+Then /^I put (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
+  if @service
+    contents = put_to_app @app, "service/#{service}/#{key}", body
+    contents.response_code.should == 200
+    contents.close
+  end
+end
+
+Then /^I delete from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    delete_from_app @app, "service/#{service}/#{key}"
+  end
+end
+
+Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.response_code.should_not == 200
+    contents.close
+  end
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
@@ -572,6 +615,7 @@ Then /^I delete my service$/ do
   if @service
     s = delete_service @service[:name]
   end
+  @service_id = nil
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|

@@ -9,12 +9,45 @@ vcap = ENV['VCAP'] || ".."
 import "#{vcap}/rakelib/core_components.rake"
 import "#{vcap}/rakelib/bundler.rake"
 
+task :default => [:help]
+
+desc "List help commands"
+task :help do
+  puts "Usage: rake [command]"
+  puts "  tests\t\trun all bvts"
+  puts "  smoke_tests\trun a smaller subset of bvts"
+  puts "  sanity\trun only the most fundamental bvts"
+  puts "  ruby\t\trun ruby-based bvts (rails3, sinatra)"
+  puts "  jvm\t\trun jvm-based bvts (spring, java_web, grails, lift)"
+  puts "  java\t\trun java-based bvts (spring, java_web)"
+  puts "  services\trun services-based bvts"
+  puts "  ci-tests\tset up a test cloud, run the bvts, and then tear it down"
+  puts "  help\t\tlist help commands"
+end
 
 desc "Run the Basic Viability Tests"
 task :tests => ['build','bvt:run']
 
+desc "Run the Basic Viability Tests but spit junit format results"
+task :junit_tests => ['build','bvt:run_junit_format']
+
 desc "Run a faster subset of Basic Viability Tests"
 task :smoke_tests => ['build','bvt:run_smoke']
+
+desc "Run a fast essential basic set of tests"
+task :sanity => ['build','bvt:run_sanity']
+
+desc "Run ruby-based tests"
+task :ruby => ['bvt:run_ruby']
+
+desc "Run jvm-based tests"
+task :jvm => ['build','bvt:run_jvm']
+
+desc "Run java-based tests"
+task :java => ['build','bvt:run_java']
+
+desc "Run services-based tests"
+task :services => ['build','bvt:run_services']
 
 ci_steps = ['ci:version_check',
             'build',
@@ -51,10 +84,10 @@ TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/spring/jpa-guestbook",
              "#{TESTS_PATH}/spring/hibernate-guestbook",
              "#{TESTS_PATH}/spring/spring-env",
+             "#{TESTS_PATH}/grails/guestbook",
              "#{TESTS_PATH}/java_web/java_tiny_app",
              "#{TESTS_PATH}/lift/hello_lift",
              "#{TESTS_PATH}/lift/lift-db-app"
-
 ]
 
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"

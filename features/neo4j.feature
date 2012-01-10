@@ -4,7 +4,7 @@ Feature: Neo4j service binding and app deployment
   As the VMC user
   I want to deploy my app against a Neo4j service
 
-  @creates_neo4j_app @creates_neo4j_service
+  @creates_neo4j_app @creates_neo4j_service @ruby
   Scenario: Deploy Neo4j
     Given I have registered and logged in
     Given I have provisioned a Neo4j service
