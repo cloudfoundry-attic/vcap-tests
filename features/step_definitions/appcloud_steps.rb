@@ -227,7 +227,7 @@ end
 
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
-  upload_app @app, @token, "rel/mochiweb_test"
+  upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token

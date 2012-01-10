@@ -82,7 +82,7 @@ mochiweb_test:
   framework: "otp_rebar"
   startup: erlangR14B02
   memory: 64
-  path: "assets/mochiweb/mochiweb_test"
+  path: "assets/mochiweb/mochiweb_test/rel/mochiweb_test"
 
 simple-lift-app:
   framework: "lift/1.0"
