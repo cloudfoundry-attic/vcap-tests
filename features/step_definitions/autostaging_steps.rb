@@ -227,6 +227,7 @@ end
 def post_content url, field, value
   easy = Curl::Easy.new
   easy.url =  url
+  easy.resolve_mode =:ipv4
   easy.http_post(Curl::PostField.content(field, value))
   response = easy.response_code
   easy.close

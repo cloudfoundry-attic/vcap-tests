@@ -8,11 +8,11 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   Background: deploying canonical service
     Given I have registered and logged in
-    Given I have deployed my application named app_sinatra_service
+    Given I have deployed my application named app_sinatra_service2
 
   @mysql @snapshot
   Scenario: Take mysql snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mysql service
     Then I check snapshot extension is enabled
     Then I post mysqlabc to mysql service with key abc
@@ -30,7 +30,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @mysql @serialized
   Scenario: Import and export serialized data for mysql service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
@@ -51,7 +51,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @redis @snapshot
   Scenario: Take redis snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision redis service
     Then I check snapshot extension is enabled
     Then I post redisabc to redis service with key abc
@@ -69,7 +69,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @redis @serialized
   Scenario: Import and export serialized data for redis service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
@@ -90,7 +90,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @mongodb @snapshot
   Scenario: Take mongodb snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mongodb service
     Then I check snapshot extension is enabled
     Then I post mongodbabc to mongo service with key abc
@@ -108,7 +108,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @mongodb @serialized
   Scenario: Import and export serialized data for mongodb service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mongodb service
     Then I post mongodbabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
@@ -129,6 +129,6 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   @delete @delete_app
   Scenario: sinatra test delete app
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I delete my application
     Then it should not be on AppCloud

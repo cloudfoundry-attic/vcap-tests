@@ -59,6 +59,7 @@ Then /^I post a key-value to (\w+)$/ do |app|
   data = "#{@simple_key}:#{@simple_value}"
   easy = Curl::Easy.new
   easy.url = uri
+  easy.resolve_mode =:ipv4
   easy.http_post(data)
   easy.response_code.should == 200
   easy.close

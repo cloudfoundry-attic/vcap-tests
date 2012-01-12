@@ -64,6 +64,7 @@ def create_snapshot
   easy = Curl::Easy.new
   easy.url = "#{@base_uri}/services/v1/configurations/#{@service_id}/snapshots"
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_post
 
   easy.response_code.should == 200
@@ -79,6 +80,7 @@ end
 def get_snapshots
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/snapshots")
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_get
 
   pending "Snapshot extension is disabled, return code=#{easy.response_code}" unless easy.response_code == 200
@@ -91,6 +93,7 @@ end
 def rollback_snapshot(snapshot_id)
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/snapshots/#{snapshot_id}")
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_put ''
 
   easy.response_code.should == 200
@@ -105,6 +108,7 @@ end
 def get_serialized_url
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/serialized/url")
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_get
 
   pending "Serialzed API is disabled, return code=#{easy.response_code}" unless easy.response_code == 200
@@ -121,6 +125,7 @@ def import_service_from_url(url)
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/serialized/url")
   easy.headers = auth_headers
   payload = {"url" => url}
+  easy.resolve_mode =:ipv4
   easy.http_put(JSON payload)
 
   resp = easy.body_str
@@ -140,6 +145,7 @@ def import_service_from_data(temp_file)
   payload = {"data" => Base64.encode64(content)}
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/serialized/data")
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_put(JSON payload)
 
   resp = easy.body_str
@@ -186,6 +192,7 @@ end
 def get_job(job_id)
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/jobs/#{job_id}")
   easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
   easy.http_get
 
   resp = easy.body_str
