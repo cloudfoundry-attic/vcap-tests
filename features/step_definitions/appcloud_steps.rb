@@ -642,7 +642,7 @@ Then /^I delete my service$/ do
   @service_id = nil
 end
 
-When /^I provision ([\w\-]+) service$/ do |requested_service|
+Given /^I have provisioned an? ([\w\-]+) service and attached it to my app$/ do |requested_service|
   @service = nil
   if find_service requested_service
     @service = case requested_service
@@ -661,8 +661,11 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
     expected_health = 1.0
     health = poll_until_done @app, expected_health, @token
     health.should == expected_health
+  else
+    pending
   end
 end
+
 
 # Simple Sinatra CRUD application that uses MySQL
 Given /^I deploy my simple application that is backed by the MySql database service on AppCloud$/ do

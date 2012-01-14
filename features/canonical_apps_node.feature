@@ -29,7 +29,7 @@ Feature: Deploy the node canonical app and check its services
   @mysql
   Scenario: node test mysql service
     Given I have my running application named app_node_service
-    When I provision mysql service
+    Given I have provisioned a mysql service and attached it to my app
     Then I post mysqlabc_updated to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc_updated
     Then I put mysqlabc to mysql service with key abc
@@ -42,7 +42,7 @@ Feature: Deploy the node canonical app and check its services
   @redis
   Scenario: node test redis service
     Given I have my running application named app_node_service
-    When I provision redis service
+    Given I have provisioned a redis service and attached it to my app
     Then I post redisabc_updated to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc_updated
     Then I put redisabc to redis service with key abc
@@ -55,7 +55,7 @@ Feature: Deploy the node canonical app and check its services
   @mongodb
   Scenario: node test mongodb service
     Given I have my running application named app_node_service
-    When I provision mongodb service
+    Given I have provisioned a mongodb service and attached it to my app
     Then I post mongoabc_updated to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc_updated
     Then I put mongoabc to mongo service with key abc
@@ -68,7 +68,7 @@ Feature: Deploy the node canonical app and check its services
   @rabbitmq
   Scenario: node test rabbitmq service
     Given I have my running application named app_node_service
-    When I provision rabbitmq service
+    Given I have provisioned a rabbitmq service and attached it to my app
     Then I post rabbitabc_updated to rabbitmq service with key abc
     Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc_updated
     Then I put rabbitabc to rabbitmq service with key abc
@@ -82,7 +82,7 @@ Feature: Deploy the node canonical app and check its services
   @postgresql
   Scenario: node test postgresql service
     Given I have my running application named app_node_service
-    When I provision postgresql service
+    Given I have provisioned a postgresql service and attached it to my app
     Then I post pgresqlabc_updated to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see pgresqlabc_updated
     Then I put postgresqlabc to postgresql service with key abc
