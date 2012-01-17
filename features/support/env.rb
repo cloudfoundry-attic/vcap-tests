@@ -28,6 +28,8 @@ require 'digest/sha1'
 TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
+SIMPLE_APP2 = "simple_app2"
+SIMPLE_APP3 = "simple_app3"
 REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
@@ -46,6 +48,7 @@ SIMPLE_LIFT_APP = "simple-lift-app"
 LIFT_DB_APP = "lift-db-app"
 TOMCAT_VERSION_CHECK_APP="tomcat-version-check-app"
 NEO4J_APP = "neo4j_app"
+ATMOS_APP = "atmos_app"
 SIMPLE_PYTHON_APP = "simple_wsgi_app"
 PYTHON_APP_WITH_DEPENDENCIES = "wsgi_app_with_requirements"
 SIMPLE_DJANGO_APP = "simple_django_app"
@@ -68,6 +71,14 @@ end
 
 After("@creates_simple_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_APP
+end
+
+After("@creates_simple_app2") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_APP2
+end
+
+After("@creates_simple_app3") do
+  AppCloudHelper.instance.delete_app_internal SIMPLE_APP3
 end
 
 After("@creates_tiny_java_app") do
@@ -174,7 +185,13 @@ at_exit do
   AppCloudHelper.instance.cleanup
 end
 
-['TERM', 'INT'].each { |s| trap(s) { AppCloudHelper.instance.cleanup; Process.exit! } }
+['TERM', 'INT'].each do |s|
+  trap(s) do
+    ENV['parallel_tests'] = 'false'
+    AppCloudHelper.instance.cleanup
+    Process.exit!
+  end
+end
 
 class AppCloudHelper
   include Singleton
@@ -241,37 +258,42 @@ class AppCloudHelper
   end
 
   def cleanup
-    delete_app_internal(SIMPLE_APP)
-    delete_app_internal(TINY_JAVA_APP)
-    delete_app_internal(REDIS_LB_APP)
-    delete_app_internal(ENV_TEST_APP)
-    delete_app_internal(SIMPLE_DB_APP)
-    delete_app_internal(BROKEN_APP)
-    delete_app_internal(RAILS3_APP)
-    delete_app_internal(JPA_APP)
-    delete_app_internal(HIBERNATE_APP)
-    delete_app_internal(DBRAILS_APP)
-    delete_app_internal(DBRAILS_BROKEN_APP)
-    delete_app_internal(GRAILS_APP)
-    delete_app_internal(ROO_APP)
-    delete_app_internal(SIMPLE_LIFT_APP)
-    delete_app_internal(LIFT_DB_APP)
-    delete_app_internal(TOMCAT_VERSION_CHECK_APP)
-    delete_app_internal(NEO4J_APP)
-    delete_app_internal(SIMPLE_PYTHON_APP)
-    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
-    delete_app_internal(SIMPLE_DJANGO_APP)
-    delete_app_internal(SIMPLE_PHP_APP)
-    delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(AUTO_RECONFIG_TEST_APP)
-    delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
-    delete_app_internal(SIMPLE_KV_APP)
-    delete_app_internal(BROKERED_SERVICE_APP)
-    delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
-    delete_services(all_my_services) unless @registered_user or !get_login_token
-    # This used to delete the entire user, but that now requires admin
-    # privs so it was removed, as was the delete_user method.  See the
-    # git history if it needs to be revived.
+    unless ENV['parallel_tests'] == 'true'
+      delete_app_internal(SIMPLE_APP)
+      delete_app_internal(SIMPLE_APP2)
+      delete_app_internal(SIMPLE_APP3)
+      delete_app_internal(TINY_JAVA_APP)
+      delete_app_internal(REDIS_LB_APP)
+      delete_app_internal(ENV_TEST_APP)
+      delete_app_internal(SIMPLE_DB_APP)
+      delete_app_internal(BROKEN_APP)
+      delete_app_internal(RAILS3_APP)
+      delete_app_internal(JPA_APP)
+      delete_app_internal(HIBERNATE_APP)
+      delete_app_internal(DBRAILS_APP)
+      delete_app_internal(DBRAILS_BROKEN_APP)
+      delete_app_internal(GRAILS_APP)
+      delete_app_internal(ROO_APP)
+      delete_app_internal(SIMPLE_LIFT_APP)
+      delete_app_internal(LIFT_DB_APP)
+      delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+      delete_app_internal(NEO4J_APP)
+      delete_app_internal(ATMOS_APP)
+      delete_app_internal(SIMPLE_PYTHON_APP)
+      delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
+      delete_app_internal(SIMPLE_DJANGO_APP)
+      delete_app_internal(SIMPLE_PHP_APP)
+      delete_app_internal(SPRING_ENV_APP)
+      delete_app_internal(AUTO_RECONFIG_TEST_APP)
+      delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
+      delete_app_internal(SIMPLE_KV_APP)
+      delete_app_internal(BROKERED_SERVICE_APP)
+      delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+      delete_services(all_my_services) unless @registered_user or !get_login_token
+      # This used to delete the entire user, but that now requires admin
+      # privs so it was removed, as was the delete_user method.  See the
+      # git history if it needs to be revived.
+    end
   end
 
   def create_uri name
@@ -365,15 +387,8 @@ class AppCloudHelper
   end
 
   def upload_app app, token, rel_path=nil
-    if @config[app]['path']
-       upload_app_help("#{@root_dir}/#{@config[app]['path']}",app)
-    else
-      # If a rel_path is given the app should be uploaded from that relative path in the application directory.
-      # Don't start rel_path with a slash!.
-      deploy_from = "#{@testapps_dir}/#{app}"
-      deploy_from = "#{deploy_from}/#{rel_path}" if rel_path
-      upload_app_help(deploy_from, app)
-    end
+    raise "Application #{appname} does not have a 'path' configuration" unless @config[app]['path']
+    upload_app_help("#{@root_dir}/#{@config[app]['path']}", app)
   end
 
   def upload_app_help(app_dir, app)
@@ -482,10 +497,12 @@ class AppCloudHelper
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
       status = get_app_status app, token
-      runningInstances = status[:runningInstances] || 0
-      health = runningInstances/status[:instances].to_f
-      # to mark? Not sure why this change, but breaks simple stop tests
-      #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      if (status)
+        runningInstances = status[:runningInstances] || 0
+        health = runningInstances/status[:instances].to_f
+        # to mark? Not sure why this change, but breaks simple stop tests
+        #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      end
     end
     health
   end
@@ -544,6 +561,14 @@ class AppCloudHelper
   end
 
   def get_app_crashes app, token
+    # FIXME: this is a temporary hack.  What really should happen here
+    # is that we should poll to make sure the crash logs have been
+    # generated, and limit the polling to 2s.
+    #
+    # Wait for the DEA to save the crash logs.  On a dev/prod instance
+    # this happens very quickly, but on a loaded dev laptop, the test
+    # is able to proceed faster than the DEA can save the logs
+    sleep 0.5
     appname = get_app_name app
     response = @client.app_crashes(appname)
 
@@ -702,6 +727,17 @@ class AppCloudHelper
      :vendor=>"neo4j",
      :tier=>"free",
      :version=>"1.4",
+     :name=>name
+    }
+  end
+
+  def provision_atmos_service token
+    name = "#{@namespace}#{@app || 'simple_atmos_app'}atmos"
+    @client.create_service(:atmos, name)
+    service_manifest = {
+     :vendor=>"atmos",
+     :tier=>"free",
+     :version=>"1.4.1",
      :name=>name
     }
   end
@@ -871,6 +907,7 @@ class AppCloudHelper
     if timeout != 0
       easy.timeout = timeout
     end
+    easy.resolve_mode =:ipv4
     easy.http_get
     easy
   end
@@ -883,6 +920,7 @@ class AppCloudHelper
   def post_uri uri, data
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data)
     easy
   end
@@ -890,6 +928,7 @@ class AppCloudHelper
   def post_record_no_close uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_post(data_hash.to_json)
     easy
   end
@@ -899,15 +938,35 @@ class AppCloudHelper
     easy.close
   end
 
+  def put_to_app app, relative_path, data
+    uri = get_uri app, relative_path
+    put_uri uri, data
+  end
+
+  def put_uri uri, data
+    easy = Curl::Easy.new
+    easy.url = uri
+    easy.resolve_mode =:ipv4
+    easy.http_put(data)
+    easy
+  end
+
   def put_record uri, data_hash
     easy = Curl::Easy.new
     easy.url = uri
+    easy.resolve_mode =:ipv4
     easy.http_put(data_hash.to_json)
     easy.close
   end
 
+  def delete_from_app app, relative_path
+    uri = get_uri app, relative_path
+    delete_record uri
+  end
+
   def delete_record uri
     easy = Curl::Easy.new
+    easy.resolve_mode =:ipv4
     easy.url = uri
     easy.http_delete
     easy.close

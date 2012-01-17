@@ -87,7 +87,7 @@ end
 
 # Create
 When /^I create a simple application$/ do
-  @app = create_app SIMPLE_APP, @token
+  @app = create_app SIMPLE_APP3, @token
 end
 
 Then /^I should have my application on AppCloud$/ do
@@ -102,7 +102,7 @@ end
 
 # Read (Query status)
 Given /^I have my simple application on AppCloud$/ do
-  @app = create_app SIMPLE_APP, @token
+  @app = create_app SIMPLE_APP3, @token
 end
 
 When /^I query status of my application$/ do
@@ -172,6 +172,10 @@ Then /^it should not be available for use$/ do
   contents.close
 end
 
+Given /^I have deleted all deployed applications$/ do
+  AppCloudHelper.instance.cleanup
+end
+
 Given /^I have deployed my application named (\w+)$/ do |app_name|
   @app = create_app app_name, @token
   upload_app @app, @token
@@ -184,6 +188,26 @@ end
 # List apps
 Given /^I have deployed a simple application$/ do
   @app = create_app SIMPLE_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+# List apps
+Given /^I have deployed another simple application$/ do
+  @app = create_app SIMPLE_APP3, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+# List apps
+Given /^I have deployed a new simple application$/ do
+  @app = create_app SIMPLE_APP2, @token
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
@@ -227,7 +251,7 @@ end
 
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
-  upload_app @app, @token, "rel/mochiweb_test"
+  upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
   health = poll_until_done @app, expected_health, @token
@@ -552,6 +576,28 @@ Then /^I should be able to get from (\w+) service with key (\w+), and I should s
   end
 end
 
+Then /^I put (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
+  if @service
+    contents = put_to_app @app, "service/#{service}/#{key}", body
+    contents.response_code.should == 200
+    contents.close
+  end
+end
+
+Then /^I delete from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    delete_from_app @app, "service/#{service}/#{key}"
+  end
+end
+
+Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |service, key|
+  if @service
+    contents = get_app_contents @app, "service/#{service}/#{key}"
+    contents.response_code.should_not == 200
+    contents.close
+  end
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
@@ -593,6 +639,7 @@ Then /^I delete my service$/ do
   if @service
     s = delete_service @service[:name]
   end
+  @service_id = nil
 end
 
 When /^I provision ([\w\-]+) service$/ do |requested_service|
@@ -699,6 +746,7 @@ When /^I add one entry in the Guestbook$/ do
 
   easy = Curl::Easy.new
   easy.url = uri
+  easy.resolve_mode =:ipv4
   easy.http_post("name=guest")
   easy.close
 end
@@ -708,6 +756,7 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
 
   easy = Curl::Easy.new
   easy.url = uri
+  easy.resolve_mode =:ipv4
   easy.http_get
   doc = Nokogiri::HTML(easy.body_str)
   number = doc.xpath('//p').count

@@ -7,13 +7,13 @@ Feature: Control the life-cycle of an application on AppCloud
   Background: Application creation
     Given I have registered and logged in
 
-      @creates_simple_app
+      @creates_simple_app3
       Scenario: create application
         When I create a simple application
         Then I should have my application on AppCloud
         But it should not be started
 
-      @creates_simple_app
+      @creates_simple_app3
       Scenario: start application
         Given I have my simple application on AppCloud
         When I upload my application
@@ -21,14 +21,14 @@ Feature: Control the life-cycle of an application on AppCloud
         Then it should be started
         And it should be available for use
 
-      @creates_simple_app
+      @creates_simple_app3
       Scenario: stop application
-        Given I have deployed a simple application
+        Given I have deployed another simple application
         When I stop my application
         Then it should be stopped
         And it should not be available for use
 
-      @creates_simple_app
+      @creates_simple_app3
       Scenario: delete application
         Given I have my simple application on AppCloud
         When I delete my application
