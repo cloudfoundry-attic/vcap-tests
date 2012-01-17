@@ -1,0 +1,7 @@
+Verified+1: cftestbuild <cftestbuild@gmail.com>
+Code-Review+2: Dale Olds <olds@vmware.com>
+Submitted-by: Dale Olds <olds@vmware.com>
+Submitted-at: Tue, 17 Jan 2012 04:35:12 +0000
+Reviewed-on: http://cloudfoundry-codereview.qa.mozycloud.com/gerrit/2863
+Project: vcap-tests
+Branch: refs/heads/auth_deployment
