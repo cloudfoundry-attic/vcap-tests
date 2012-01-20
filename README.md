@@ -21,7 +21,7 @@ On Ubuntu you can install these dependencies with
 # License
 
 Cloud Foundry uses the Apache 2.0 license. See
-[LICENSE](https://github.com/cloudfoundry/LICENSE) for details.
+[LICENSE](https://github.com/cloudfoundry/vcap-tests/LICENSE) for details.
 
 # Installation Notes
 
