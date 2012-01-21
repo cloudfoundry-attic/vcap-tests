@@ -598,6 +598,28 @@ Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |servi
   end
 end
 
+Then /^I should be able to create a (.+) named (.+) in the (.+) service$/ do |object,name,service|
+   contents = put_to_app @app, "service/#{service}/#{object}/#{name}", ''
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I should be able to drop the (.+) named (.+) from the (.+) service$/ do |object,name,service|
+  contents = delete_from_app @app, "service/#{service}/#{object}/#{name}"
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I unbind the service from my app$/ do
+  service = all_my_service_manifests.first
+  unbind_service @app, service, @token
+end
+
+Then /^I bind the service to my app$/ do
+  service = all_my_service_manifests.first
+  bind_service @app, service, @token
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
