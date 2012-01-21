@@ -349,9 +349,9 @@ class AppCloudHelper
     }
   end
 
-  def create_app app, token, instances=1
-    appname = get_app_name app
-    delete_app app, token
+  def create_app app, token, instances=1, uid=nil
+    appname = get_app_name app, uid
+    delete_app app, token, uid
     url = create_uri appname
     manifest = {
       :name => "#{appname}",
@@ -373,12 +373,14 @@ class AppCloudHelper
     app
   end
 
-  def get_app_name app
+  def get_app_name app, uid=nil
     # URLs synthesized from app names containing '_' are not handled well by the Lift framework.
     # So we used '-' instead of '_'
     # '_' is not a valid character for hostname according to RFC 822,
     # use '-' to replace it.
-    "#{@namespace}my-test-app-#{app}".gsub("_", "-")
+    app_name = "#{@namespace}my-test-app-#{app}".gsub("_", "-")
+    app_name += uid if uid
+    app_name
   end
 
   def strip_app_name long_app
@@ -447,8 +449,8 @@ class AppCloudHelper
     @client.update_app(appname , manifest)
   end
 
-  def get_app_status app, token
-    appname = get_app_name app
+  def get_app_status app, token, uid=nil
+    appname = get_app_name app, uid
     begin
       response = @client.app_info(appname)
     rescue
@@ -463,8 +465,8 @@ class AppCloudHelper
     end
   end
 
-  def delete_app app, token
-    appname = get_app_name app
+  def delete_app app, token, uid=nil
+    appname = get_app_name app, uid
     begin
       response = @client.delete_app(appname)
     rescue
@@ -575,8 +577,8 @@ class AppCloudHelper
     crash_info = response if response
   end
 
-  def get_app_stats app, token
-    appname = get_app_name app
+  def get_app_stats app, token, uid=nil
+    appname = get_app_name app, uid
     response = @client.app_stats(appname)
     response.first if response
   end
@@ -635,7 +637,11 @@ class AppCloudHelper
   end
 
   def all_my_services
-    @client.services.map{ |service| service[:name] }
+    all_my_service_manifests.map{ |service| service[:name] }
+  end
+
+  def all_my_service_manifests
+    @client.services
   end
 
   def get_services token
@@ -851,7 +857,6 @@ class AppCloudHelper
     service_manifest
   end
 
-
   def attach_provisioned_service app, service_manifest, token
     appname = get_app_name app
     app_manifest = get_app_status app, token
@@ -861,6 +866,30 @@ class AppCloudHelper
     provisioned_service << svc_name
     app_manifest[:services] = provisioned_service
     @client.update_app(appname, app_manifest)
+  end
+
+  def detach_provisioned_service app, service_manifest, token
+    appname = get_app_name app
+    app_manifest = get_app_status app, token
+    provisioned_services = app_manifest[:services]
+    return unless provisioned_services && !provisioned_services.empty?
+    provisioned_services.delete(service_manifest[:name])
+    app_manifest[:services] = provisioned_services
+    @client.update_app(appname, app_manifest)
+  end
+
+  def bind_service app, service_manifest, token
+    attach_provisioned_service app, service_manifest, token
+    restart_app app, token
+    expected_health = 1.0
+    poll_until_done app, expected_health, token
+  end
+
+  def unbind_service app, service_manifest, token
+    detach_provisioned_service app, service_manifest, token
+    restart_app app, token
+    expected_health = 1.0
+    poll_until_done app, expected_health, token
   end
 
   def delete_services services
@@ -969,7 +998,7 @@ class AppCloudHelper
     easy.resolve_mode =:ipv4
     easy.url = uri
     easy.http_delete
-    easy.close
+    easy
   end
 
   def parse_json payload
