@@ -177,6 +177,17 @@ Given /^I have deleted all deployed applications$/ do
 end
 
 Given /^I have deployed my application named (\w+)$/ do |app_name|
+  @app_uid = nil
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+Given /^I have deployed my application named (\w+) identified by (\w+)$/ do |app_name, uid|
+  @app_uid = uid
   @app = create_app app_name, @token
   upload_app @app, @token
   start_app @app, @token
@@ -598,6 +609,28 @@ Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |servi
   end
 end
 
+Then /^I should be able to create a (.+) named (.+) in the (.+) service$/ do |object,name,service|
+  contents = put_to_app @app, "service/#{service}/#{object}/#{name}", ''
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I should be able to drop the (.+) named (.+) from the (.+) service$/ do |object,name,service|
+  contents = delete_from_app @app, "service/#{service}/#{object}/#{name}"
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I unbind the service from my app$/ do
+  service = all_my_service_manifests.first
+  unbind_service @app, service, @token
+end
+
+Then /^I bind the service to my app$/ do
+  service = all_my_service_manifests.first
+  bind_service @app, service, @token
+end
+
 Then /^I should be able to access the updated version of my application$/ do
   contents = get_app_contents @app
   contents.should_not == nil
@@ -766,6 +799,16 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
 end
 
 Given /^I have my running application named (\w+)$/ do |app_name|
+  @app_uid = nil
+  status = get_app_status app_name, @token
+  status.should_not == nil
+  if status
+    @app = app_name
+  end
+end
+
+Given /^I have my running application named (\w+) identified by (\w+)$/ do |app_name, uid|
+  @app_uid = uid
   status = get_app_status app_name, @token
   status.should_not == nil
   if status
@@ -811,4 +854,10 @@ Then /^I should be able to immediately access the Java application through its u
   contents.body_str.should_not == nil
   contents.body_str.should =~ /I am up and running/
   contents.close
+end
+
+# Misc utilities
+
+Then /^I wait for (\d+) seconds$/ do |s|
+  sleep(s.to_i)
 end
