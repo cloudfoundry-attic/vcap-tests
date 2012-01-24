@@ -12,12 +12,12 @@ Then /^the content should contain prompts$/ do
   @prompts.should =~ /prompts/
 end
 
-When /^I get the user data$/ do
-  @content = get_url "/Users"
+When /^I try and get the user data$/ do
+  @code = get_status "/Users"
 end
 
-Then /^the content should be an empty list$/ do
-  @content.should =~ /"resources":\[\]/
+Then /^the response should be 403$/ do
+  @code.should == 403
 end
 
 def get_prompts
@@ -31,4 +31,14 @@ def get_url(path)
   response.code.should == 200
   response.body.should_not == nil
   response.body
+end
+
+def get_status(path)
+  url = @base + path
+  begin
+    response = RestClient.get url, {"Accept"=>"application/json"}
+    response.code
+  rescue RestClient::Exception => e
+    e.http_code
+  end
 end

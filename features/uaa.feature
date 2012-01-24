@@ -12,5 +12,5 @@ Feature: UAA Service
 
     @uaa @smoke
     Scenario: Get Users data
-      When I get the user data
-      Then the content should be an empty list
+      When I try and get the user data
+      Then the response should be 403
