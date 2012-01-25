@@ -145,6 +145,18 @@ app_node_service:
   memory: 512
   path: "assets/node/app_node_service"
 
+app_node_version04:
+  framework: "node"
+  startup: node
+  memory: 64
+  path: "assets/node/app_node_version"
+
+app_node_version06:
+  framework: "node"
+  startup: node06
+  memory: 64
+  path: "assets/node/app_node_version"
+
 app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
