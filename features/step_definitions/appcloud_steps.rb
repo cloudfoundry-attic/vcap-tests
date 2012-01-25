@@ -626,6 +626,14 @@ Then /^I should be able to access my application root and see hello from (\w+)$/
   contents.close
 end
 
+Then /^I should be able to access my application root and see it's running version (.+)$/ do |version|
+  contents = get_app_contents @app
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should == "running version #{version}"
+  contents.close
+end
+
 Then /^I should be able to access the original version of my application$/ do
   pending
   contents = get_app_contents @app
