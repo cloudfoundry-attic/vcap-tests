@@ -13,6 +13,7 @@ Then /^the content should contain prompts$/ do
 end
 
 When /^I get the user data$/ do
+  pending "getting user data is temporarily disabled in the bvts"
   @content = get_url "/Users"
 end
 
