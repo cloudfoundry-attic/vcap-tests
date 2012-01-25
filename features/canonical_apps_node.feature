@@ -26,6 +26,20 @@ Feature: Deploy the node canonical app and check its services
     Then I should be able to access my application root and see hello from node
     Then I should be able to access crash and it should crash
 
+  @versions
+  Scenario: node test deploy app
+    Given I have deployed my application named app_node_version04
+    When I query status of my application
+    Then I should get the state of my application
+    Then I should be able to access my application root and see it's running version v0.4.12
+
+  @versions
+  Scenario: node test deploy app
+    Given I have deployed my application named app_node_version06
+    When I query status of my application
+    Then I should get the state of my application
+    Then I should be able to access my application root and see it's running version v0.6.8
+
   @mysql
   Scenario: node test mysql service
     Given I have my running application named app_node_service
