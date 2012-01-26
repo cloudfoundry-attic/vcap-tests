@@ -32,7 +32,8 @@ namespace :bvt do
   end
 
   task :run_uaa do
-    sh "cd #{CoreComponents.root}/uaa/uaa; mvn -P vcap -Dtest=*IntegrationTests test | tee /tmp/uaa.bvt.log | grep 'BUILD SUCCESSFUL'" do |ok,status|
+    config_path=ENV['CLOUD_FOUNDRY_CONFIG_PATH']?"-DCLOUD_FOUNDRY_CONFIG_PATH=#{ENV['CLOUD_FOUNDRY_CONFIG_PATH']} ":''
+    sh "cd #{CoreComponents.root}/uaa/uaa; MAVEN_OPTS=\"#{ENV['MAVEN_OPTS']}\" mvn -P vcap #{config_path}-Duaa.integration.test=true -Dtest=*IntegrationTests test | tee /tmp/uaa.bvt.log | grep 'BUILD SUCCESSFUL'" do |ok,status|
       logmsg = `tail -20 /tmp/uaa.bvt.log`
       ok or fail "UAA integration tests failed...truncated logs:\n#{logmsg}\nUAA integration tests failed"
     end
