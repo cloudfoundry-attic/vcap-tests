@@ -72,7 +72,7 @@ task 'ci-tests' => ci_steps
 task 'ci-java-tests' => 'java_client:ci_tests'
 
 desc "Run really simple tests for UAA service"
-task 'uaa-tests' => ['uaa:run']
+task 'uaa-tests' => ['uaa:run', 'bvt:run_uaa']
 
 def tests_path
   if @tests_path == nil
