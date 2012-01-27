@@ -31,6 +31,14 @@ namespace :bvt do
     sh "bundle exec cucumber --tags @services"
   end
 
+  task :run_uaa do
+    config_path=ENV['CLOUD_FOUNDRY_CONFIG_PATH']?"-DCLOUD_FOUNDRY_CONFIG_PATH=#{ENV['CLOUD_FOUNDRY_CONFIG_PATH']} ":''
+    sh "cd #{CoreComponents.root}/uaa/uaa; MAVEN_OPTS=\"#{ENV['MAVEN_OPTS']}\" mvn -P vcap #{config_path}-Duaa.integration.test=true -Dtest=*IntegrationTests test | tee /tmp/uaa.bvt.log | grep 'BUILD SUCCESSFUL'" do |ok,status|
+      logmsg = `tail -20 /tmp/uaa.bvt.log`
+      ok or fail "UAA integration tests failed...truncated logs:\n#{logmsg}\nUAA integration tests failed"
+    end
+  end
+
   desc "Run the Basic Viability Tests with jUnit output"
   task :run_for_ci do
     # Don't fail the Rake run if a test fails.
