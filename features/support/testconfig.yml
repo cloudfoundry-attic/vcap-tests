@@ -201,3 +201,4 @@ sqlfire_app:
   framework: "spring_web/1.0"
   startup: "thin start"
   memory: 256
+  path: "assets/sqlfire/spring_app/target"
