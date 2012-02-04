@@ -378,7 +378,9 @@ class AppCloudHelper
     # So we used '-' instead of '_'
     # '_' is not a valid character for hostname according to RFC 822,
     # use '-' to replace it.
-    "#{@namespace}my-test-app-#{app}".gsub("_", "-")
+    app_name = "#{@namespace}my-test-app-#{app}".gsub("_", "-")
+    app_name += @app_uid if @app_uid
+    app_name
   end
 
   def strip_app_name long_app
@@ -635,7 +637,11 @@ class AppCloudHelper
   end
 
   def all_my_services
-    @client.services.map{ |service| service[:name] }
+    all_my_service_manifests.map{ |service| service[:name] }
+  end
+
+  def all_my_service_manifests
+    @client.services
   end
 
   def get_services token
@@ -851,7 +857,6 @@ class AppCloudHelper
     service_manifest
   end
 
-
   def attach_provisioned_service app, service_manifest, token
     appname = get_app_name app
     app_manifest = get_app_status app, token
@@ -861,6 +866,30 @@ class AppCloudHelper
     provisioned_service << svc_name
     app_manifest[:services] = provisioned_service
     @client.update_app(appname, app_manifest)
+  end
+
+  def detach_provisioned_service app, service_manifest, token
+    appname = get_app_name app
+    app_manifest = get_app_status app, token
+    provisioned_services = app_manifest[:services]
+    return unless provisioned_services && !provisioned_services.empty?
+    provisioned_services.delete(service_manifest[:name])
+    app_manifest[:services] = provisioned_services
+    @client.update_app(appname, app_manifest)
+  end
+
+  def bind_service app, service_manifest, token
+    attach_provisioned_service app, service_manifest, token
+    restart_app app, token
+    expected_health = 1.0
+    poll_until_done app, expected_health, token
+  end
+
+  def unbind_service app, service_manifest, token
+    detach_provisioned_service app, service_manifest, token
+    restart_app app, token
+    expected_health = 1.0
+    poll_until_done app, expected_health, token
   end
 
   def delete_services services
@@ -969,7 +998,7 @@ class AppCloudHelper
     easy.resolve_mode =:ipv4
     easy.url = uri
     easy.http_delete
-    easy.close
+    easy
   end
 
   def parse_json payload
