@@ -485,6 +485,10 @@ class AppCloudHelper
     end
 
     app_manifest[:state] = 'STARTED'
+    #Enable console for Rails applications, as done in vmc
+    if app_manifest[:staging][:model] == 'rails3'
+      app_manifest[:console] = true
+    end
     response = @client.update_app(appname, app_manifest)
     raise "Problem starting application #{appname}." if response.first != 200
   end
