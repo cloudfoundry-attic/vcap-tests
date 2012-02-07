@@ -1,3 +1,7 @@
+$:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+
+require "parallel_runner"
+
 namespace :bvt do
   task :run do
     sh "bundle exec cucumber --tags ~@bvt_upgrade"
@@ -121,4 +125,69 @@ namespace :bvt do
     ENV['parallel_tests'] = "false"
     sh "bundle exec cucumber features/cleanup.feature"
   end
+
+  task :in_threads do
+    include ColorHelpers
+
+    puts yellow("Starting parallel BVT run")
+
+    runner = Bvt::ParallelRunner.new($stdout)
+
+    start_time = Time.now
+
+    list_tests_cmd = "bundle exec cucumber -e hooks.rb " +
+      "-d -f BVT::ListScenarios --tags ~@bvt_upgrade " +
+      "--tags ~@canonical --tags ~@cleanup"
+
+    list_tests_out = `#{list_tests_cmd}`
+    if $?.exitstatus != 0
+      raise "Cannot get tests list: exit code #{$?.exitstatus}"
+    end
+
+    tests = list_tests_out.lines.map{ |t| t.strip }.select{ |t| t =~ /^features/}
+
+    runner.cleanup
+
+    # Adding canonical tests
+    canonical_apps = ["node", "sinatra", "rails", "spring"]
+
+    canonical_apps.each do |app|
+      task_env = {
+        "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36),
+        "BVT_CANONICAL" => "yes"
+      }
+      runner.add_task("features/canonical_apps_#{app}.feature", task_env)
+    end
+
+    runner.run_tasks
+    runner.cleanup
+
+    # Run rest of the tests
+    tests.sort_by { rand }.each do |test|
+      task_env = {
+        "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36)
+      }
+      runner.add_task(test, task_env)
+    end
+
+    runner.run_tasks
+    runner.cleanup
+
+    if runner.failed_tasks.size > 0
+      puts red("\nFailed scenarios output:")
+      runner.failed_tasks.each do |scenario, output|
+        puts red(scenario)
+        puts output
+      end
+      puts red("\nTotal number of failing scenarios: #{runner.failed_tasks.size} (see output above)")
+      runner.failed_tasks.map { |scenario, output| puts red(scenario) }
+      puts "You can run them explicitly with: bundle exec cucumber FEATURE_PATH:LINE"
+    else
+      puts green("\nNo failed scenarios!")
+    end
+
+    puts yellow("\nTotal number of scenarios: #{tests.size} + #{canonical_apps.size} canonical tests")
+    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
+  end
+
 end

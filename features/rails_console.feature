@@ -14,6 +14,7 @@ Feature: Deploy the rails canonical app and check the console
     Then I should get responses irb():001:0>  from console of my application
     When I send command app.class to console of my application
     Then I should get responses app.class,=> ActionDispatch::Integration::Session,irb():002:0>  from console of my application
+    Then I close console
 
    @runs_rails_console
    Scenario: rails test console tab completion
@@ -22,3 +23,4 @@ Feature: Deploy the rails canonical app and check the console
     Then I should get responses irb():001:0>  from console of my application
     When I send tab completion puts to console of my application
     Then I should get completion results puts from console of my application
+    Then I close console

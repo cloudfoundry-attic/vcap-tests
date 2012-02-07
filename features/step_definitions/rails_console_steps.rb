@@ -25,7 +25,7 @@ Then /^I should get completion results (.+) from console of my application$/ do 
   expected_results.should == @console_tab_response
 end
 
-After("@runs_rails_console") do
+Then /^I close console$/ do
   close_console
   delete_caldecott
 end

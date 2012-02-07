@@ -54,7 +54,3 @@ def post_xml_content url, content
   response = RestClient.post url, content, :content_type => 'text/xml', :accept => 'text/xml'
   response.code
 end
-
-After("@creates_lift_db_adapter") do |scenario|
-  delete_app_services
-end

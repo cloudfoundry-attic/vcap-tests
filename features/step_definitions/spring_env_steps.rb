@@ -65,7 +65,3 @@ def http_get_body path
   response.code.should == 200
   response.body
 end
-
-After("@creates_spring_env_app") do |scenario|
-  delete_app_services
-end
