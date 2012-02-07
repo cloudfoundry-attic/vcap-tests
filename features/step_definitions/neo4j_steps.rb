@@ -34,7 +34,3 @@ Then /^I should be able to retrieve it$/ do
   contents["answer"].should == "A1"
   response.close
 end
-
-After("@creates_neo4j_service") do |scenario|
-  delete_app_services if @neo4j_service
-end

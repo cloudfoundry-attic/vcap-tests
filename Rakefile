@@ -55,6 +55,9 @@ task :java => ['build', 'bvt:init', 'bvt:run_java']
 desc "Run services-based tests"
 task :services => ['build', 'bvt:init', 'bvt:run_services']
 
+desc "Run tests in parallel using thread pool"
+task :parallel => ['build','bvt:in_threads']
+
 ci_steps = ['ci:version_check',
             'build',
             'bundler:install:production',

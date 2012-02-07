@@ -236,35 +236,6 @@ Then /^it should be bound to the right services$/ do
   found.should == @should_be_there.length
 end
 
-
-After("@lb_check") do |scenario|
-  app_info = get_app_status @app, @token
-  app_info.should_not == nil
-  services = app_info[:services]
-  delete_services services if services.length.to_i > 0
-
-  if(scenario.failed?)
-    if @counters != nil
-      puts "The scenario failed due to unexpected load balance distribution from the router"
-      puts "The following hash shows the per-instance counts along with the target and allowable deviation"
-      pp @counters
-      puts "target: #{@perf_target}, allowable deviation: #{@perf_slop}"
-    end
-  end
-end
-
-# look at for env_test cleanup
-After("@env_test_check") do |scenario|
-  app_info = get_app_status @app, @token
-  app_info.should_not == nil
-  services = app_info[:services]
-  delete_services services if services.length.to_i > 0
-
-  if(scenario.failed?)
-     puts "The scenario failed #{scenario}"
-  end
-end
-
 Given /^The appcloud instance has a set of available frameworks$/ do
   calculate_frameworks_list
   @frameworks_list.length.should > 1

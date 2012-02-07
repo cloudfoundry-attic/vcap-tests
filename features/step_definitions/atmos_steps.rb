@@ -31,11 +31,3 @@ Then /^I should be able to get the object$/ do
   r.body_str.should == 'abc'
   r.close
 end
-
-After("@creates_atmos_app") do |scenario|
-  delete_app @app, @token if @app
-end
-
-After("@creates_atmos_service") do |scenario|
-  delete_service @atmos_service[:name] if @atmos_service
-end

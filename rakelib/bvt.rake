@@ -1,3 +1,7 @@
+$:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+
+require "parallel_runner"
+
 namespace :bvt do
   task :run do
     sh "bundle exec cucumber --tags ~@bvt_upgrade"
@@ -121,4 +125,96 @@ namespace :bvt do
     ENV['parallel_tests'] = "false"
     sh "bundle exec cucumber features/cleanup.feature"
   end
+
+  task :in_threads do
+    include ColorHelpers
+
+    if !ENV["USERS_CONFIG_FILE"]
+      puts red("Please provide config file path with USERS_CONFIG_FILE")
+      puts "YML format:"
+      puts "users:"
+      puts "  count: 20"
+      puts "  template: prefix{n}@email.com"
+      puts "  password: password"
+      raise "Config file is not provided"
+    end
+    config_file = File.expand_path(ENV["USERS_CONFIG_FILE"], Dir.pwd)
+    puts "Using config file #{config_file}"
+    config = YAML.load_file(config_file)
+
+    unless config.is_a?(Hash) && config.has_key?("users") && config["users"].is_a?(Hash)
+      raise "Invalid config file format"
+    end
+
+    users = config["users"]
+
+    n_users = users["count"]
+    user_template = users["template"]
+    password = users["password"].to_s
+
+    start_time = Time.now
+
+    puts yellow("Starting parallel BVT run")
+    puts green("Number of users: #{n_users}")
+
+    # Generating users
+    users = []
+    n_users.times do |i|
+      users << user_template.sub(/{[^}]*}/, (i+1).to_s)
+    end
+
+    runner = Bvt::ParallelRunner.new(users, password, $stdout)
+
+    list_tests_cmd = "bundle exec cucumber -e hooks.rb " +
+      "-d -f BVT::ListScenarios --tags ~@bvt_upgrade " +
+      "--tags ~@canonical --tags ~@cleanup"
+
+    list_tests_out = `#{list_tests_cmd}`
+    if $?.exitstatus != 0
+      raise "Cannot get tests list: exit code #{$?.exitstatus}"
+    end
+
+    tests = list_tests_out.lines.map{ |t| t.strip }.select{ |t| t =~ /^features/}
+
+    runner.cleanup
+
+    # Adding canonical tests
+    canonical_apps = ["node", "sinatra", "rails", "spring"]
+
+    canonical_apps.each do |app|
+      task_env = {
+        "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36),
+        "CANONICAL" => "yes"
+      }
+      runner.add_task("features/canonical_apps_#{app}.feature", task_env)
+    end
+
+    runner.run_tasks
+    runner.cleanup
+
+    # Run rest of the tests
+    tests.sort_by { rand }.each do |test|
+      task_env = {
+        "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36)
+      }
+      runner.add_task(test, task_env)
+    end
+
+    runner.run_tasks
+    runner.cleanup
+
+    puts "\nTotal number of scenarios: #{tests.size} + #{canonical_apps.size} canonical tests"
+
+    # duration
+    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
+
+    if runner.failed_tasks.size > 0
+      puts red("\nFailing Scenarios: #{runner.failed_tasks.size}")
+      runner.failed_tasks.map {|f| puts red(f.scenario) }
+    else
+      puts green("\nNo failed scenarios!")
+    end
+
+  end
+
 end
