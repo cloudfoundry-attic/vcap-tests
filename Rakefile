@@ -15,6 +15,7 @@ desc "List help commands"
 task :help do
   puts "Usage: rake [command]"
   puts "  tests\t\t\t\trun all bvts"
+  puts "  parallel\t\t\trun all scenarios in parallel threads"
   puts "  p_tests\t\t\trun bvts in parallel (default to 5 processes. set env variable TEST_PROC to modify)"
   puts "  p_tests tests=canonical\trun canonical bvts in parallel"
   puts "  p_tests tests=[tests]\t\trun specified comma-delimited bvts in parallel (features/a.feature,features/b.feature)"
@@ -54,6 +55,9 @@ task :java => ['build', 'bvt:init', 'bvt:run_java']
 
 desc "Run services-based tests"
 task :services => ['build', 'bvt:init', 'bvt:run_services']
+
+desc "Run tests in parallel using thread pool"
+task :parallel => ['build','bvt:in_threads']
 
 ci_steps = ['ci:version_check',
             'build',

@@ -66,126 +66,6 @@ class Fixnum
   end
 end
 
-After do
-  AppCloudHelper.instance.cleanup
-end
-
-After("@creates_simple_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_APP
-end
-
-After("@creates_simple_app2") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_APP2
-end
-
-After("@creates_simple_app3") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_APP3
-end
-
-After("@creates_tiny_java_app") do
-  AppCloudHelper.instance.delete_app_internal TINY_JAVA_APP
-end
-
-After("@creates_simple_db_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_DB_APP
-end
-
-After("@creates_redis_lb_app") do
-  AppCloudHelper.instance.delete_app_internal REDIS_LB_APP
-end
-
-After("@creates_env_test_app") do
-  AppCloudHelper.instance.delete_app_internal ENV_TEST_APP
-end
-
-After("@creates_broken_app") do
-  AppCloudHelper.instance.delete_app_internal BROKEN_APP
-end
-
-After("@creates_rails3_app") do
-  AppCloudHelper.instance.delete_app_internal RAILS3_APP
-end
-
-After("@creates_jpa_app") do
-  AppCloudHelper.instance.delete_app_internal JPA_APP
-end
-
-After("@creates_hibernate_app") do
-  AppCloudHelper.instance.delete_app_internal HIBERNATE_APP
-end
-
-After("@creates_dbrails_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_APP
-end
-
-After("@creates_dbrails_broken_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_BROKEN_APP
-end
-
-After("@creates_grails_app") do
-  AppCloudHelper.instance.delete_app_internal GRAILS_APP
-end
-
-After("@creates_roo_app") do
-  AppCloudHelper.instance.delete_app_internal ROO_APP
-end
-
-After("@creates_mochiweb_app") do
-    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
-end
-
-After("@creates_simple_lift_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
-end
-
-After("@creates_lift_db_app") do
-  AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
-end
-
-After("@creates_tomcat_version_check_app") do
-  AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
-end
-
-After("@creates_neo4j_app") do
-  AppCloudHelper.instance.delete_app_internal NEO4J_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_django_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_DJANGO_APP
-end
-
-After("@creates_simple_php_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
-end
-
-After("@creates_spring_env_app") do
-  AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
-end
-
-After("@creates_auto_reconfig_test_app") do
-  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_TEST_APP
-end
-
-After("@creates_auto_reconfig_missing_deps_test_app") do
-  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_MISSING_DEPS_TEST_APP
-end
-
-After("@creates_java_app_with_delay") do
-  AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
-end
-
-at_exit do
-  AppCloudHelper.instance.cleanup
-end
-
 ['TERM', 'INT'].each do |s|
   trap(s) do
     ENV['parallel_tests'] = 'false'
@@ -259,7 +139,25 @@ class AppCloudHelper
   end
 
   def cleanup
-    unless ENV['parallel_tests'] == 'true'
+    if ENV["CLEAN_ALL"]
+      list_apps(@token).each do |app|
+        delete_app(app[:name], @token, false)
+      end
+      delete_services(all_my_services)
+
+    elsif ENV["CLEAN_NAMESPACE"] && !ENV["CANONICAL"]
+      ns_regexp = /^#{Regexp.quote(@namespace)}/
+
+      list_apps(@token).each do |app|
+        delete_app(app[:name], @token, false) if app[:name] =~ ns_regexp
+      end
+
+      all_my_services.each do |service|
+        delete_service(service) if service =~ ns_regexp
+      end
+    end
+
+    unless ENV['parallel_tests'] == 'true' || ENV['CLEAN_NAMESPACE']
       delete_app_internal(SIMPLE_APP)
       delete_app_internal(SIMPLE_APP2)
       delete_app_internal(SIMPLE_APP3)
@@ -465,8 +363,9 @@ class AppCloudHelper
     end
   end
 
-  def delete_app app, token
-    appname = get_app_name app
+  def delete_app app, token, process_name=true
+    appname = process_name ? get_app_name(app) : app
+
     begin
       response = @client.delete_app(appname)
     rescue

@@ -103,17 +103,3 @@ def perform_http_request(klass, url, body=nil)
   req.body = body if body
   resp = Net::HTTP.new(uri.host, uri.port).start {|http| http.request(req)}
 end
-
-After("@creates_simple_kv_app") do |scenario|
-  AppCloudHelper.instance.delete_app_internal SIMPLE_KV_APP
-end
-
-
-After("@creates_brokered_service_app") do |scenario|
-  AppCloudHelper.instance.delete_app_internal BROKERED_SERVICE_APP
-end
-
-After("@creates_brokered_service") do |scenario|
-  delete_brokered_services if @brokered_service
-end
-

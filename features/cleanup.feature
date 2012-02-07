@@ -5,5 +5,6 @@ Feature: Delete all deployments in AppCloud
   Background: register
     Given I have registered and logged in
 
+  @cleanup
   Scenario: delete all deployed applications
     Given I have deleted all deployed applications
