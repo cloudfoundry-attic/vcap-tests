@@ -58,6 +58,7 @@ AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
+RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -289,6 +290,7 @@ class AppCloudHelper
       delete_app_internal(SIMPLE_KV_APP)
       delete_app_internal(BROKERED_SERVICE_APP)
       delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+      delete_app_internal(RAILS_CONSOLE_TEST_APP)
       delete_services(all_my_services) unless @registered_user or !get_login_token
       # This used to delete the entire user, but that now requires admin
       # privs so it was removed, as was the delete_user method.  See the
@@ -485,6 +487,10 @@ class AppCloudHelper
     end
 
     app_manifest[:state] = 'STARTED'
+    #Enable console for Rails applications, as done in vmc
+    if app_manifest[:staging][:model] == 'rails3'
+      app_manifest[:console] = true
+    end
     response = @client.update_app(appname, app_manifest)
     raise "Problem starting application #{appname}." if response.first != 200
   end

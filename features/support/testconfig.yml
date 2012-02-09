@@ -237,3 +237,9 @@ java_app_with_startup_delay:
   startup: "thin start"
   memory: 128
   path: "assets/java_web/app_with_startup_delay/target"
+
+rails_console_test_app:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/app_rails_service"
