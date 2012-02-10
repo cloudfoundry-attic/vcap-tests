@@ -18,9 +18,9 @@ Feature: Deploy the spring canonical app and check its services
 
   Background: deploying canonical service
     Given I have registered and logged in
+    Given I have deployed my application named app_spring_service
 
   Scenario: spring test deploy app
-    Given I have deployed my application named app_spring_service
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see hello from spring
@@ -32,9 +32,6 @@ Feature: Deploy the spring canonical app and check its services
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-
-  @mysql @delete
-  Scenario: spring test delete service
     Then I delete my service
 
   @redis
@@ -43,9 +40,6 @@ Feature: Deploy the spring canonical app and check its services
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
-
-  @redis @delete
-  Scenario: spring test delete service
     Then I delete my service
 
   @mongodb
@@ -54,9 +48,6 @@ Feature: Deploy the spring canonical app and check its services
     When I provision mongodb service
     Then I post mongoabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc
-
-  @mongodb @delete
-  Scenario: spring test delete service
     Then I delete my service
 
   @rabbitmq
@@ -66,9 +57,6 @@ Feature: Deploy the spring canonical app and check its services
     Then I post rabbitabc to rabbitmq service with key abc
     Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
     Then I post rabbitabc to rabbitmq service with key abc
-
-  @rabbitmq @delete
-  Scenario: spring test delete service
     Then I delete my service
 
   @postgresql
@@ -77,14 +65,4 @@ Feature: Deploy the spring canonical app and check its services
     When I provision postgresql service
     Then I post postgresqlabc to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
-
-  @postgresql @delete
-  Scenario: spring test delete service
     Then I delete my service
-
-  @delete @delete_app
-  Scenario: spring test delete app
-    Given I have my running application named app_spring_service
-    When I delete my application
-    Then it should not be on AppCloud
-

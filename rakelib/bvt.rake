@@ -137,7 +137,7 @@ namespace :bvt do
 
     list_tests_cmd = "bundle exec cucumber -e hooks.rb " +
       "-d -f BVT::ListScenarios --tags ~@bvt_upgrade " +
-      "--tags ~@canonical --tags ~@cleanup"
+      "--tags ~@cleanup"
 
     list_tests_out = `#{list_tests_cmd}`
     if $?.exitstatus != 0
@@ -145,21 +145,6 @@ namespace :bvt do
     end
 
     tests = list_tests_out.lines.map{ |t| t.strip }.select{ |t| t =~ /^features/}
-
-    runner.cleanup
-
-    # Adding canonical tests
-    canonical_apps = ["node", "sinatra", "rails", "spring"]
-
-    canonical_apps.each do |app|
-      task_env = {
-        "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36),
-        "BVT_CANONICAL" => "yes"
-      }
-      runner.add_task("features/canonical_apps_#{app}.feature", task_env)
-    end
-
-    runner.run_tasks
     runner.cleanup
 
     # Run rest of the tests
@@ -186,7 +171,7 @@ namespace :bvt do
       puts green("\nNo failed scenarios!")
     end
 
-    puts yellow("\nTotal number of scenarios: #{tests.size} + #{canonical_apps.size} canonical tests")
+    puts yellow("\nTotal number of scenarios: #{tests.size}")
     puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
   end
 
