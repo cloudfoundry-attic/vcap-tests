@@ -10,7 +10,7 @@
 # --tags @canonical --tags @spring --tags @mysql,postgresql
 # --tags @canonical --tags @spring --tags @postgresql --tags ~@delete
 
-@canonical @node @services
+@canonical @node @services @debug-node
 Feature: Deploy the node canonical app and check its services
 
   As a user with all canonical apps
@@ -18,27 +18,15 @@ Feature: Deploy the node canonical app and check its services
 
   Background: deploying canonical service
     Given I have registered and logged in
+    Given I have deployed my application named app_node_service
 
   Scenario: node test deploy app
-    Given I have deployed my application named app_node_service
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see hello from node
     Then I should be able to access crash and it should crash
-
-  @versions
-  Scenario: node test deploy app
-    Given I have deployed my application named app_node_version04
-    When I query status of my application
-    Then I should get the state of my application
-    Then I should be able to access my application root and see it's running version v0.4.12
-
-  @versions
-  Scenario: node test deploy app
-    Given I have deployed my application named app_node_version06
-    When I query status of my application
-    Then I should get the state of my application
-    Then I should be able to access my application root and see it's running version v0.6.8
+    When I delete my application
+    Then it should not be on AppCloud
 
   @mysql
   Scenario: node test mysql service
@@ -48,10 +36,9 @@ Feature: Deploy the node canonical app and check its services
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc_updated
     Then I put mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-
-  @mysql @delete
-  Scenario: node test delete service
     Then I delete my service
+    When I delete my application
+    Then it should not be on AppCloud
 
   @redis
   Scenario: node test redis service
@@ -61,10 +48,9 @@ Feature: Deploy the node canonical app and check its services
     Then I should be able to get from redis service with key abc, and I should see redisabc_updated
     Then I put redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
-
-  @redis @delete
-  Scenario: node test delete service
     Then I delete my service
+    When I delete my application
+    Then it should not be on AppCloud
 
   @mongodb
   Scenario: node test mongodb service
@@ -74,10 +60,9 @@ Feature: Deploy the node canonical app and check its services
     Then I should be able to get from mongo service with key abc, and I should see mongoabc_updated
     Then I put mongoabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc
-
-  @mongodb @delete
-  Scenario: node test delete service
     Then I delete my service
+    When I delete my application
+    Then it should not be on AppCloud
 
   @rabbitmq
   Scenario: node test rabbitmq service
@@ -88,10 +73,9 @@ Feature: Deploy the node canonical app and check its services
     Then I put rabbitabc to rabbitmq service with key abc
     Then I should be able to get from rabbitmq service with key abc, and I should see rabbitabc
     Then I post rabbitabc to rabbitmq service with key abc
-
-  @rabbitmq @delete
-  Scenario: node test delete service
     Then I delete my service
+    When I delete my application
+    Then it should not be on AppCloud
 
   @postgresql
   Scenario: node test postgresql service
@@ -101,14 +85,6 @@ Feature: Deploy the node canonical app and check its services
     Then I should be able to get from postgresql service with key abc, and I should see pgresqlabc_updated
     Then I put postgresqlabc to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
-
-  @postgresql @delete
-  Scenario: node test delete service
     Then I delete my service
-
-  @delete @delete_app
-  Scenario: node test delete app
-    Given I have my running application named app_node_service
     When I delete my application
     Then it should not be on AppCloud
-
