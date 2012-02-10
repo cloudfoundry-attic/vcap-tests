@@ -15,3 +15,6 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring Grails application using the created MySQL service
         Then I should have the same 3 records on retrieving all records from the Grails application
+        Then I delete my service
+        Then I delete my application
+

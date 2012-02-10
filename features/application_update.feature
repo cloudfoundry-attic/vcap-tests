@@ -11,12 +11,14 @@ Feature: Update an application on AppCloud
      Scenario: increase instance count
          When I increase the instance count of my application by 2
          Then I should have 3 instances of my application
+         Then I delete my application
 
      @creates_simple_app @smoke
      Scenario: decrease instance count
          When I increase the instance count of my application by 2
          And I decrease the instance count of my application by 1
          Then I should have 2 instances of my application
+         Then I delete my application
 
      @creates_simple_app @smoke
      Scenario: add a url for the application to respond to
@@ -24,6 +26,7 @@ Feature: Update an application on AppCloud
          Then I should have 2 urls associated with my application
          And I should be able to access the application through the original url.
          And I should be able to access the application through the new url.
+         Then I delete my application
 
      @creates_simple_app
      Scenario: add a second url that differs by case
@@ -31,6 +34,7 @@ Feature: Update an application on AppCloud
          Then I should have 1 urls associated with my application
          And I should be able to access the application through the original url.
          And I should be able to access the application through the new url.
+         Then I delete my application
 
      @creates_simple_app @smoke
      Scenario: remove a url that the application responds to
@@ -39,6 +43,7 @@ Feature: Update an application on AppCloud
          Then I should have 1 urls associated with my application
          And I should be able to access the application through the remaining url.
          And I should be not be able to access the application through the removed url.
+         Then I delete my application
 
      @creates_simple_app @smoke
      Scenario: change url that the application responds to
@@ -47,6 +52,7 @@ Feature: Update an application on AppCloud
          Then I should have 1 urls associated with my application
          And I should be able to access the application through the new url.
          And I should be not be able to access the application through the original url.
+         Then I delete my application
 
        @creates_simple_app @smoke
        Scenario: redeploy application
@@ -54,4 +60,4 @@ Feature: Update an application on AppCloud
          And I update my application on AppCloud
          Then my update should succeed
          And I should be able to access the updated version of my application
-
+         Then I delete my application

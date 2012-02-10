@@ -12,6 +12,7 @@ Feature: Control the life-cycle of an application on AppCloud
         When I create a simple application
         Then I should have my application on AppCloud
         But it should not be started
+        Then I delete my application
 
       @creates_simple_app3
       Scenario: start application
@@ -20,6 +21,7 @@ Feature: Control the life-cycle of an application on AppCloud
         And I start my application
         Then it should be started
         And it should be available for use
+        Then I delete my application
 
       @creates_simple_app3
       Scenario: stop application
@@ -27,6 +29,7 @@ Feature: Control the life-cycle of an application on AppCloud
         When I stop my application
         Then it should be stopped
         And it should not be available for use
+        Then I delete my application
 
       @creates_simple_app3
       Scenario: delete application
@@ -39,3 +42,4 @@ Feature: Control the life-cycle of an application on AppCloud
         Given I have deployed my application named java_app_with_startup_delay
         Then it should be started
         And I should be able to immediately access the Java application through its url
+        Then I delete my application

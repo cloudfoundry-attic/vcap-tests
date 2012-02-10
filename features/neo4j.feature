@@ -11,3 +11,5 @@ Feature: Neo4j service binding and app deployment
     Given I have deployed a Neo4j application that is bound to this service
     When I add an answer to my application
     Then I should be able to retrieve it
+    Then I delete my service
+    Then I delete my application

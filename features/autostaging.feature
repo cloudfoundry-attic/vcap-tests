@@ -15,6 +15,8 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring JPA application using the created MySQL service
         Then I should have the same 3 records on retrieving all records from the application
+        Then I delete my service
+        Then I delete my application
 
       @creates_hibernate_app @creates_hibernate_db_adapter @java @sanity @services
       Scenario: start Spring Web application using Hibernate and add some records
@@ -25,6 +27,8 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring Hibernate application using the created MySQL service
         Then I should have the same 3 records on retrieving all records from the application
+        Then I delete my service
+        Then I delete my application
 
       @creates_roo_app @creates_roo_db_adapter @java @services
       Scenario: start Spring Roo application and add some records
@@ -35,6 +39,8 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring Roo application using the created MySQL service
         Then I should have the same 3 records on retrieving all records from the Roo application
+        Then I delete my service
+        Then I delete my application
 
       @creates_hibernate_app @creates_hibernate_postgresql_adapter @java @sanity @services
       Scenario: start Spring Web application using Hibernate and add some records
@@ -45,3 +51,5 @@ Feature: Deploy applications that make use of autostaging
         When I delete my application
         And I deploy a Spring Hibernate application using the created PostgreSQL service
         Then I should have the same 3 records on retrieving all records from the application
+        Then I delete my service
+        Then I delete my application

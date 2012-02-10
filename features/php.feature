@@ -9,3 +9,4 @@ Feature: Use PHP on AppCloud
   Scenario: Deploy Simple PHP Application
     Given I have deployed a simple PHP application
     Then it should be available for use
+    Then I delete my application

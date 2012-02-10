@@ -9,17 +9,18 @@ Feature: Retrieve information on an application on AppCloud
 
 	   @creates_simple_app2
 	   Scenario: query application status
-         Given I have deployed a new simple application
+       Given I have deployed a new simple application
 	     When I query status of my application
 	     Then I should get the state of my application
+       Then I delete my application
 
-	   @creates_simple_app2
-       @creates_tiny_java_app @java
+	   @creates_simple_app2 @creates_tiny_java_app @java
 	   Scenario: list applications
-         Given I have deployed a new simple application
+       Given I have deployed a new simple application
 	     And I have deployed a tiny Java application
 	     When I list my applications
 	     Then I should get status on the simple app as well as the tiny Java application
+       Then I delete my application
 
        @creates_simple_app2
        Scenario: get application files
@@ -27,6 +28,7 @@ Feature: Retrieve information on an application on AppCloud
          When I list files associated with my application
          Then I should get a list of directories and files associated with my application on AppCloud
          And I should be able to retrieve any of the listed files
+         Then I delete my application
 
        @creates_simple_app2
        Scenario: get instances information
@@ -34,12 +36,14 @@ Feature: Retrieve information on an application on AppCloud
          And I have 2 instances of a simple application
          When I get instance information for my application
          Then I should get status on all instances of my application
+         Then I delete my application
 
        @creates_simple_app2
        Scenario: get resource usage information for an application
          Given I have deployed a new simple application
          When I get resource usage for my application
          Then I should get information representing my application's resource use.
+         Then I delete my application
 
        @creates_simple_app2
        Scenario: get crash information for an application
@@ -49,6 +53,7 @@ Feature: Retrieve information on an application on AppCloud
          Then I should be able to get the time of the crash from that information
          And I should be able to get a list of files associated with my application on AppCloud
          And I should be able to retrieve any of the listed files
+         Then I delete my application
 
        @creates_broken_app @ruby
        Scenario: get crash information for a broken application
@@ -57,5 +62,4 @@ Feature: Retrieve information on an application on AppCloud
          When I get crash information for my application
          Then I should be able to get a list of files associated with my application on AppCloud
          And I should be able to retrieve any of the listed files
-
-
+         Then I delete my application
