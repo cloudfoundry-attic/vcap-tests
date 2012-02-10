@@ -10,7 +10,7 @@
 # --tags @canonical --tags @spring --tags @mysql,postgresql
 # --tags @canonical --tags @spring --tags @postgresql --tags ~@delete
 
-@canonical @sinatra @ruby @services
+@sinatra @ruby @services @debug-canonical
 Feature: Deploy the sinatra canonical app and check its services
 
   As a user with all canonical apps.
@@ -28,45 +28,40 @@ Feature: Deploy the sinatra canonical app and check its services
 
   @mysql
   Scenario: sinatra test mysql service
+    Given I have deployed my application named app_sinatra_service
     Given I have my running application named app_sinatra_service
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
     Then I post mysql123 to mysql service with key 123
     Then I post mysqldef to mysql service with key def
-
-  @mysql @delete
-  Scenario: sinatra test delete service
     Then I delete my service
 
   @redis
   Scenario: sinatra test redis service
+    Given I have deployed my application named app_sinatra_service
     Given I have my running application named app_sinatra_service
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
     Then I post redis123 to redis service with key 123
     Then I post redisdef to redis service with key def
-
-  @redis @delete
-  Scenario: sinatra test delete service
     Then I delete my service
 
   @mongodb
   Scenario: sinatra test mongodb service
+    Given I have deployed my application named app_sinatra_service
     Given I have my running application named app_sinatra_service
     When I provision mongodb service
     Then I post mongoabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongoabc
     Then I post mongo123 to mongo service with key 123
     Then I post mongodef to mongo service with key def
-
-  @mongodb @delete
-  Scenario: sinatra test delete service
     Then I delete my service
 
   @rabbitmq
   Scenario: sinatra test rabbitmq service
+    Given I have deployed my application named app_sinatra_service
     Given I have my running application named app_sinatra_service
     When I provision rabbitmq service
     Then I post rabbitabc to rabbitmq service with key abc
@@ -74,27 +69,15 @@ Feature: Deploy the sinatra canonical app and check its services
     Then I post rabbitabc to rabbitmq service with key abc
     Then I post rabbit123 to rabbitmq service with key 123
     Then I post rabbitdef to rabbitmq service with key def
-
-  @rabbitmq @delete
-  Scenario: sinatra test delete service
     Then I delete my service
 
   @postgresql
   Scenario: sinatra test postgresql service
+    Given I have deployed my application named app_sinatra_service
     Given I have my running application named app_sinatra_service
     When I provision postgresql service
     Then I post postgresqlabc to postgresql service with key abc
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
     Then I post postgresql123 to postgresql service with key 123
     Then I post postgresqldef to postgresql service with key def
-
-  @postgresql @delete
-  Scenario: sinatra test delete service
     Then I delete my service
-
-  @delete @delete_app
-  Scenario: sinatra test delete app
-    Given I have my running application named app_sinatra_service
-    When I delete my application
-    Then it should not be on AppCloud
-
