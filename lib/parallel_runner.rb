@@ -7,7 +7,7 @@ module Bvt
     include Interactive
 
     ABORT_ON_EXCEPTION = false
-    CONFIG_DEFAULT_PATH = "./parallel_config.yml"
+    CONFIG_DEFAULT_PATH = File.expand_path("~/.bvt_parallel_config.yml")
     DEFAULT_N_USERS = "10"
     DEFAULT_USER_TEMPLATE = "vcap_tester{n}@vmware.com"
     DEFAULT_USER_PASSWORD = "tester"
@@ -58,21 +58,15 @@ module Bvt
           config_path = CONFIG_DEFAULT_PATH
         else
           puts "Could not find saved config file"
-
-          if ask("Do you want to register users and save config file?", :default => true)
-            config_path = generate_config
-          else
-            raise "Can't proceed without configuration"
-          end
+          config_path = generate_config(config_path)
         end
       end
 
-      config_file = File.expand_path(config_path, Dir.pwd)
-      puts "Using config file #{config_file}"
-      config = YAML.load_file(config_file)
-
-      unless config.is_a?(Hash) && config.has_key?("users") && config["users"].is_a?(Hash)
-        raise "Invalid config file format"
+      config = get_target_config(config_path)
+      if !config
+        puts "No information about given VCAP target"
+        config_path = generate_config(config_path)
+        config = get_target_config(config_path)
       end
 
       users = config["users"]
@@ -90,7 +84,11 @@ module Bvt
 
     end
 
-    def generate_config
+    def generate_config(config_path)
+      if !ask("Do you want to register users and save config file?", :default => true)
+        raise "Can't proceed without configuration"
+      end
+
       ENV["VCAP_BVT_TARGET"] ||= ask("VCAP target")
       vcap_target = ENV["VCAP_BVT_TARGET"]
 
@@ -132,22 +130,45 @@ module Bvt
       end
 
       config = {}
+      config["target"] = ENV["VCAP_BVT_TARGET"]
       config["users"] = {}
       config["users"]["count"] = n_users.to_i
       config["users"]["template"] = user_template
       config["users"]["password"] = passwd
 
-      config_path = save_config(config)
+      config_path = save_config(config, config_path)
 
     end
 
-    def save_config(config)
-      save_to = CONFIG_DEFAULT_PATH
-      File.open(save_to, "w") do |f|
-        f.write config.to_yaml
+    def get_full_config(config_path)
+      config_file = File.expand_path(config_path, Dir.pwd)
+      puts "Using config file #{config_file}"
+      config = YAML.load_file(config_file)
+
+      unless config.is_a?(Array)
+        raise "Invalid config file format"
       end
-      puts "Config file written to #{save_to}"
-      save_to
+
+      config
+    end
+
+    def get_target_config(config_path)
+      config = get_full_config(config_path)
+      config.select{ |i| i["target"] == ENV["VCAP_BVT_TARGET"] }.slice(0)
+    end
+
+    def save_config(config, config_path=nil)
+      config_path ||= CONFIG_DEFAULT_PATH
+      full_config = []
+      if File.exists?(config_path)
+        full_config = get_full_config(config_path)
+      end
+      full_config << config
+      File.open(config_path, "w") do |f|
+        f.write full_config.to_yaml
+      end
+      puts "Config file written to #{config_path}"
+      config_path
     end
 
     def ask_and_validate(question, pattern, default = nil)
