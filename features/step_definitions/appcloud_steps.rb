@@ -565,7 +565,7 @@ Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
   end
 end
 
-Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\w+)$/ do |service, key, value|
+Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\S+)$/ do |service, key, value|
   if @service
     contents = get_app_contents @app, "service/#{service}/#{key}"
     contents.should_not == nil

@@ -127,6 +127,24 @@ app_rails_service:
   memory: 256
   path: "assets/rails3/app_rails_service"
 
+app_rails_service_autoconfig:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/app_rails_service_autoconfig"
+
+rails_autoconfig_disabled_by_file:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/autoconfig_disabled_by_file"
+
+rails_autoconfig_disabled_by_gem:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/autoconfig_disabled_by_gem"
+
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
@@ -138,6 +156,43 @@ app_sinatra_service2:
   startup: "ruby main.rb"
   memory: 256
   path: "assets/sinatra/app_sinatra_service"
+
+app_sinatra_service_autoconfig:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/app_sinatra_service_autoconfig"
+
+amqp_autoconfig:
+  framework: "sinatra"
+  startup: "ruby app.rb"
+  memory: 64
+  runtime: ruby19
+  path: "assets/sinatra/amqp_autoconfig"
+
+autoconfig_unsupported_versions:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_unsupported_versions"
+
+autoconfig_unsupported_carrot_version:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_unsupported_carrot_version"
+
+sinatra_autoconfig_disabled_by_file:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_disabled_by_file"
+
+sinatra_autoconfig_disabled_by_gem:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_disabled_by_gem"
 
 app_node_service:
   framework: "node"
