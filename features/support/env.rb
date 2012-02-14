@@ -59,6 +59,15 @@ SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
+RAILS_AUTO_RECONFIG_TEST_APP = "app_rails_service_autoconfig"
+RAILS_AUTO_RECONFIG_FILE_DISABLE_APP = "rails_autoconfig_disabled_by_file"
+RAILS_AUTO_RECONFIG_GEM_DISABLE_APP = "rails_autoconfig_disabled_by_gem"
+SINATRA_AUTO_RECONFIG_TEST_APP = "app_sinatra_service_autoconfig"
+SINATRA_AMQP_AUTO_RECONFIG_APP = "amqp_autoconfig"
+SINATRA_AUTO_RECONFIG_UNSUPPORTED_VERSIONS_APP = "autoconfig_unsupported_versions"
+SINATRA_AUTO_RECONFIG_UNSUPPORTED_CARROT_VERSION_APP = "autoconfig_unsupported_carrot_version"
+SINATRA_AUTO_RECONFIG_FILE_DISABLE_APP = "sinatra_autoconfig_disabled_by_file"
+SINATRA_AUTO_RECONFIG_GEM_DISABLE_APP = "sinatra_autoconfig_disabled_by_gem"
 
 class Fixnum
   def to_json(options = nil)
@@ -256,8 +265,9 @@ class AppCloudHelper
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :model => @config[app]['framework'],
-        :stack => @config[app]['startup']
+        :framework => @config[app]['framework'],
+        :stack => @config[app]['startup'],
+        :runtime => @config[app]['runtime']
       },
       :resources=> {
           :memory => @config[app]['memory'] || 64
@@ -541,6 +551,10 @@ class AppCloudHelper
 
   def all_my_services
     @client.services.map{ |service| service[:name] }
+  end
+
+  def all_services
+    @client.services
   end
 
   def get_services token

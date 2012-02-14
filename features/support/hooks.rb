@@ -120,6 +120,42 @@ After("@creates_java_app_with_delay") do
   AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
 end
 
+After("@creates_rails_auto_reconfig_test_app") do
+  AppCloudHelper.instance.delete_app_internal RAILS_AUTO_RECONFIG_TEST_APP
+end
+
+After("@creates_rails_auto_reconfig_file_disable_app") do
+  AppCloudHelper.instance.delete_app_internal RAILS_AUTO_RECONFIG_FILE_DISABLE_APP
+end
+
+After("@creates_rails_auto_reconfig_gem_disable_app") do
+  AppCloudHelper.instance.delete_app_internal RAILS_AUTO_RECONFIG_GEM_DISABLE_APP
+end
+
+After("@creates_sinatra_auto_reconfig_test_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AUTO_RECONFIG_TEST_APP
+end
+
+After("@creates_sinatra_amqp_auto_reconfig_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AMQP_AUTO_RECONFIG_APP
+end
+
+After("@creates_sinatra_auto_reconfig_unsupported_versions_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AUTO_RECONFIG_UNSUPPORTED_VERSIONS_APP
+end
+
+After("@creates_sinatra_auto_reconfig_unsupported_carrot_version_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AUTO_RECONFIG_UNSUPPORTED_CARROT_VERSION_APP
+end
+
+After("@creates_sinatra_auto_reconfig_file_disable_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AUTO_RECONFIG_FILE_DISABLE_APP
+end
+
+After("@creates_sinatra_auto_reconfig_gem_disable_app") do
+  AppCloudHelper.instance.delete_app_internal SINATRA_AUTO_RECONFIG_GEM_DISABLE_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
