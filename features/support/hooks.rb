@@ -40,24 +40,12 @@ After("@creates_broken_app") do
   AppCloudHelper.instance.delete_app_internal BROKEN_APP
 end
 
-After("@creates_rails3_app") do
-  AppCloudHelper.instance.delete_app_internal RAILS3_APP
-end
-
 After("@creates_jpa_app") do
   AppCloudHelper.instance.delete_app_internal JPA_APP
 end
 
 After("@creates_hibernate_app") do
   AppCloudHelper.instance.delete_app_internal HIBERNATE_APP
-end
-
-After("@creates_dbrails_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_APP
-end
-
-After("@creates_dbrails_broken_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_BROKEN_APP
 end
 
 After("@creates_grails_app") do
@@ -150,15 +138,7 @@ After("@creates_roo_db_adapter") do |scenario|
   delete_app_services
 end
 
-After("@creates_rails3_db_adapter") do |scenario|
-  delete_app_services
-end
-
 After("@creates_dbrails_db_adapter") do |scenario|
-  delete_app_services
-end
-
-After("@creates_dbrails_broken_db_adapter") do |scenario|
   delete_app_services
 end
 

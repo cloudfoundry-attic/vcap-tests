@@ -256,8 +256,9 @@ class AppCloudHelper
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :model => @config[app]['framework'],
-        :stack => @config[app]['startup']
+        :framework => @config[app]['framework'],
+        :stack => @config[app]['startup'],
+        :runtime => @config[app]['runtime']
       },
       :resources=> {
           :memory => @config[app]['memory'] || 64
@@ -365,7 +366,6 @@ class AppCloudHelper
 
   def delete_app app, token, process_name=true
     appname = process_name ? get_app_name(app) : app
-
     begin
       response = @client.delete_app(appname)
     rescue
@@ -541,6 +541,10 @@ class AppCloudHelper
 
   def all_my_services
     @client.services.map{ |service| service[:name] }
+  end
+
+  def all_services
+    @client.services
   end
 
   def get_services token
