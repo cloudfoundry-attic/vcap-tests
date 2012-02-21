@@ -660,6 +660,7 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
                when "rabbitmq" then provision_rabbitmq_service @token
                when "postgresql" then provision_postgresql_service
                when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
+               when "sqlfire" then provision_sqlfire_service @token
                end
 
     attach_provisioned_service @app, @service, @token

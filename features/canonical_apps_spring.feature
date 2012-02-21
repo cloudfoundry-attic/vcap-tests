@@ -82,6 +82,17 @@ Feature: Deploy the spring canonical app and check its services
   Scenario: spring test delete service
     Then I delete my service
 
+  @sqlfire
+  Scenario: spring test sqlfire service
+    Given I have my running application named app_spring_service
+    When I provision sqlfire service
+    Then I post sqlfireabc to sqlfire service with key abc
+    Then I should be able to get from sqlfire service with key abc, and I should see sqlfireabc
+
+  @sqlfire @delete
+  Scenario: spring test delete service
+    Then I delete my service
+
   @delete @delete_app
   Scenario: spring test delete app
     Given I have my running application named app_spring_service

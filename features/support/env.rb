@@ -59,7 +59,6 @@ SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
-SQLFIRE_APP = "sqlfire_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -685,9 +684,9 @@ class AppCloudHelper
     }
   end
 
-  def provision_sqlfire_service(token, plan="free")
+  def provision_sqlfire_service token
     name = "#{@namespace}#{@app || 'simple_db_app'}_sqlfire"
-    @client.create_service(:sqlfire, name, {:plan => plan})
+    @client.create_service(:sqlfire, name)
     service_manifest = {
       :type=>"database",
       :vendor=>"sqlfire",
