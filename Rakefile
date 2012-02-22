@@ -106,21 +106,32 @@ TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
 task :build, [:force] do |t, args|
   puts "\nBuilding tests"
+
   sh('git submodule update --init')
   if build_required? args.force
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
-    TESTS_TO_BUILD.each do |test|
-      puts "\tBuilding '#{test}'"
-      Dir.chdir test do
-        sh('mvn package -DskipTests') do |success, exit_code|
-          unless success
-            clear_build_artifact
-            do_mvn_clean('-q')
-            fail "\tFailed to build #{test} - aborting build"
+    begin
+      TESTS_TO_BUILD.each do |test|
+        puts "\tBuilding '#{test}'"
+        Dir.chdir test do
+          sh('mvn package -DskipTests') do |success, exit_code|
+            unless success
+              clear_build_artifact
+              do_mvn_clean('-q')
+              fail "\tFailed to build #{test} - aborting build"
+            end
           end
         end
+        puts "\tCompleted building '#{test}'"
       end
-      puts "\tCompleted building '#{test}'"
+    rescue Exception => ex
+      case ex.to_s
+        when "Command failed with status (127): [mvn clean -q...]"
+          raise RuntimeError,  "\nBVT need java development environment to build java-based test apps before pushing them to appcloud.\n\
+Please run 'sudo aptitude install maven2 default-jdk' on your Linux box"
+        else
+          raise ex
+      end
     end
     save_git_hash
   else
@@ -167,4 +178,3 @@ end
 def do_mvn_clean options=nil
   sh("mvn clean #{options}")
 end
-
