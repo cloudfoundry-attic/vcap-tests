@@ -28,6 +28,7 @@ Feature: Measure various performance features of an application
         And all 5 instances should participate
         And all 5 instances should do within 55 percent of their fair share of the 150 operations
         And after resetting all counters it should return OK and no data
+        Then I delete all my service
         Then I delete my application
 
       @creates_env_test_app @env_test_check @smoke
@@ -38,6 +39,7 @@ Feature: Measure various performance features of an application
         Then it should be started
         Then it should be bound to the right services
         And env_test's health_check entrypoint should return OK
+        Then I delete all my service
         Then I delete my application
 
       @creates_env_test_app @env_test_check
@@ -49,6 +51,7 @@ Feature: Measure various performance features of an application
         Then it should be started
         Then it should be bound to an atmos service
         And env_test's health_check entrypoint should return OK
+        Then I delete all my service
         Then I delete my application
 
       @smoke
@@ -64,4 +67,5 @@ Feature: Measure various performance features of an application
         Given The lift framework is supported on appcloud
         When I upload my foo-based ruby18 application it should fail
         When I upload my sinatra ruby2010 application it should fail
+        Then I delete all my service
         Then I delete my application
