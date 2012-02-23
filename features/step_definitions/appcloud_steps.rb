@@ -562,6 +562,10 @@ Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
     contents = post_to_app @app, "service/#{service}/#{key}", body
     contents.response_code.should == 200
     contents.close
+
+    # Time dependency
+    # Some app's post is async. Sleep to ensure the operation is done.
+    sleep 0.1
   end
 end
 
