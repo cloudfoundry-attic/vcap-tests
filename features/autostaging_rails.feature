@@ -10,19 +10,20 @@ Feature: Deploy applications that make use of autostaging
       Scenario: start application and write data
         Given I have deployed a Rails 3 application
         Then I can add a Widget to the database
-        Then I delete my service
+        Then I delete all my service
         Then I delete my application
 
       @creates_dbrails_app, @creates_dbrails_db_adapter @ruby @sanity @services
       Scenario: start and test a rails db app with Gemfile that includes mysql2 gem
         Given I deploy a dbrails application using the MySQL DB service
         Then The dbrails app should work
-        Then I delete my service
+        Then I delete all my service
         Then I delete my application
 
       @creates_dbrails_broken_app, @creates_dbrails_broken_db_adapter @ruby
       Scenario: start and test a rails db app with Gemfile that DOES NOT include mysql2 or sqllite gems
         Given I deploy a broken dbrails application  using the MySQL DB service
         Then The broken dbrails application should fail
-        Then I delete my service
+        Then I delete all my service
         Then I delete my application
+

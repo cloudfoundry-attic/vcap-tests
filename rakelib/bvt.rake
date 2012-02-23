@@ -4,7 +4,7 @@ require "parallel_runner"
 
 namespace :bvt do
   task :run do
-    sh "bundle exec cucumber --tags ~@bvt_upgrade"
+    sh "bundle exec cucumber -e hooks.rb --tags ~@bvt_upgrade"
   end
 
   task :run_junit_format do
