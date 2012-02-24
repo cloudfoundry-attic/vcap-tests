@@ -190,8 +190,8 @@ java_app_with_startup_delay:
   memory: 256
   path: "assets/java_web/app_with_startup_delay/target"
 
-blob_app:
+vblob_app:
   framework: "http://b20nine.com/unknown"
-  startup: "ruby blob.rb"
+  startup: "ruby vblob.rb"
   memory: 256
-  path: "assets/sinatra/blob_app"
+  path: "assets/sinatra/vblob_app"

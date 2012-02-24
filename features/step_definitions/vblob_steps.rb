@@ -1,12 +1,12 @@
-Given /^I have provisioned a blob service$/ do
+Given /^I have provisioned a vblob service$/ do
   pending unless find_service 'vblob'
-  @blob_service = provision_blob_service @token
-  @blob_service.should_not == nil
+  @vblob_service = provision_vblob_service @token
+  @vblob_service.should_not == nil
 end
 
-Given /^I have deployed a blob application that is bound to this service$/ do
-  @app = create_app BLOB_APP, @token
-  attach_provisioned_service @app, @blob_service, @token
+Given /^I have deployed a vblob application that is bound to this service$/ do
+  @app = create_app VBLOB_APP, @token
+  attach_provisioned_service @app, @vblob_service, @token
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
@@ -14,14 +14,14 @@ Given /^I have deployed a blob application that is bound to this service$/ do
   health.should == expected_health
 end
 
-Given /^I create a container in my blob service through my application$/ do
+Given /^I create a container in my vblob service through my application$/ do
   uri = get_uri(@app, 'container1')
   r = post_uri(uri,'dummy') # here post_uri requires payload, but our service safely ignores the payload, thus really some dummy data to make post_uri happy
   r.response_code.should == 200
   r.close
 end
 
-When /^I create an file in my blob service through my application$/ do
+When /^I create an file in my vblob service through my application$/ do
   uri = get_uri(@app, 'container1/file1')
   r = post_uri(uri, 'abc')
   r.response_code.should == 200
@@ -37,11 +37,11 @@ Then /^I should be able to get the file$/ do
   r.close
 end
 
-After("@creates_blob_app") do |scenario|
+After("@creates_vblob_app") do |scenario|
   delete_app @app, @token if @app
 end
 
-After("@creates_blob_service") do |scenario|
-  delete_service @blob_service[:name] if @blob_service
+After("@creates_vblob_service") do |scenario|
+  delete_service @vblob_service[:name] if @vblob_service
 end
 
