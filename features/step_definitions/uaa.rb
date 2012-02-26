@@ -16,8 +16,8 @@ When /^I try and get the user data$/ do
   @code = get_status "/Users"
 end
 
-Then /^the response should be 403$/ do
-  @code.should == 403
+Then /^the response should be UNAUTHORIZED$/ do
+  @code.should == 401
 end
 
 def get_prompts

@@ -13,4 +13,4 @@ Feature: UAA Service
     @uaa @smoke
     Scenario: Get Users data
       When I try and get the user data
-      Then the response should be 403
+      Then the response should be UNAUTHORIZED
