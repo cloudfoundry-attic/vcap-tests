@@ -23,7 +23,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc2
     When I rollback to previous snapshot for mysql service
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
   @mysql @serialized
@@ -42,7 +42,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc2
     When I import serialized data from request of mysql service
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
   @redis @snapshot
@@ -58,7 +58,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from redis service with key abc, and I should see redisabc2
     When I rollback to previous snapshot for redis service
     Then I should be able to get from redis service with key abc, and I should see redisabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
   @redis @serialized
@@ -77,7 +77,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from redis service with key abc, and I should see redisabc2
     When I import serialized data from request of redis service
     Then I should be able to get from redis service with key abc, and I should see redisabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
   @mongodb @snapshot
@@ -93,7 +93,7 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
     When I rollback to previous snapshot for mongodb service
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
   @mongodb @serialized
@@ -112,6 +112,6 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
     When I import serialized data from request of mongodb service
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
-    Then I delete all my service
+    Then I delete my service
     Then I delete my application
 
