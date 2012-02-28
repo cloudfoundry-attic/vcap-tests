@@ -151,6 +151,31 @@ app_rack_service:
   memory: 256
   path: "assets/rack/app_rack_service"
 
+app_rack_service_autoconfig:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/app_rack_service_autoconfig"
+
+rack_autoconfig_ruby19:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  runtime: ruby19
+  path: "assets/rack/autoconfig_ruby19"
+
+rack_autoconfig_disabled_by_file:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/autoconfig_disabled_by_file"
+
+rack_autoconfig_disabled_by_gem:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/autoconfig_disabled_by_gem"
+
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
