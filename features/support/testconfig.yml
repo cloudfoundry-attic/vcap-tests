@@ -145,6 +145,12 @@ rails_autoconfig_disabled_by_gem:
   memory: 256
   path: "assets/rails3/autoconfig_disabled_by_gem"
 
+app_rack_service:
+  framework: "rack"
+  startup: "ruby main.rb"
+  memory: 256
+  path: "assets/rack/app_rack_service"
+
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
