@@ -77,13 +77,24 @@ def create_snapshot
   @snapshot_id = job["result"]["snapshot_id"]
 end
 
+def lifecycle_cleanup
+  # delete app and service manually
+  delete_service @service[:name] if @service
+  @service = nil
+  delete_app @app, @token if @app
+  @app = nil
+end
+
 def get_snapshots
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/snapshots")
   easy.headers = auth_headers
   easy.resolve_mode =:ipv4
   easy.http_get
 
-  pending "Snapshot extension is disabled, return code=#{easy.response_code}" unless easy.response_code == 200
+  unless easy.response_code == 200
+    lifecycle_cleanup
+    pending "Snapshot extension is disabled, return code=#{easy.response_code}"
+  end
 
   resp = easy.body_str
   resp.should_not == nil
@@ -111,7 +122,10 @@ def get_serialized_url
   easy.resolve_mode =:ipv4
   easy.http_get
 
-  pending "Serialzed API is disabled, return code=#{easy.response_code}" unless easy.response_code == 200
+  unless easy.response_code == 200
+    lifecycle_cleanup
+    pending "Serialzed API is disabled, return code=#{easy.response_code}"
+  end
   resp = easy.body_str
   resp.should_not == nil
   job = JSON.parse(resp)
