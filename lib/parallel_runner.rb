@@ -31,6 +31,7 @@ module Bvt
       @active_tasks = Set.new
       @target = ENV["VCAP_BVT_TARGET"]
       @config_path = ENV["BVT_USERS_CONFIG"] || CONFIG_DEFAULT_PATH
+      @log = nil
 
       config_users
 
@@ -181,6 +182,8 @@ module Bvt
                 @failed_tasks[task.scenario] = task_output
                 raise Exception if ABORT_ON_EXCEPTION
               end
+              # sleep 1 second
+              sleep 1
             end
           end
         end
@@ -221,7 +224,8 @@ module Bvt
         output << io.read
       end
 
-      output
+      print "."
+      @log.puts(output)
     end
 
   end
