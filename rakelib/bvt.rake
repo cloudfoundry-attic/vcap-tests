@@ -145,6 +145,8 @@ namespace :bvt do
     end
 
     tests = list_tests_out.lines.map{ |t| t.strip }.select{ |t| t =~ /^features/}
+    total_number = tests.size
+    puts yellow("\nTotal number of scenarios: #{total_number}")
     runner.cleanup
 
     # Run rest of the tests
@@ -158,21 +160,17 @@ namespace :bvt do
     runner.run_tasks
     runner.cleanup
 
+    puts "\n========================"
+    puts yellow("\nTotal number of scenarios: #{total_number}")
+    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
+
     if runner.failed_tasks.size > 0
-      puts red("\nFailed scenarios output:")
-      runner.failed_tasks.each do |scenario, output|
-        puts red(scenario)
-        puts output
-      end
-      puts red("\nTotal number of failing scenarios: #{runner.failed_tasks.size} (see output above)")
-      runner.failed_tasks.map { |scenario, output| puts red(scenario) }
-      puts "You can run them explicitly with: bundle exec cucumber FEATURE_PATH:LINE"
+      puts red("\nTotal number of failing scenarios: #{runner.failed_tasks.size} (see '#{runner.log.path}' logs for details)")
+      runner.failed_tasks.map { |scenario, output| puts yellow(scenario); puts red(output); puts "" }
+      puts "You can run them explicitly with: "
+      puts yellow("bundle exec cucumber FEATURE_PATH:LINE")
     else
       puts green("\nNo failed scenarios!")
     end
-
-    puts yellow("\nTotal number of scenarios: #{tests.size}")
-    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
   end
-
 end
