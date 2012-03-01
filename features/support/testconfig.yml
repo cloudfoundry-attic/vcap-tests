@@ -202,19 +202,19 @@ sinatra_autoconfig_disabled_by_gem:
 
 app_node_service:
   framework: "node"
-  startup: node
+  runtime: node
   memory: 512
   path: "assets/node/app_node_service"
 
 app_node_version04:
   framework: "node"
-  startup: node
+  runtime: node
   memory: 64
   path: "assets/node/app_node_version"
 
 app_node_version06:
   framework: "node"
-  startup: node06
+  runtime: node06
   memory: 64
   path: "assets/node/app_node_version"
 

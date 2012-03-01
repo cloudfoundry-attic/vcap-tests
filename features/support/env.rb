@@ -257,7 +257,6 @@ class AppCloudHelper
       :name => "#{appname}",
       :staging => {
         :framework => @config[app]['framework'],
-        :stack => @config[app]['startup'],
         :runtime => @config[app]['runtime']
       },
       :resources=> {
