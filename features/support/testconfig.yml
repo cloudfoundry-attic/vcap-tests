@@ -304,3 +304,9 @@ rails_console_test_app:
   startup: "thin start"
   memory: 256
   path: "assets/rails3/app_rails_service"
+
+vblob_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby vblob.rb"
+  memory: 256
+  path: "assets/sinatra/vblob_app"
