@@ -256,7 +256,7 @@ class AppCloudHelper
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :framework => @config[app]['framework'],
+        :model => @config[app]['framework'],
         :stack => @config[app]['startup'],
         :runtime => @config[app]['runtime']
       },
