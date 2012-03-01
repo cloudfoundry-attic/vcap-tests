@@ -1,6 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
 require "parallel_runner"
+require "ruby-debug"
 
 namespace :bvt do
   task :run do
@@ -129,9 +130,17 @@ namespace :bvt do
   task :in_threads do
     include ColorHelpers
 
+    # redirect output to log file
+    BVT_LOG_FILE_PATH = './bvt_parallel.log'
+    if File.exist? (BVT_LOG_FILE_PATH)
+      File.delete(BVT_LOG_FILE_PATH)
+    end
+    ret = `touch "#{BVT_LOG_FILE_PATH}"`
+    log = File.open(BVT_LOG_FILE_PATH, 'a')
+
     puts yellow("Starting parallel BVT run")
 
-    runner = Bvt::ParallelRunner.new($stdout)
+    runner = Bvt::ParallelRunner.new($stdout, log)
 
     start_time = Time.now
 
@@ -145,6 +154,8 @@ namespace :bvt do
     end
 
     tests = list_tests_out.lines.map{ |t| t.strip }.select{ |t| t =~ /^features/}
+    total_number = tests.size
+    puts yellow("\nTotal number of scenarios: #{total_number}")
     runner.cleanup
 
     # Run rest of the tests
@@ -158,21 +169,30 @@ namespace :bvt do
     runner.run_tasks
     runner.cleanup
 
+    # re-run failed cases
+    puts yellow("\n\nRerun failed cases")
+    puts runner.failed_tasks.keys
+    tests = runner.failed_tasks.keys
+    tests.sort_by { rand }.each do |test|
+      task_env = {
+          "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36)
+      }
+      runner.add_task(test, task_env)
+    end
+    runner.run_tasks
+    runner.cleanup
+
+    puts "\n========================"
+    puts yellow("\nTotal number of scenarios: #{total_number}")
+    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
+
     if runner.failed_tasks.size > 0
-      puts red("\nFailed scenarios output:")
-      runner.failed_tasks.each do |scenario, output|
-        puts red(scenario)
-        puts output
-      end
-      puts red("\nTotal number of failing scenarios: #{runner.failed_tasks.size} (see output above)")
-      runner.failed_tasks.map { |scenario, output| puts red(scenario) }
-      puts "You can run them explicitly with: bundle exec cucumber FEATURE_PATH:LINE"
+      puts red("\nTotal number of failing scenarios: #{runner.failed_tasks.size} (see '#{BVT_LOG_FILE_PATH}' logs for details)")
+      runner.failed_tasks.map { |scenario, output| puts red(scenario); puts red(output) }
+      puts "You can run them explicitly with: \nbundle exec cucumber -e hooks.rb FEATURE_PATH:LINE"
     else
       puts green("\nNo failed scenarios!")
     end
-
-    puts yellow("\nTotal number of scenarios: #{tests.size}")
-    puts "Total execution time: %sm:%.3fs" % (Time.now - start_time).divmod(60)
+    log.close
   end
-
 end

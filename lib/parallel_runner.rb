@@ -23,7 +23,7 @@ module Bvt
 
     attr_accessor :failed_tasks
 
-    def initialize(io)
+    def initialize(io, log)
       @io = io
       @lock = Mutex.new
       @queue = Queue.new
@@ -31,22 +31,10 @@ module Bvt
       @active_tasks = Set.new
       @target = ENV["VCAP_BVT_TARGET"]
       @config_path = ENV["BVT_USERS_CONFIG"] || CONFIG_DEFAULT_PATH
+      @log = log
 
       config_users
 
-      Thread.new do
-        loop do
-          sleep(10)
-          @lock.synchronize do
-            @io.puts "======================================"
-            @io.puts "Currently running #{@active_tasks.size} tasks"
-            @active_tasks.each do |task|
-              @io.puts "#{task.scenario} running for #{(Time.now - task.start_time).round} seconds"
-            end
-            @io.puts "======================================\n\n"
-          end
-        end
-      end
     end
 
     def config_users
@@ -174,19 +162,49 @@ module Bvt
             task_output = run_task(task, user)
 
             @lock.synchronize do
-              @io.puts(task_output)
               @active_tasks.delete(task)
-
               if task_output =~ /Failing Scenarios:/
-                @failed_tasks[task.scenario] = task_output
+                @failed_tasks[task.scenario] = parse_error(task_output)
+                @io.print "F"
                 raise Exception if ABORT_ON_EXCEPTION
+              else
+                @io.print "."
               end
             end
+            # add think time when finishing every task
+            sleep 0.1
           end
         end
+        # ramp up user threads one by one
+        sleep 0.1
       end
 
       threads.each { |t| t.join }
+    end
+
+    def parse_error(output)
+      contents = output.split(/\n/)
+      res = []
+      match = false
+      index = 0
+      contents.each do |line|
+        # find start line of error messages
+        if line =~ /^\s+Error \d+:/
+          res << line
+          match = true
+          # continue to aggregate error messages till end
+          for i in index + 1..contents.length
+            puts contents[i]
+            if contents[i] =~ /^$/
+              break
+            end
+            res << contents[i]
+          end
+        end
+        index = index + 1
+        break if match
+      end
+      res.join('\n')
     end
 
     def cleanup
@@ -207,13 +225,12 @@ module Bvt
       }
 
       cmd << ENV.to_hash.merge(task.env.merge(env_extras))
-      cmd += ["bundle", "exec", "cucumber", "-e", "hooks.rb", "--color", task.scenario]
+      cmd += ["bundle", "exec", "cucumber", "-e", "hooks.rb", task.scenario]
       cmd
 
       output = ""
 
       @lock.synchronize do
-        @io.puts "Started #{yellow(task.scenario)} as #{user}"
         task.start_time = Time.now
       end
 
@@ -221,6 +238,7 @@ module Bvt
         output << io.read
       end
 
+      @log.puts(output)
       output
     end
 
