@@ -4,7 +4,7 @@ require "parallel_runner"
 
 namespace :bvt do
   task :run do
-    sh "bundle exec cucumber -e hooks.rb --tags ~@bvt_upgrade"
+    sh "bundle exec cucumber -e hooks.rb --tags ~@bvt_upgrade --tags ~@pending"
   end
 
   task :run_junit_format do
@@ -137,7 +137,7 @@ namespace :bvt do
 
     list_tests_cmd = "bundle exec cucumber -e hooks.rb " +
       "-d -f BVT::ListScenarios --tags ~@bvt_upgrade " +
-      "--tags ~@cleanup"
+      "--tags ~@cleanup --tags ~@pending"
 
     list_tests_out = `#{list_tests_cmd}`
     if $?.exitstatus != 0
