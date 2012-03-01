@@ -612,6 +612,7 @@ end
 
 Then /^I delete all my service$/ do
   delete_services(all_my_services)
+  @service_id = nil
 end
 
 Then /^I should be able to access crash and it should crash$/ do
