@@ -23,7 +23,7 @@ module Bvt
 
     attr_accessor :failed_tasks
 
-    def initialize(io)
+    def initialize(io, log)
       @io = io
       @lock = Mutex.new
       @queue = Queue.new
@@ -31,6 +31,7 @@ module Bvt
       @active_tasks = Set.new
       @target = ENV["VCAP_BVT_TARGET"]
       @config_path = ENV["BVT_USERS_CONFIG"] || CONFIG_DEFAULT_PATH
+      @log = log
 
       config_users
 
@@ -174,13 +175,13 @@ module Bvt
             task_output = run_task(task, user)
 
             @lock.synchronize do
-              @io.puts(task_output)
               @active_tasks.delete(task)
-
               if task_output =~ /Failing Scenarios:/
                 @failed_tasks[task.scenario] = task_output
                 raise Exception if ABORT_ON_EXCEPTION
               end
+              # sleep 1 second
+              sleep 1
             end
           end
         end
@@ -213,7 +214,7 @@ module Bvt
       output = ""
 
       @lock.synchronize do
-        @io.puts "Started #{yellow(task.scenario)} as #{user}"
+        @io.print "."
         task.start_time = Time.now
       end
 
@@ -221,6 +222,7 @@ module Bvt
         output << io.read
       end
 
+      @log.puts(output)
       output
     end
 
