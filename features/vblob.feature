@@ -12,3 +12,5 @@ Feature: vblob service binding and app deployment
     Given I create a container in my vblob service through my application
     When I create an file in my vblob service through my application
     Then I should be able to get the file
+    Then I delete my service
+    Then I delete my application

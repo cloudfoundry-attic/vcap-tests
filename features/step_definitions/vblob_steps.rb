@@ -1,12 +1,12 @@
 Given /^I have provisioned a vblob service$/ do
   pending unless find_service 'vblob'
-  @vblob_service = provision_vblob_service @token
-  @vblob_service.should_not == nil
+  @service = provision_vblob_service @token
+  @service.should_not == nil
 end
 
 Given /^I have deployed a vblob application that is bound to this service$/ do
   @app = create_app VBLOB_APP, @token
-  attach_provisioned_service @app, @vblob_service, @token
+  attach_provisioned_service @app, @service, @token
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
@@ -36,12 +36,3 @@ Then /^I should be able to get the file$/ do
   r.body_str.should == 'abc'
   r.close
 end
-
-After("@creates_vblob_app") do |scenario|
-  delete_app @app, @token if @app
-end
-
-After("@creates_vblob_service") do |scenario|
-  delete_service @vblob_service[:name] if @vblob_service
-end
-
