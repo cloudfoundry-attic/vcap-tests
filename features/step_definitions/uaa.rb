@@ -1,11 +1,12 @@
 require 'rest_client'
 
 Given /^I know the UAA service base URL$/ do
-  @base = 'uaa.' + @target
+  @uaabase = @client.info[:authenticationEndpoint]
+  pending "no uaa authentication endpoint available" unless @uaabase
 end
 
 When /^I get the login prompts$/ do
-  @prompts = get_prompts
+  @prompts = get_url "/login"
 end
 
 Then /^the content should contain prompts$/ do
@@ -20,12 +21,8 @@ Then /^the response should be UNAUTHORIZED$/ do
   @code.should == 401
 end
 
-def get_prompts
-  get_url "/login"
-end
-
 def get_url(path)
-  url = @base + path
+  url = @uaabase + path
   response = RestClient.get url, {"Accept"=>"application/json"}
   response.should_not == nil
   response.code.should == 200
@@ -34,7 +31,7 @@ def get_url(path)
 end
 
 def get_status(path)
-  url = @base + path
+  url = @uaabase + path
   begin
     response = RestClient.get url, {"Accept"=>"application/json"}
     response.code
