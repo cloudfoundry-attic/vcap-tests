@@ -254,19 +254,21 @@ class AppCloudHelper
   def create_app app, token, instances=1
     appname = get_app_name app
     delete_app app, token
-    url = create_uri appname
+    uris = []
+    uris << create_uri(appname) if not @config[app]['no_url']
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :framework => @config[app]['framework'],
-        :runtime => @config[app]['runtime']
+        :framework => @config[app]['framework']
       },
       :resources=> {
           :memory => @config[app]['memory'] || 64
       },
-      :uris => [url],
-      :instances => "#{instances}",
+      :uris => uris,
+      :instances => "#{instances}"
     }
+    manifest[:staging][:runtime] = @config[app]['runtime'] if @config[app]['runtime']
+    manifest[:staging][:command] = @config[app]['command'] if @config[app]['command']
     response = @client.create_app(appname, manifest)
     if response.first == 400
       puts "Creation of app #{appname} failed"
@@ -335,18 +337,6 @@ class AppCloudHelper
       # Cleanup if we created an exploded directory.
       FileUtils.rm_f(upload_file) if upload_file
       FileUtils.rm_rf(explode_dir) if explode_dir
-  end
-
-  def update_app_help(app_dir, app)
-    appname = get_app_name app
-    manifest = {
-      :name => "#{appname}",
-      :staging => {
-        :model => @config[app]['framework'],
-        :stack => @config[app]['startup']
-      }
-    }
-    @client.update_app(appname , manifest)
   end
 
   def get_app_status app, token
@@ -585,6 +575,13 @@ class AppCloudHelper
   def pending_unless_framework_exists(token, framework)
     unless get_frameworks(token).include?(framework)
       pending "Not running #{framework} based test because #{framework} is not available in this Cloud Foundry instance."
+    end
+  end
+
+  def pending_unless_runtime_exists(runtime)
+    runtimes = @client.info().to_a().join()
+    unless (runtimes =~ /#{runtime}/)
+      pending "Not running test because runtime #{runtime} is not available in this Cloud Foundry instance"
     end
   end
 
