@@ -216,6 +216,17 @@ Given /^I have deployed a new simple application$/ do
   health.should == expected_health
 end
 
+Given /^I have deployed a (\w+) application with runtime (\w+) named (\w+)$/ do |framework, runtime, app_name|
+  pending_unless_framework_exists(@token, framework)
+  pending_unless_runtime_exists(runtime)
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have built a simple Erlang application$/ do
   # Try to find an appropriate Erlang
   erlang_ready = true
@@ -659,6 +670,12 @@ Then /^I should be able to access crash and it should crash$/ do
   contents.response_code.should >= 500
   contents.response_code.should < 600
   contents.close
+end
+
+Then /^I should be able to access my application file (\S+) and see (.+)$/ do |file, expected_contents|
+  @instance = '0'
+  response = get_app_files @app, @instance, file, @token
+  response.should == expected_contents
 end
 
 Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
