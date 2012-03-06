@@ -171,7 +171,7 @@ module Bvt
             @lock.synchronize do
               @active_tasks.delete(task)
               if task_output =~ /Failing Scenarios:/
-                @failed_tasks[task.scenario] = parse_error(task_output)
+                @failed_tasks[task.scenario] = Time.now.getgm.to_s + "\n" + parse_error(task_output)
                 @io.print "F"
               else
                 @io.print "."

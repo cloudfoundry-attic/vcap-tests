@@ -131,6 +131,12 @@ namespace :bvt do
 
     puts yellow("Starting parallel BVT run")
 
+    if not ENV['seed'] == nil
+      seed = ENV['seed'].to_i
+    else
+      seed = Time.now.to_i
+    end
+    rand_num = Random.new(seed)
     runner = Bvt::ParallelRunner.new($stdout)
 
     start_time = Time.now
@@ -150,7 +156,7 @@ namespace :bvt do
     runner.cleanup
 
     # Run rest of the tests
-    tests.sort_by { rand }.each do |test|
+    tests.sort_by { rand_num.rand }.each do |test|
       task_env = {
         "VCAP_BVT_NS" => "t" + rand(2**32).to_s(36)
       }
@@ -169,6 +175,8 @@ namespace :bvt do
       runner.failed_tasks.map { |scenario, output| puts yellow(scenario); puts red(output); puts "" }
       puts "You can run them explicitly with: "
       puts yellow("bundle exec cucumber FEATURE_PATH:LINE")
+      puts "\nIf you want to reproduce runtime error, please pass seed value to parallel task"
+      puts yellow("bundle exec rake parallel seed=#{seed}")
     else
       puts green("\nNo failed scenarios!")
     end
