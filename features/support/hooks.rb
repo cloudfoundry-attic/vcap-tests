@@ -3,6 +3,7 @@
 # that can overlap with parallel task, and tests may fail
 # Parallel task does not use hooks, it cleans apps from current namespace
 # The best way is to put last task as the last step of scenario, not as hook
+require(File.join(File.dirname(__FILE__), "env.rb"))
 
 After do
   AppCloudHelper.instance.cleanup
@@ -115,15 +116,15 @@ end
 # autostaging
 
 After("@creates_services") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_jpa_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_hibernate_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_hibernate_postgresql_adapter") do |scenario|
@@ -135,11 +136,11 @@ After("@creates_grails_db_adapter") do |scenario|
 end
 
 After("@creates_roo_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 After("@creates_dbrails_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 # atmos
@@ -155,7 +156,7 @@ end
 # lift
 
 After("@creates_lift_db_adapter") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
 
 # neo4j
@@ -167,10 +168,7 @@ end
 # appcloud_performance
 
 After("@lb_check") do |scenario|
-  app_info = get_app_status @app, @token
-  app_info.should_not == nil
-  services = app_info[:services]
-  delete_services services if services.length.to_i > 0
+  delete_app_services_check
 
   if(scenario.failed?)
     if @counters != nil
@@ -184,10 +182,7 @@ end
 
 # look at for env_test cleanup
 After("@env_test_check") do |scenario|
-  app_info = get_app_status @app, @token
-  app_info.should_not == nil
-  services = app_info[:services]
-  delete_services services if services.length.to_i > 0
+  delete_app_services_check
 
   if(scenario.failed?)
      puts "The scenario failed #{scenario}"
@@ -212,5 +207,5 @@ end
 # spring_env_steps
 
 After("@creates_spring_env_app") do |scenario|
-  delete_app_services
+  delete_app_services_check
 end
