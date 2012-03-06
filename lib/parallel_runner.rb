@@ -171,7 +171,7 @@ module Bvt
             @lock.synchronize do
               @active_tasks.delete(task)
               if task_output =~ /Failing Scenarios:/
-                @failed_tasks[task.scenario] = parse_error(task_output)
+                @failed_tasks[task.scenario] = Time.now.getgm.to_s + "\n" + parse_error(task_output)
                 @io.print "F"
               else
                 @io.print "."
@@ -195,7 +195,7 @@ module Bvt
       index = 0
       contents.each do |line|
         # find start line of error messages
-        if line =~ /^\s+Error \d+:/ || line =~ /^\s+expected:/
+        if line =~ /^\s+Error \d+:/ || line =~ /^\s+expected:/ || line=~ /^\s+Error:/
           res << line
           match = true
           # continue to aggregate error messages till end
