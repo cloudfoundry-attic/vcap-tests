@@ -10,3 +10,4 @@ Feature: Use Erlang on AppCloud
     Given I have built a simple Erlang application
       And I have deployed a simple Erlang application
     Then it should be available for use
+    Then I delete my application

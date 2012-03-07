@@ -16,3 +16,5 @@ Feature: Create a simple key-value brokered service and test it using applicatio
     Then I create a brokered service and bind it to brokered_service_app
     Then I post a key-value to app_brokered_service
     Then I should able to access the same key-value from simple_kv_app
+    Then I delete my service
+    Then I delete my application

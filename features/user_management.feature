@@ -16,6 +16,6 @@ Feature: User registration with and establishment of an authentication token wit
 	   Then I should get an authentication token that I need to use with all subsequent AppCloud requests
 
 	 Scenario: Reset user authentication token
-       Given I have registered and logged in
+     Given I have registered and logged in
 	   When I login
 	   Then I should get a new authentication token that I need to use for all subsequent AppCloud requests

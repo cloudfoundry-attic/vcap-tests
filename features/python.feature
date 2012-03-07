@@ -9,13 +9,16 @@ Feature: Use Python on AppCloud
   Scenario: Deploy Simple Python Application
     Given I have deployed a simple Python application
     Then it should be available for use
+    Then I delete my application
 
   @creates_wsgi_app_with_dependency
   Scenario: Deploy Python Application with a dependency
     Given I have deployed a Python application with a dependency
     Then it should be available for use
+    Then I delete my application
 
   @creates_django_app
   Scenario: Deploy Django Application
     Given I have deployed a Django application
     Then it should be available for use
+    Then I delete my application

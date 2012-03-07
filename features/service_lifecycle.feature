@@ -8,11 +8,11 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
 
   Background: deploying canonical service
     Given I have registered and logged in
-    Given I have deployed my application named app_sinatra_service
+    Given I have deployed my application named app_sinatra_service2
 
   @mysql @snapshot
   Scenario: Take mysql snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mysql service
     Then I check snapshot extension is enabled
     Then I post mysqlabc to mysql service with key abc
@@ -23,14 +23,12 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc2
     When I rollback to previous snapshot for mysql service
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-
-  @mysql @delete @snapshot
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
   @mysql @serialized
   Scenario: Import and export serialized data for mysql service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
@@ -44,14 +42,12 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc2
     When I import serialized data from request of mysql service
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
-
-  @mysql @delete @serialized
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
   @redis @snapshot
   Scenario: Take redis snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision redis service
     Then I check snapshot extension is enabled
     Then I post redisabc to redis service with key abc
@@ -62,14 +58,12 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from redis service with key abc, and I should see redisabc2
     When I rollback to previous snapshot for redis service
     Then I should be able to get from redis service with key abc, and I should see redisabc
-
-  @redis @delete @snapshot
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
   @redis @serialized
   Scenario: Import and export serialized data for redis service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision redis service
     Then I post redisabc to redis service with key abc
     Then I should be able to get from redis service with key abc, and I should see redisabc
@@ -83,14 +77,12 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from redis service with key abc, and I should see redisabc2
     When I import serialized data from request of redis service
     Then I should be able to get from redis service with key abc, and I should see redisabc
-
-  @redis @delete @serialized
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
   @mongodb @snapshot
   Scenario: Take mongodb snapshot and rollback to a certain snapshot
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mongodb service
     Then I check snapshot extension is enabled
     Then I post mongodbabc to mongo service with key abc
@@ -101,14 +93,12 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
     When I rollback to previous snapshot for mongodb service
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
-
-  @mongodb @delete @snapshot
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
   @mongodb @serialized
   Scenario: Import and export serialized data for mongodb service
-    Given I have my running application named app_sinatra_service
+    Given I have my running application named app_sinatra_service2
     When I provision mongodb service
     Then I post mongodbabc to mongo service with key abc
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
@@ -122,13 +112,6 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
     When I import serialized data from request of mongodb service
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
-
-  @mongodb @delete @serialized
-  Scenario: sinatra test delete service
     Then I delete my service
+    Then I delete my application
 
-  @delete @delete_app
-  Scenario: sinatra test delete app
-    Given I have my running application named app_sinatra_service
-    When I delete my application
-    Then it should not be on AppCloud

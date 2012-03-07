@@ -11,3 +11,4 @@ Feature: atmos service binding and app deployment
     Given I have deployed an atmos application that is bound to this service
     When I create an object in backend atmos through my application
     Then I should be able to get the object
+    Then I delete my application

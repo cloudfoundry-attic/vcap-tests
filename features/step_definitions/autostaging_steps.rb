@@ -223,10 +223,46 @@ Then /^I can add a Widget to the database$/ do
   response.close
 end
 
+Given /^I have deployed my application named (\w+) without starting$/ do |app_name|
+  @app = create_app app_name, @token
+  upload_app @app, @token
+end
+
+Then /^I start my application named (\w+)$/ do |app_name|
+ @app = app_name
+ expected_health = 1.0
+ health = start_app_check_health expected_health
+ health.should == expected_health
+end
+
+Then /^I provision ([\w\-]+) service without restarting$/ do |requested_service|
+  @service = nil
+  if find_service requested_service
+    @service = case requested_service
+               when "mysql" then provision_db_service @token
+               when "redis" then provision_redis_service @token
+               when "mongodb" then provision_mongodb_service @token
+               when "rabbitmq" then provision_rabbitmq_service @token
+               when "postgresql" then provision_postgresql_service
+               when "rabbitmq-srs" then provision_rabbitmq_srs_service @token
+               end
+
+    attach_provisioned_service @app, @service, @token
+  end
+end
+
+Then /^I delete my service of type ([\w\-]+)$/ do |requested_service|
+  all_services.each do |s|
+    if s[:vendor].to_s == requested_service
+      delete_service(s[:name])
+    end
+  end
+end
 
 def post_content url, field, value
   easy = Curl::Easy.new
   easy.url =  url
+  easy.resolve_mode =:ipv4
   easy.http_post(Curl::PostField.content(field, value))
   response = easy.response_code
   easy.close
@@ -356,42 +392,3 @@ Then /^I should have the same (\d+) records on retrieving all records from the R
   # The Roo page returns an extra row for the footer in the table .. hence the "+ 1"
   verify_contents arg1.to_i + 1, response.body_str, "//table/tr"
 end
-
-After("@creates_services") do |scenario|
-  delete_app_services
-end
-
-After("@creates_jpa_db_adapter") do |scenario|
-  delete_app_services
-end
-
-After("@creates_hibernate_db_adapter") do |scenario|
-  delete_app_services
-end
-
-
-After("@creates_hibernate_postgresql_adapter") do |scenario|
-  delete_app_services_check
-end
-
-After("@creates_grails_db_adapter") do |scenario|
-  delete_app_services_check
-end
-
-After("@creates_roo_db_adapter") do |scenario|
-  delete_app_services
-end
-
-After("@creates_rails3_db_adapter") do |scenario|
-  delete_app_services
-end
-
-
-After("@creates_dbrails_db_adapter") do |scenario|
-  delete_app_services
-end
-
-After("@creates_dbrails_broken_db_adapter") do |scenario|
-  delete_app_services
-end
-

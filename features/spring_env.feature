@@ -15,3 +15,5 @@ Feature: Use Spring 3.1 Environment on AppCloud
 
     When I bind a redis service named cache-provider to the Spring 3.1 application
     Then the cloud service properties should be correct for a redis service named cache-provider
+    Then I delete all my service
+    Then I delete my application

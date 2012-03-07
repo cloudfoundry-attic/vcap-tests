@@ -28,6 +28,8 @@ require 'digest/sha1'
 TEST_AUTOMATION_USER_ID = "vcap_tester@vmware.com"
 TEST_AUTOMATION_PASSWORD = "tester"
 SIMPLE_APP = "simple_app"
+SIMPLE_APP2 = "simple_app2"
+SIMPLE_APP3 = "simple_app3"
 REDIS_LB_APP = "redis_lb_app"
 ENV_TEST_APP = "env_test_app"
 TINY_JAVA_APP = "tiny_java_app"
@@ -56,6 +58,8 @@ AUTO_RECONFIG_MISSING_DEPS_TEST_APP="auto-reconfig-missing-deps-test-app"
 SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
+RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
+VBLOB_APP = "vblob_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -63,119 +67,13 @@ class Fixnum
   end
 end
 
-After do
-  AppCloudHelper.instance.cleanup
+['TERM', 'INT'].each do |s|
+  trap(s) do
+    ENV['parallel_tests'] = 'false'
+    AppCloudHelper.instance.cleanup
+    Process.exit!
+  end
 end
-
-After("@creates_simple_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_APP
-end
-
-After("@creates_tiny_java_app") do
-  AppCloudHelper.instance.delete_app_internal TINY_JAVA_APP
-end
-
-After("@creates_simple_db_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_DB_APP
-end
-
-After("@creates_redis_lb_app") do
-  AppCloudHelper.instance.delete_app_internal REDIS_LB_APP
-end
-
-After("@creates_env_test_app") do
-  AppCloudHelper.instance.delete_app_internal ENV_TEST_APP
-end
-
-After("@creates_broken_app") do
-  AppCloudHelper.instance.delete_app_internal BROKEN_APP
-end
-
-After("@creates_rails3_app") do
-  AppCloudHelper.instance.delete_app_internal RAILS3_APP
-end
-
-After("@creates_jpa_app") do
-  AppCloudHelper.instance.delete_app_internal JPA_APP
-end
-
-After("@creates_hibernate_app") do
-  AppCloudHelper.instance.delete_app_internal HIBERNATE_APP
-end
-
-After("@creates_dbrails_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_APP
-end
-
-After("@creates_dbrails_broken_app") do
-  AppCloudHelper.instance.delete_app_internal DBRAILS_BROKEN_APP
-end
-
-After("@creates_grails_app") do
-  AppCloudHelper.instance.delete_app_internal GRAILS_APP
-end
-
-After("@creates_roo_app") do
-  AppCloudHelper.instance.delete_app_internal ROO_APP
-end
-
-After("@creates_mochiweb_app") do
-    AppCloudHelper.instance.delete_app_internal SIMPLE_ERLANG_APP
-end
-
-After("@creates_simple_lift_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_LIFT_APP
-end
-
-After("@creates_lift_db_app") do
-  AppCloudHelper.instance.delete_app_internal LIFT_DB_APP
-end
-
-After("@creates_tomcat_version_check_app") do
-  AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
-end
-
-After("@creates_neo4j_app") do
-  AppCloudHelper.instance.delete_app_internal NEO4J_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_wsgi_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
-end
-
-After("@creates_django_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_DJANGO_APP
-end
-
-After("@creates_simple_php_app") do
-  AppCloudHelper.instance.delete_app_internal SIMPLE_PHP_APP
-end
-
-After("@creates_spring_env_app") do
-  AppCloudHelper.instance.delete_app_internal SPRING_ENV_APP
-end
-
-After("@creates_auto_reconfig_test_app") do
-  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_TEST_APP
-end
-
-After("@creates_auto_reconfig_missing_deps_test_app") do
-  AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_MISSING_DEPS_TEST_APP
-end
-
-After("@creates_java_app_with_delay") do
-  AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
-end
-
-at_exit do
-  AppCloudHelper.instance.cleanup
-end
-
-['TERM', 'INT'].each { |s| trap(s) { AppCloudHelper.instance.cleanup; Process.exit! } }
 
 class AppCloudHelper
   include Singleton
@@ -242,38 +140,62 @@ class AppCloudHelper
   end
 
   def cleanup
-    delete_app_internal(SIMPLE_APP)
-    delete_app_internal(TINY_JAVA_APP)
-    delete_app_internal(REDIS_LB_APP)
-    delete_app_internal(ENV_TEST_APP)
-    delete_app_internal(SIMPLE_DB_APP)
-    delete_app_internal(BROKEN_APP)
-    delete_app_internal(RAILS3_APP)
-    delete_app_internal(JPA_APP)
-    delete_app_internal(HIBERNATE_APP)
-    delete_app_internal(DBRAILS_APP)
-    delete_app_internal(DBRAILS_BROKEN_APP)
-    delete_app_internal(GRAILS_APP)
-    delete_app_internal(ROO_APP)
-    delete_app_internal(SIMPLE_LIFT_APP)
-    delete_app_internal(LIFT_DB_APP)
-    delete_app_internal(TOMCAT_VERSION_CHECK_APP)
-    delete_app_internal(NEO4J_APP)
-    delete_app_internal(ATMOS_APP)
-    delete_app_internal(SIMPLE_PYTHON_APP)
-    delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
-    delete_app_internal(SIMPLE_DJANGO_APP)
-    delete_app_internal(SIMPLE_PHP_APP)
-    delete_app_internal(SPRING_ENV_APP)
-    delete_app_internal(AUTO_RECONFIG_TEST_APP)
-    delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
-    delete_app_internal(SIMPLE_KV_APP)
-    delete_app_internal(BROKERED_SERVICE_APP)
-    delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
-    delete_services(all_my_services) unless @registered_user or !get_login_token
-    # This used to delete the entire user, but that now requires admin
-    # privs so it was removed, as was the delete_user method.  See the
-    # git history if it needs to be revived.
+    if ENV["BVT_CLEAN_ALL"]
+      list_apps(@token).each do |app|
+        delete_app(app[:name], @token, false)
+      end
+      delete_services(all_my_services)
+
+    elsif ENV["BVT_CLEAN_NAMESPACE"] && !ENV["BVT_CANONICAL"]
+      ns_regexp = /^#{Regexp.quote(@namespace)}/
+
+      list_apps(@token).each do |app|
+        delete_app(app[:name], @token, false) if app[:name] =~ ns_regexp
+      end
+
+      all_my_services.each do |service|
+        delete_service(service) if service =~ ns_regexp
+      end
+    end
+
+    unless ENV['parallel_tests'] == 'true' || ENV['BVT_CLEAN_NAMESPACE']
+      delete_app_internal(SIMPLE_APP)
+      delete_app_internal(SIMPLE_APP2)
+      delete_app_internal(SIMPLE_APP3)
+      delete_app_internal(TINY_JAVA_APP)
+      delete_app_internal(REDIS_LB_APP)
+      delete_app_internal(ENV_TEST_APP)
+      delete_app_internal(SIMPLE_DB_APP)
+      delete_app_internal(BROKEN_APP)
+      delete_app_internal(RAILS3_APP)
+      delete_app_internal(JPA_APP)
+      delete_app_internal(HIBERNATE_APP)
+      delete_app_internal(DBRAILS_APP)
+      delete_app_internal(DBRAILS_BROKEN_APP)
+      delete_app_internal(GRAILS_APP)
+      delete_app_internal(ROO_APP)
+      delete_app_internal(SIMPLE_LIFT_APP)
+      delete_app_internal(LIFT_DB_APP)
+      delete_app_internal(TOMCAT_VERSION_CHECK_APP)
+      delete_app_internal(NEO4J_APP)
+      delete_app_internal(ATMOS_APP)
+      delete_app_internal(SIMPLE_PYTHON_APP)
+      delete_app_internal(PYTHON_APP_WITH_DEPENDENCIES)
+      delete_app_internal(SIMPLE_DJANGO_APP)
+      delete_app_internal(SIMPLE_PHP_APP)
+      delete_app_internal(SPRING_ENV_APP)
+      delete_app_internal(AUTO_RECONFIG_TEST_APP)
+      delete_app_internal(AUTO_RECONFIG_MISSING_DEPS_TEST_APP)
+      delete_app_internal(SIMPLE_KV_APP)
+      delete_app_internal(BROKERED_SERVICE_APP)
+      delete_app_internal(JAVA_APP_WITH_STARTUP_DELAY)
+      delete_app_internal(RAILS_CONSOLE_TEST_APP)
+      delete_app_internal(VBLOB_APP)
+      delete_services(all_my_services) unless @registered_user or !get_login_token
+      # This used to delete the entire user, but that now requires admin
+      # privs so it was removed, as was the delete_user method.  See the
+      # git history if it needs to be revived.
+    end
   end
 
   def create_uri name
@@ -336,8 +258,8 @@ class AppCloudHelper
     manifest = {
       :name => "#{appname}",
       :staging => {
-        :model => @config[app]['framework'],
-        :stack => @config[app]['startup']
+        :framework => @config[app]['framework'],
+        :runtime => @config[app]['runtime']
       },
       :resources=> {
           :memory => @config[app]['memory'] || 64
@@ -443,8 +365,8 @@ class AppCloudHelper
     end
   end
 
-  def delete_app app, token
-    appname = get_app_name app
+  def delete_app app, token, process_name=true
+    appname = process_name ? get_app_name(app) : app
     begin
       response = @client.delete_app(appname)
     rescue
@@ -465,6 +387,10 @@ class AppCloudHelper
     end
 
     app_manifest[:state] = 'STARTED'
+    #Enable console for Rails applications, as done in vmc
+    if app_manifest[:staging][:model] == 'rails3'
+      app_manifest[:console] = true
+    end
     response = @client.update_app(appname, app_manifest)
     raise "Problem starting application #{appname}." if response.first != 200
   end
@@ -477,10 +403,12 @@ class AppCloudHelper
       sleep sleep_time
       secs_til_timeout = secs_til_timeout - sleep_time
       status = get_app_status app, token
-      runningInstances = status[:runningInstances] || 0
-      health = runningInstances/status[:instances].to_f
-      # to mark? Not sure why this change, but breaks simple stop tests
-      #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      if (status)
+        runningInstances = status[:runningInstances] || 0
+        health = runningInstances/status[:instances].to_f
+        # to mark? Not sure why this change, but breaks simple stop tests
+        #health = runningInstances == 0 ? status['instances'].to_f : runningInstances.to_f
+      end
     end
     health
   end
@@ -616,6 +544,10 @@ class AppCloudHelper
     @client.services.map{ |service| service[:name] }
   end
 
+  def all_services
+    @client.services
+  end
+
   def get_services token
     @client.services_info
   end
@@ -725,6 +657,17 @@ class AppCloudHelper
     @client.create_service(@brokered_service_name.to_sym, name)
     service_manifest = {
      :vendor=>"brokered_service",
+     :tier=>"free",
+     :version=>"1.0",
+     :name=>name
+    }
+  end
+
+  def provision_vblob_service token
+    name = "#{@namespace}#{@app || 'simple_vblob_app'}vblob"
+    @client.create_service(:vblob, name)
+    service_manifest = {
+     :vendor=>"vblob",
      :tier=>"free",
      :version=>"1.0",
      :name=>name

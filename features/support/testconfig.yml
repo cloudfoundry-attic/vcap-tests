@@ -9,61 +9,79 @@ sleep_secs: 1
 simple_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby foo.rb"
+  memory: 128
+  path: "assets/sinatra/hello_vcap"
+
+simple_app2:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby foo.rb"
+  memory: 64
+  path: "assets/sinatra/hello_vcap"
+
+simple_app3:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby foo.rb"
+  memory: 64
   path: "assets/sinatra/hello_vcap"
 
 tiny_java_app:
   framework: "java_web/1.0"
   startup: "thin start"
+  memory: 128
   path: "assets/java_web/java_tiny_app/target"
 
 simple_db_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby simple_db_app.rb"
+  memory: 128
   path: "assets/sinatra/simple_db_app"
 
 redis_lb_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby redis_lb.rb"
+  memory: 128
   path: "assets/sinatra/redis_lb_app"
 
 env_test_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby env_test.rb"
+  memory: 64
   path: "assets/sinatra/env_test_app"
 
 broken_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby broken.rb"
+  memory: 64
   path: "assets/sinatra/broken_app"
 
 rails3_app:
   framework: "rails/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 128
   path: "assets/rails3/rails3_app"
 
 jpa_app:
   framework: "spring_web/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 512
   path: "assets/spring/jpa-guestbook/target"
 
 hibernate_app:
   framework: "spring_web/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 512
   path: "assets/spring/hibernate-guestbook/target"
 
 dbrails_app:
   framework: "rails/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 128
   path: "assets/rails3/dbrails_app"
 
 dbrails_broken_app:
   framework: "rails/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 128
   path: "assets/rails3/dbrails_broken_app"
 
 grails_app:
@@ -93,7 +111,7 @@ simple-lift-app:
 lift-db-app:
   framework: "lift/1.0"
   startup: "thin start"
-  memory: 512
+  memory: 256
   path: "assets/lift/lift-db-app/target"
 
 tomcat-version-check-app:
@@ -109,22 +127,101 @@ app_rails_service:
   memory: 256
   path: "assets/rails3/app_rails_service"
 
+app_rails_service_autoconfig:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/app_rails_service_autoconfig"
+
+rails_autoconfig_disabled_by_file:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/autoconfig_disabled_by_file"
+
+rails_autoconfig_disabled_by_gem:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/autoconfig_disabled_by_gem"
+
+app_rack_service:
+  framework: "rack"
+  startup: "ruby main.rb"
+  memory: 256
+  path: "assets/rack/app_rack_service"
+
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
   startup: "ruby main.rb"
-  memory: 64
+  memory: 256
   path: "assets/sinatra/app_sinatra_service"
+
+app_sinatra_service2:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby main.rb"
+  memory: 256
+  path: "assets/sinatra/app_sinatra_service"
+
+app_sinatra_service_autoconfig:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/app_sinatra_service_autoconfig"
+
+amqp_autoconfig:
+  framework: "sinatra"
+  startup: "ruby app.rb"
+  memory: 64
+  runtime: ruby19
+  path: "assets/sinatra/amqp_autoconfig"
+
+autoconfig_unsupported_versions:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_unsupported_versions"
+
+autoconfig_unsupported_carrot_version:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_unsupported_carrot_version"
+
+sinatra_autoconfig_disabled_by_file:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_disabled_by_file"
+
+sinatra_autoconfig_disabled_by_gem:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/sinatra/autoconfig_disabled_by_gem"
 
 app_node_service:
   framework: "node"
-  startup: node
-  memory: 64
+  runtime: node
+  memory: 512
   path: "assets/node/app_node_service"
+
+app_node_version04:
+  framework: "node"
+  runtime: node
+  memory: 64
+  path: "assets/node/app_node_version"
+
+app_node_version06:
+  framework: "node"
+  runtime: node06
+  memory: 64
+  path: "assets/node/app_node_version"
 
 app_spring_service:
   framework: "spring_web/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 512
   path: "assets/spring/app_spring_service/target"
 
 my_test_app_env_test_app:
@@ -136,19 +233,22 @@ my_test_app_env_test_app:
 neo4j_app:
   framework: "http://b20nine.com/unknown"
   startup: "ruby neo4j.rb"
-  memory: 256
+  memory: 128
   path: "assets/sinatra/neo4j_app"
 
 simple_wsgi_app:
   framework: "wsgi"
+  memory: 64
   path: "assets/django/simple_wsgi_app"
 
 wsgi_app_with_requirements:
   framework: "wsgi"
+  memory: 64
   path: "assets/django/wsgi_app_with_requirements"
 
 simple_django_app:
   framework: "django"
+  memory: 64
   path: "assets/django/simple_django_app"
 
 simple_php_app:
@@ -166,7 +266,7 @@ spring-env-app:
 auto-reconfig-test-app:
   framework: "spring_web/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 512
   path: "assets/spring/auto-reconfig-test-app/target"
 
 auto-reconfig-missing-deps-test-app:
@@ -184,15 +284,29 @@ atmos_app:
 simple_kv_app:
   framework: "http://b20nine.com/unknown"
   startup: "thin start"
+  memory: 64
   path: "assets/sinatra/simple_kv_app"
 
 brokered_service_app:
   framework: "http://b20nine.com/unknown"
   startup: "thin start"
+  memory: 64
   path: "assets/sinatra/brokered_service_app"
 
 java_app_with_startup_delay:
   framework: "java_web/1.0"
   startup: "thin start"
-  memory: 256
+  memory: 128
   path: "assets/java_web/app_with_startup_delay/target"
+
+rails_console_test_app:
+  framework: "rails/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/rails3/app_rails_service"
+
+vblob_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby vblob.rb"
+  memory: 256
+  path: "assets/sinatra/vblob_app"

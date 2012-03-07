@@ -87,7 +87,7 @@ end
 
 # Create
 When /^I create a simple application$/ do
-  @app = create_app SIMPLE_APP, @token
+  @app = create_app SIMPLE_APP3, @token
 end
 
 Then /^I should have my application on AppCloud$/ do
@@ -102,7 +102,7 @@ end
 
 # Read (Query status)
 Given /^I have my simple application on AppCloud$/ do
-  @app = create_app SIMPLE_APP, @token
+  @app = create_app SIMPLE_APP3, @token
 end
 
 When /^I query status of my application$/ do
@@ -172,6 +172,10 @@ Then /^it should not be available for use$/ do
   contents.close
 end
 
+Given /^I have deleted all deployed applications$/ do
+  AppCloudHelper.instance.cleanup
+end
+
 Given /^I have deployed my application named (\w+)$/ do |app_name|
   @app = create_app app_name, @token
   upload_app @app, @token
@@ -184,6 +188,26 @@ end
 # List apps
 Given /^I have deployed a simple application$/ do
   @app = create_app SIMPLE_APP, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+# List apps
+Given /^I have deployed another simple application$/ do
+  @app = create_app SIMPLE_APP3, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
+# List apps
+Given /^I have deployed a new simple application$/ do
+  @app = create_app SIMPLE_APP2, @token
   upload_app @app, @token
   start_app @app, @token
   expected_health = 1.0
@@ -538,10 +562,14 @@ Then /^I post (\w+) to (\w+) service with key (\w+)$/ do |body, service, key|
     contents = post_to_app @app, "service/#{service}/#{key}", body
     contents.response_code.should == 200
     contents.close
+
+    # Time dependency
+    # Some app's post is async. Sleep to ensure the operation is done.
+    sleep 0.1
   end
 end
 
-Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\w+)$/ do |service, key, value|
+Then /^I should be able to get from (\w+) service with key (\w+), and I should see (\S+)$/ do |service, key, value|
   if @service
     contents = get_app_contents @app, "service/#{service}/#{key}"
     contents.should_not == nil
@@ -584,6 +612,7 @@ end
 
 Then /^I delete all my service$/ do
   delete_services(all_my_services)
+  @service_id = nil
 end
 
 Then /^I should be able to access crash and it should crash$/ do
@@ -599,6 +628,14 @@ Then /^I should be able to access my application root and see hello from (\w+)$/
   contents.should_not == nil
   contents.body_str.should_not == nil
   contents.body_str.should == "hello from #{framework}"
+  contents.close
+end
+
+Then /^I should be able to access my application root and see it's running version (.+)$/ do |version|
+  contents = get_app_contents @app
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.body_str.should == "running version #{version}"
   contents.close
 end
 
@@ -722,6 +759,7 @@ When /^I add one entry in the Guestbook$/ do
 
   easy = Curl::Easy.new
   easy.url = uri
+  easy.resolve_mode =:ipv4
   easy.http_post("name=guest")
   easy.close
 end
@@ -731,6 +769,7 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
 
   easy = Curl::Easy.new
   easy.url = uri
+  easy.resolve_mode =:ipv4
   easy.http_get
   doc = Nokogiri::HTML(easy.body_str)
   number = doc.xpath('//p').count
