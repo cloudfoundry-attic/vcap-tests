@@ -10,7 +10,7 @@
 # --tags @canonical --tags @spring --tags @mysql,postgresql
 # --tags @canonical --tags @spring --tags @postgresql --tags ~@delete
 
-@canonical @rack @ruby @services @pending
+@canonical @rack @ruby @services
 Feature: Deploy the rack canonical app and check its services
 
   As a user with all canonical apps.
@@ -18,7 +18,7 @@ Feature: Deploy the rack canonical app and check its services
 
   Background: deploying canonical service
     Given I have registered and logged in
-    Given I have deployed my application named app_rack_service
+    Given I have deployed a rack application named app_rack_service
 
   Scenario: rack test deploy app
     When I query status of my application

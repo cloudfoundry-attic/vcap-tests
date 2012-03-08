@@ -249,6 +249,16 @@ Given /^I have built a simple Erlang application$/ do
   end
 end
 
+Given /^I have deployed a (\w+) application named (\w+)$/ do |fw, app_name|
+  pending_unless_framework_exists(@token, fw)
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
+end
+
 Given /^I have deployed a simple Erlang application$/ do
   @app = create_app SIMPLE_ERLANG_APP, @token
   upload_app @app, @token
