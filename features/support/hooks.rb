@@ -73,10 +73,6 @@ After("@creates_tomcat_version_check_app") do
   AppCloudHelper.instance.delete_app_internal TOMCAT_VERSION_CHECK_APP
 end
 
-After("@creates_neo4j_app") do
-  AppCloudHelper.instance.delete_app_internal NEO4J_APP
-end
-
 After("@creates_wsgi_app") do
   AppCloudHelper.instance.delete_app_internal SIMPLE_PYTHON_APP
 end
@@ -157,12 +153,6 @@ end
 
 After("@creates_lift_db_adapter") do |scenario|
   delete_app_services_check
-end
-
-# neo4j
-
-After("@creates_neo4j_service") do |scenario|
-  delete_app_services if @neo4j_service
 end
 
 # appcloud_performance
