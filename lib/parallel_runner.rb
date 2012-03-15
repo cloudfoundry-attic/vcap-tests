@@ -195,7 +195,7 @@ module Bvt
       index = 0
       contents.each do |line|
         # find start line of error messages
-        if line =~ /^\s+Error \d+:/ || line =~ /^\s+expected:/ || line=~ /^\s+Error:/
+        if line =~ /^\s+Error/ || line =~ /^\s+expected:/
           res << line
           match = true
           # continue to aggregate error messages till end
@@ -209,7 +209,11 @@ module Bvt
         index = index + 1
         break if match
       end
-      res.join("\n")
+      if res
+        res.join("\n")
+      else
+        "Cannot parse error message!! Please send your ./.bvt_parallel.log to pxie@rbcon.com\n"
+      end
     end
 
     def cleanup
