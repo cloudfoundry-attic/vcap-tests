@@ -11,6 +11,7 @@ Feature: Deploy the sinatra canonical app and check that services can be rebound
 
   @mysql
   Scenario: Verify rebinding for mysql
+    Given that the mysql service is available
     Given I have my running application named app_sinatra_service
     When I provision mysql service
     Then I post mysqlabc to mysql service with key abc
@@ -32,6 +33,7 @@ Feature: Deploy the sinatra canonical app and check that services can be rebound
 
   @mysql
   Scenario: Verify binding mysql to two applications
+    Given that the mysql service is available
     Given I have my running application named app_sinatra_service
     When I provision mysql service
     Given I have my running application named app_sinatra_service identified by app2
@@ -53,6 +55,7 @@ Feature: Deploy the sinatra canonical app and check that services can be rebound
 
   @postgresql
   Scenario: Verify rebinding for postgresql
+    Given that the postgresql service is available
     Given I have my running application named app_sinatra_service
     When I provision postgresql service
     Then I post postgresqlabc to postgresql service with key abc
@@ -74,6 +77,7 @@ Feature: Deploy the sinatra canonical app and check that services can be rebound
 
   @postgresql
   Scenario: Verify binding postgresql to two applications
+    Given that the postgresql service is available
     Given I have my running application named app_sinatra_service
     When I provision postgresql service
     Given I have my running application named app_sinatra_service identified by app2
