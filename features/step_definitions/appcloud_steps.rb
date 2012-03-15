@@ -626,6 +626,10 @@ Then /^I should be able to drop the (.+) named (.+) from the (.+) service$/ do |
   contents.close
 end
 
+Given /^that the (.+) service is available$/ do |service|
+  pending "The #{service} service is not available" unless find_service service
+end
+
 Then /^I unbind the service from my app$/ do
   service = all_my_service_manifests.first
   unbind_service @app, service, @token
