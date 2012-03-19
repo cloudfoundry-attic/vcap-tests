@@ -176,7 +176,8 @@ Given /^I have deleted all deployed applications$/ do
   AppCloudHelper.instance.cleanup
 end
 
-Given /^I have deployed my application named (\w+)$/ do |app_name|
+Given /^I have deployed my application named (\w+)( identified by (\w+))?$/ do |app_name, identified_by, uid|
+  @app_uid = uid
   @app = create_app app_name, @token
   upload_app @app, @token
   start_app @app, @token
@@ -247,6 +248,16 @@ Given /^I have built a simple Erlang application$/ do
     rel_build_result = `make relclean rel`
     raise "Erlang application build failed: #{rel_build_result}" if $? != 0
   end
+end
+
+Given /^I have deployed a (\w+) application named (\w+)$/ do |fw, app_name|
+  pending_unless_framework_exists(@token, fw)
+  @app = create_app app_name, @token
+  upload_app @app, @token
+  start_app @app, @token
+  expected_health = 1.0
+  health = poll_until_done @app, expected_health, @token
+  health.should == expected_health
 end
 
 Given /^I have deployed a simple Erlang application$/ do
@@ -590,7 +601,8 @@ end
 
 Then /^I delete from (\w+) service with key (\w+)$/ do |service, key|
   if @service
-    delete_from_app @app, "service/#{service}/#{key}"
+    contents = delete_from_app @app, "service/#{service}/#{key}"
+    contents.close
   end
 end
 
@@ -600,6 +612,32 @@ Then /^I should not be able to get from (\w+) service with key (\w+)$/ do |servi
     contents.response_code.should_not == 200
     contents.close
   end
+end
+
+Then /^I should be able to create a (.+) named (.+) in the (.+) service$/ do |object,name,service|
+  contents = put_to_app @app, "service/#{service}/#{object}/#{name}", ''
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I should be able to drop the (.+) named (.+) from the (.+) service$/ do |object,name,service|
+  contents = delete_from_app @app, "service/#{service}/#{object}/#{name}"
+  contents.response_code.should == 200
+  contents.close
+end
+
+Given /^that the (.+) service is available$/ do |service|
+  pending "The #{service} service is not available" unless find_service service
+end
+
+Then /^I unbind the service from my app$/ do
+  service = all_my_service_manifests.first
+  unbind_service @app, service, @token
+end
+
+Then /^I bind the service to my app$/ do
+  service = all_my_service_manifests.first
+  bind_service @app, service, @token
 end
 
 Then /^I should be able to access the updated version of my application$/ do
@@ -728,7 +766,8 @@ Then /^be able to delete the record$/ do
   contents = get_uri_contents uri
   contents.should_not == nil
   contents.close
-  delete_record uri
+  contents = delete_record uri
+  contents.close
   contents = get_uri_contents uri
   contents.should_not == nil
   contents.response_code.should == 404
@@ -778,7 +817,8 @@ Then /^I should be able to retrieve entries from Guestbook$/ do
   number.should >= 1
 end
 
-Given /^I have my running application named (\w+)$/ do |app_name|
+Given /^I have my running application named (\w+)( identified by (\w+))?$/ do |app_name, identified_by, uid|
+  @app_uid = uid
   status = get_app_status app_name, @token
   status.should_not == nil
   if status

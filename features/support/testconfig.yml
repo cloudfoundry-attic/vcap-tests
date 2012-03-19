@@ -121,6 +121,18 @@ tomcat-version-check-app:
   tomcat_version: "6.0.35"
   path: "assets/java_web/tomcat-version-check-app/target"
 
+app_rails_version18:
+  framework: "rails3"
+  runtime: ruby18
+  memory: 256
+  path: "assets/rails3/app_rails_version"
+
+app_rails_version19:
+  framework: "rails3"
+  runtime: ruby19
+  memory: 256
+  path: "assets/rails3/app_rails_version"
+
 app_rails_service:
   framework: "rails/1.0"
   startup: "thin start"
@@ -150,6 +162,31 @@ app_rack_service:
   startup: "ruby main.rb"
   memory: 256
   path: "assets/rack/app_rack_service"
+
+app_rack_service_autoconfig:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/app_rack_service_autoconfig"
+
+rack_autoconfig_ruby19:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  runtime: ruby19
+  path: "assets/rack/autoconfig_ruby19"
+
+rack_autoconfig_disabled_by_file:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/autoconfig_disabled_by_file"
+
+rack_autoconfig_disabled_by_gem:
+  framework: "rack"
+  startup: "ruby app.rb"
+  memory: 64
+  path: "assets/rack/autoconfig_disabled_by_gem"
 
 app_sinatra_service:
   framework: "http://b20nine.com/unknown"
