@@ -11,7 +11,7 @@
 # --tags @canonical --tags @spring --tags @postgresql --tags ~@delete
 
 @canonical @node
-Feature: Deploy the node canonical app with different version
+Feature: Deploy the node app with different versions and dependencies
 
   As a user with all canonical apps
   I want to deploy node apps with different version
@@ -34,5 +34,21 @@ Feature: Deploy the node canonical app with different version
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see it's running version v0.6.8
+    When I delete my application
+    Then it should not be on AppCloud
+
+  Scenario: node test deploy app with dependencies version04
+    Given I have deployed my application named app_node_dependencies04
+    When I query status of my application
+    Then I should get the state of my application
+    Then I should be able to access my application root and see hello from express
+    When I delete my application
+    Then it should not be on AppCloud
+
+  Scenario: node test deploy app with dependencies version06
+    Given I have deployed my application named app_node_dependencies06
+    When I query status of my application
+    Then I should get the state of my application
+    Then I should be able to access my application root and see hello from express
     When I delete my application
     Then it should not be on AppCloud
