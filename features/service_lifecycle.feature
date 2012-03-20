@@ -115,3 +115,39 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I delete my service
     Then I delete my application
 
+  @postgresql @snapshot
+  Scenario: Take postgresql snapshot and rollback to a certain snapshot
+    Given I have my running application named app_sinatra_service2
+    When I provision postgresql service
+    Then I check snapshot extension is enabled
+    Then I post postgresqlabc to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    When I create a snapshot of postgresql service
+    Then I should be able to query snapshots for postgresql service
+    Then I post postgresqlabc2 to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc2
+    When I rollback to previous snapshot for postgresql service
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    Then I delete my service
+    Then I delete my application
+
+  @postgresql @serialized
+  Scenario: Import and export serialized data for postgresql service
+    Given I have my running application named app_sinatra_service2
+    When I provision postgresql service
+    Then I post postgresqlabc to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    When I create a serialized URL of postgresql service
+    Then I should be able to download data from serialized URL
+    Then I post postgresqlabc2 to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc2
+    When I import serialized data from URL of postgresql service
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    Then I post postgresqlabc2 to postgresql service with key abc
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc2
+    When I import serialized data from request of postgresql service
+    Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    Then I delete my service
+    Then I delete my application
+
+
