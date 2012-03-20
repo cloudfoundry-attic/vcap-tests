@@ -109,18 +109,32 @@ task :build, [:force] do |t, args|
   sh('git submodule update --init')
   if build_required? args.force
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
-    TESTS_TO_BUILD.each do |test|
-      puts "\tBuilding '#{test}'"
-      Dir.chdir test do
-        sh('mvn package -DskipTests') do |success, exit_code|
-          unless success
-            clear_build_artifact
-            do_mvn_clean('-q')
-            fail "\tFailed to build #{test} - aborting build"
+    prompt_msg = "\nBVT need java development environment to build java-based test apps before pushing them to appcloud.\nPlease run 'sudo aptitude install maven2 default-jdk' on your Linux box"
+    begin
+      mvn_version = `mvn -v`
+    rescue Exception => e
+      if e.to_s == "No such file or directory - mvn -v"
+        raise RuntimeError, prompt_msg
+      else
+        raise e
+      end
+    end
+    if (mvn_version.index("Apache Maven") != nil && mvn_version.index("Java version") != nil)
+      TESTS_TO_BUILD.each do |test|
+        puts "\tBuilding '#{test}'"
+        Dir.chdir test do
+          sh('mvn package -DskipTests') do |success, exit_code|
+            unless success
+              clear_build_artifact
+              do_mvn_clean('-q')
+              fail "\tFailed to build #{test} - aborting build"
+            end
           end
         end
+        puts "\tCompleted building '#{test}'"
       end
-      puts "\tCompleted building '#{test}'"
+    else
+      raise RuntimeError, prompt_msg
     end
     save_git_hash
   else
