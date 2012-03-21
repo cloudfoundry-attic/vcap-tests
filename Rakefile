@@ -109,18 +109,23 @@ task :build, [:force] do |t, args|
   sh('git submodule update --init')
   if build_required? args.force
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
-    TESTS_TO_BUILD.each do |test|
-      puts "\tBuilding '#{test}'"
-      Dir.chdir test do
-        sh('mvn package -DskipTests') do |success, exit_code|
-          unless success
-            clear_build_artifact
-            do_mvn_clean('-q')
-            fail "\tFailed to build #{test} - aborting build"
+    mvnVersion = 'mvn -v'
+    if (mvnVersion.index("Apache Maven") != nil && mvnVersion.index("Java version") != nil)
+      TESTS_TO_BUILD.each do |test|
+        puts "\tBuilding '#{test}'"
+        Dir.chdir test do
+          sh('mvn package -DskipTests') do |success, exit_code|
+            unless success
+              clear_build_artifact
+              do_mvn_clean('-q')
+              fail "\tFailed to build #{test} - aborting build"
+            end
           end
         end
+        puts "\tCompleted building '#{test}'"
       end
-      puts "\tCompleted building '#{test}'"
+    else
+      raise RuntimeError, "\nBVT need java development environment to build java-based test apps before pushing them to appcloud.\nPlease run 'sudo aptitude install maven2 default-jdk' on your Linux box"
     end
     save_git_hash
   else
