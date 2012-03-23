@@ -24,3 +24,13 @@ Feature: Deploy the rails canonical app and check the console
     When I send tab completion puts to console of my application
     Then I should get completion results puts from console of my application
     Then I close console
+
+   @runs_rails_console
+   Scenario: rails test console stdout redirect
+    Given I have my running application named rails_console_test_app
+    When I first access console of my application
+    Then I should get responses irb():001:0>  from console of my application
+    When I send command puts 'hi' to console of my application
+    Then I should get responses puts 'hi',hi,=> nil,irb():002:0>  from console of my application
+    Then I close console
+
