@@ -1,8 +1,7 @@
 require 'rest_client'
 
 Given /^I know the UAA service base URL$/ do
-  @uaabase = @client.info[:authenticationEndpoint]
-  pending "no uaa authentication endpoint available" unless @uaabase
+  @uaabase = @client.info[:authorization_endpoint]
 end
 
 When /^I get the login prompts$/ do
