@@ -49,6 +49,10 @@ Then /^I should get an authentication token that I need to use with all subseque
   @token.should_not == nil
 end
 
+Then /^I should be able to change my password$/ do
+  AppCloudHelper.instance.change_password.should_not == nil
+end
+
 # Re-login
 Given /^I have logged in$/ do
 

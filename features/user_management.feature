@@ -10,10 +10,11 @@ Feature: User registration with and establishment of an authentication token wit
 	   When I register
 	   Then I should be able to login to AppCloud.
 
-	 Scenario: Login user
+	 Scenario: User account access
 	   Given I am registered
 	   When I login
 	   Then I should get an authentication token that I need to use with all subsequent AppCloud requests
+     Then I should be able to change my password
 
 	 Scenario: Reset user authentication token
      Given I have registered and logged in

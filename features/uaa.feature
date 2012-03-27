@@ -14,3 +14,8 @@ Feature: UAA Service
     Scenario: Get Users data
       When I try and get the user data
       Then the response should be UNAUTHORIZED
+
+    @uaa @smoke
+    Scenario: Change password
+      When I try and get the user data
+      Then the response should be UNAUTHORIZED
