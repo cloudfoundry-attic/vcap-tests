@@ -224,6 +224,15 @@ class AppCloudHelper
     @last_registered_user = test_user
   end
 
+  def rotate_password
+    new_password = test_passwd + "-2"
+    @client.change_password new_password
+    token_a = @client.login(test_user, new_password)
+    @client.change_password test_passwd
+    token_b = @client.login(test_user, test_passwd)
+    token_b if token_a
+  end
+
   def login
     token = @client.login(test_user, test_passwd)
     # TBD - ABS: This is a hack around the 1 sec granularity of our token time stamp
