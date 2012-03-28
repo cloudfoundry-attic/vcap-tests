@@ -108,6 +108,10 @@ task :build, [:force] do |t, args|
   puts "\nBuilding tests"
   sh('git submodule update --init')
   if build_required? args.force
+    prompt_message = "\nBVT need java development environment to build java-based test apps before pushing them to appcloud.\n
+Please run 'sudo aptitude install maven2 default-jdk' on your Linux box"
+    `mvn -v 2>&1`
+    raise prompt_message if $?.exitstatus != 0
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
