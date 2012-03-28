@@ -1,7 +1,11 @@
 require 'vmc'
 
 When /^I first access console of my application$/ do
-  prompt = run_console get_app_name @app
+  console_output = run_console get_app_name @app
+  #Due to small bug in vmc console_login method, the prompt may or may
+  #not be pre-pended with "Switch to inspect mode \n".  Pull out the last line
+  #just in case
+  prompt = console_output.split("\n")[-1]
   @console_response = [prompt]
 end
 
@@ -18,6 +22,15 @@ end
 Then /^I should get responses (.+) from console of my application$/ do |expected|
   expected_results = expected.split(",")
   expected_results.should == @console_response
+end
+
+Then /^I should get response including (.+) from console of my application$/ do |expected|
+  @console_response.should_not == nil
+  matched = false
+  @console_response.each do |response|
+    matched = true if response=~ /#{Regexp.escape(expected)}/
+  end
+  matched.should == true
 end
 
 Then /^I should get completion results (.+) from console of my application$/ do |expected|
