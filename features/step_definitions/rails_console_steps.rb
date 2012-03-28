@@ -20,6 +20,15 @@ Then /^I should get responses (.+) from console of my application$/ do |expected
   expected_results.should == @console_response
 end
 
+Then /^I should get response including (.+) from console of my application$/ do |expected|
+  @console_response.should_not == nil
+  matched = false
+  @console_response.each do |response|
+    matched = true if response=~ /#{Regexp.escape(expected)}/
+  end
+  matched.should == true
+end
+
 Then /^I should get completion results (.+) from console of my application$/ do |expected|
   expected_results = expected.split(",")
   expected_results.should == @console_tab_response
