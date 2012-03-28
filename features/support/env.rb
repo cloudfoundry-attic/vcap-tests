@@ -67,6 +67,12 @@ class Fixnum
   end
 end
 
+class Bignum
+  def to_json(options = nil)
+    to_s
+  end
+end
+
 ['TERM', 'INT'].each do |s|
   trap(s) do
     ENV['parallel_tests'] = 'false'
