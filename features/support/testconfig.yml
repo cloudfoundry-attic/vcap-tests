@@ -294,9 +294,15 @@ java_app_with_startup_delay:
   path: "assets/java_web/app_with_startup_delay/target"
 
 rails_console_test_app:
-  framework: "rails/1.0"
+  framework: "rails3"
   memory: 256
   path: "assets/rails3/app_rails_service"
+
+rails_console_19_test_app:
+  framework: "rails3"
+  memory: 256
+  path: "assets/rails3/hello_vcap"
+  runtime: ruby19
 
 vblob_app:
   framework: "http://b20nine.com/unknown"
