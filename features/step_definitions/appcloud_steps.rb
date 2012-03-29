@@ -220,8 +220,7 @@ Given /^I have deployed a new simple application$/ do
   health.should == expected_health
 end
 
-Given /^I have deployed a (\w+) application with runtime (\w+) named (\w+)$/ do |framework, runtime, app_name|
-  pending_unless_framework_exists(@token, framework)
+Given /^I have deployed my application with runtime (\w+) named (\w+)$/ do |runtime, app_name|
   pending_unless_runtime_exists(runtime)
   @app = create_app app_name, @token
   upload_app @app, @token

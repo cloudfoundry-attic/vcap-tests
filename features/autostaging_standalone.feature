@@ -8,7 +8,7 @@ Feature: Deploy standalone applications that make use of autostaging
 
       @ruby @sanity @services
       Scenario: standalone ruby18 autostaging
-        Given I have deployed a standalone application with runtime ruby18 named standalone_ruby18_autoconfig
+        Given I have deployed my application named standalone_ruby18_autoconfig
         When I query status of my application
         Then I should get the state of my application
         Then I should be able to access my application root and see hello from sinatra
@@ -34,7 +34,7 @@ Feature: Deploy standalone applications that make use of autostaging
 
       @ruby
       Scenario: standalone ruby 19 autostaging
-        Given I have deployed a standalone application with runtime ruby19 named standalone_ruby19_autoconfig
+        Given I have deployed my application named standalone_ruby19_autoconfig
        When I query status of my application
         Then I should get the state of my application
         Then I should be able to access my application root and see hello from sinatra
@@ -60,7 +60,7 @@ Feature: Deploy standalone applications that make use of autostaging
 
       @ruby
       Scenario: standalone ruby opt-out of autostaging via config file
-        Given I have deployed a standalone application with runtime ruby18 named standalone_ruby_autoconfig_disabled_by_file
+        Given I have deployed my application named standalone_ruby_autoconfig_disabled_by_file
         When I query status of my application
         Then I should get the state of my application
         Then I should be able to access my application root and see hello from sinatra
@@ -71,7 +71,7 @@ Feature: Deploy standalone applications that make use of autostaging
 
       @ruby
       Scenario: standalone ruby opt-out of autostaging via cf-runtime gem
-        Given I have deployed a standalone application with runtime ruby18 named standalone_ruby_autoconfig_disabled_by_gem
+        Given I have deployed my application named standalone_ruby_autoconfig_disabled_by_gem
         When I query status of my application
         Then I should get the state of my application
         Then I should be able to access my application root and see hello from sinatra
