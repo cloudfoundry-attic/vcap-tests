@@ -99,7 +99,7 @@ lift-db-app:
 tomcat-version-check-app:
   framework: "spring_web/1.0"
   memory: 128
-  tomcat_version: "7.0.26"
+  tomcat_version: "6.0.35"
   path: "assets/java_web/tomcat-version-check-app/target"
 
 app_rails_version18:
