@@ -303,6 +303,12 @@ vblob_app:
   memory: 256
   path: "assets/sinatra/vblob_app"
 
+service_quota_app:
+  framework: "http://b20nine.com/unknown"
+  startup: "ruby main.rb"
+  memory: 512
+  path: "assets/sinatra/app_sinatra_service_quota/"
+
 standalone_ruby18_app:
   framework: "standalone"
   command: "bundle exec ruby main.rb -p $VCAP_APP_PORT"

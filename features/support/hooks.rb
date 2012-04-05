@@ -199,3 +199,13 @@ end
 After("@creates_spring_env_app") do |scenario|
   delete_app_services_check
 end
+
+# service quota
+
+After("@creates_service_quota_app") do |scenario|
+  delete_app @app, @token if @app
+end
+
+After("@creates_postgresql_quota_service") do |scenario|
+  delete_service @postgresql_quota_service[:name] if @postgresql_quota_service
+end
