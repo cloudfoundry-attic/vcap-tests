@@ -101,11 +101,25 @@ TESTS_TO_BUILD = ["#{TESTS_PATH}/spring/auto-reconfig-test-app",
              "#{TESTS_PATH}/java_web/java_tiny_app",
              "#{TESTS_PATH}/lift/hello_lift",
              "#{TESTS_PATH}/lift/lift-db-app",
+             "#{TESTS_PATH}/play/computer_database_scala",
+             "#{TESTS_PATH}/play/computer_database_autoconfig_disabled",
+             "#{TESTS_PATH}/play/computer_database_cf_by_name",
+             "#{TESTS_PATH}/play/computer_database_cf_by_type",
+             "#{TESTS_PATH}/play/computer_database_jpa",
+             "#{TESTS_PATH}/play/computer_database_jpa_mysql",
+             "#{TESTS_PATH}/play/computer_database_multi_dbs",
+             "#{TESTS_PATH}/play/todolist",
+             "#{TESTS_PATH}/play/todolist_with_cfruntime",
+             "#{TESTS_PATH}/play/zentasks_cf_by_name",
+             "#{TESTS_PATH}/play/zentasks_cf_by_type",
              "#{TESTS_PATH}/standalone/java_app"
 ]
 
+PLAY_VERSION="2.0.1"
+
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
 task :build, [:force] do |t, args|
+  download_play if not File.exists? File.join(Dir.pwd, "play-#{PLAY_VERSION}","play")
   puts "\nBuilding tests"
   sh('git submodule update --init')
   if build_required? args.force
@@ -114,6 +128,7 @@ Please run 'sudo aptitude install maven2 default-jdk' on your Linux box"
     `mvn -v 2>&1`
     raise prompt_message if $?.exitstatus != 0
     ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
+    ENV['PLAY2_HOME']=File.join(Dir.pwd, "play-2.0.1")
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
       Dir.chdir test do
@@ -157,6 +172,13 @@ def build_required? (force_build=nil)
   end
 end
 
+def download_play
+  puts "Downloading and unpacking Play Framework"
+  sh("wget http://download.playframework.org/releases/play-#{PLAY_VERSION}.zip")
+  sh("unzip -q play-#{PLAY_VERSION}.zip")
+  FileUtils.rm_f("play-#{PLAY_VERSION}.zip")
+end
+
 def save_git_hash
   Dir.chdir(tests_path) do
     git_hash = `git rev-parse --short=8 --verify HEAD`
@@ -172,4 +194,3 @@ end
 def do_mvn_clean options=nil
   sh("mvn clean #{options}")
 end
-
