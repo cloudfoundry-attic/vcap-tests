@@ -321,6 +321,8 @@ class AppCloudHelper
     Dir.chdir(app_dir) do
       if war_file = Dir.glob('*.war').first
         VMC::Cli::ZipUtil.unpack(war_file, explode_dir)
+      elsif zip_file = Dir.glob('*.zip').first
+         VMC::Cli::ZipUtil.unpack(zip_file, explode_dir)
       else
         FileUtils.mkdir(explode_dir)
         files = Dir.glob('{*,.[^\.]*}')
@@ -341,6 +343,7 @@ class AppCloudHelper
         }
         total_size += File.size(filename)
       end
+
 
       appcloud_resources = @client.check_resources(fingerprints)
       if appcloud_resources
