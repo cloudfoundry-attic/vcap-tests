@@ -415,4 +415,53 @@ standalone_erlang_app:
   path: "assets/standalone/erlang_app"
   no_url: true
 
+play_helloworld_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/helloworld/dist"
+
+play_computer_database_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database/dist"
+
+play_todolist_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/todolist/dist"
+
+play_zentasks_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/zentasks/dist"
+
+play_computer_database_scala_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database_scala/dist"
+
+play_computer_database_autoconfig_disabled_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database_autoconfig_disabled/dist"
+
+play_todolist_with_cfruntime_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/todolist_with_cfruntime/dist"
+
+play_computer_database_jpa_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database_jpa/dist"
+
+play_computer_database_jpa_mysql_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database_jpa_mysql/dist"
+
+play_computer_database_multi_dbs_app:
+  framework: "play"
+  memory: 128
+  path: "assets/play/computer_database_multi_dbs/dist"
 

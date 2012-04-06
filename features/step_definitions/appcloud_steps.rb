@@ -264,6 +264,37 @@ Given /^I have built a simple Erlang application$/ do
   end
 end
 
+Given /^I have( clean)? built a Play application named (\w+)( with config file (.*))?$/ do |clean, app_name, with_config,config_file|
+  # figure out if BVT environment has Play installed
+  begin
+    installed_play = `play help`
+  rescue
+  end
+  if $? != 0
+    puts "BVT environment does not have Play 2.0 installed. Please install manually."
+    pending "Not running Play test because the app cannot be built.  Please install Play 2.0 on this machine."
+  else
+    Dir.chdir("#{@testapps_dir}/play/#{app_name[/play_(.*)_.*app/,1]}") do
+      # Some apps have to be rebuilt every time b/c the test builds them with different config files
+      if clean || !(File.exists? "dist")
+        puts "Building #{app_name}"
+        if config_file
+          cmd = "play -Dconfig.file=#{File.join(File.dirname(__FILE__),'../','support','play',config_file)} clean dist"
+        else
+          cmd = "play clean dist"
+        end
+        build_result = `#{cmd}`
+        raise "Play application build failed: #{build_result}" if $? != 0
+      end
+    end
+  end
+end
+
+Then /^I provision a postgresql service named (.*) without restarting$/ do |service_name|
+  @service = provision_postgresql_service_named @token, service_name
+  attach_provisioned_service @app, @service, @token
+end
+
 Given /^I have deployed a (\w+) application named (\w+)$/ do |fw, app_name|
   pending_unless_framework_exists(@token, fw)
   @app = create_app app_name, @token
@@ -679,6 +710,39 @@ Then /^I should be able to access my application file (\S+) and see (.+)$/ do |f
   @instance = '0'
   response = get_app_files @app, @instance, file, @token
   response.should == expected_contents
+end
+
+	
+Then /^I should be able to access my application file (\S+) and get text including (.+)$/ do |file, expected_contents|
+  @instance = '0'
+  response = get_app_files @app, @instance, file, @token
+  response.should_not == nil
+  responses = response.split("\n")
+  matched = false
+  responses.each do |response|
+    matched = true if response=~ /#{Regexp.escape(expected_contents)}/
+  end
+  matched.should == true
+end
+
+Then /^I should be able to list application files and not find file (\S+)$/ do |file|
+  @instance = '0'
+  found = true
+  begin
+    get_app_files @app, @instance, file, @token
+  rescue VMC::Client::NotFound
+    found=false
+  end
+  found.should == false
+end
+
+Then /^I should be able to access my application URL (\S+)$/ do |path|
+  path = nil if  path == "root"
+  contents = get_app_contents @app, path
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 200
+  contents.close
 end
 
 Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
