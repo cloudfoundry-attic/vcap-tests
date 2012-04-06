@@ -271,6 +271,11 @@ Given /^I have built a simple Erlang application$/ do
   end
 end
 
+Then /^I provision a postgresql service named (.*) without restarting$/ do |service_name|
+  @service = provision_postgresql_service_named @token, service_name
+  attach_provisioned_service @app, @service, @token
+end
+
 Given /^I have deployed a (\w+) application named (\w+)$/ do |fw, app_name|
   pending_unless_framework_exists(@token, fw)
   @app = create_app app_name, @token
@@ -686,6 +691,39 @@ Then /^I should be able to access my application file (\S+) and see (.+)$/ do |f
   @instance = '0'
   response = get_app_files @app, @instance, file, @token
   response.should == expected_contents
+end
+
+
+Then /^I should be able to access my application file (\S+) and get text including (.+)$/ do |file, expected_contents|
+  @instance = '0'
+  response = get_app_files @app, @instance, file, @token
+  response.should_not == nil
+  responses = response.split("\n")
+  matched = false
+  responses.each do |response|
+    matched = true if response=~ /#{Regexp.escape(expected_contents)}/
+  end
+  matched.should == true
+end
+
+Then /^I should be able to list application files and not find file (\S+)$/ do |file|
+  @instance = '0'
+  found = true
+  begin
+    get_app_files @app, @instance, file, @token
+  rescue VMC::Client::NotFound, VMC::Client::TargetError
+    found=false
+  end
+  found.should == false
+end
+
+Then /^I should be able to access my application URL (\S+)$/ do |path|
+  path = nil if  path == "root"
+  contents = get_app_contents @app, path
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 200
+  contents.close
 end
 
 Then /^I should be able to access my application root and see hello from (\w+)$/ do |framework|
