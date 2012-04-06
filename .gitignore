@@ -14,3 +14,4 @@ ci-working-dir
 *.pyc
 .DS_Store
 .build
+play-2.0.1
