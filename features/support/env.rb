@@ -61,6 +61,11 @@ JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
 VBLOB_APP = "vblob_app"
 SERVICE_QUOTA_APP = "service_quota_app"
+JRUBY18_SINATRA_SIMPLE_APP = "jruby18_sinatra_simple_app"
+JRUBY19_SINATRA_SIMPLE_APP = "jruby19_sinatra_simple_app"
+JRUBY19_SINATRA_MYSQL_APP = "jruby19_sinatra_mysql_app"
+JRUBY19_RAILS3_SIMPLE_APP = "jruby19_rails3_simple_app"
+JRUBY19_RAILS3_MYSQL_APP = "jruby19_rails3_mysql_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -194,6 +199,11 @@ class AppCloudHelper
       delete_app_internal(RAILS_CONSOLE_TEST_APP)
       delete_app_internal(VBLOB_APP)
       delete_app_internal(SERVICE_QUOTA_APP)
+      delete_app_internal(JRUBY18_SINATRA_SIMPLE_APP)
+      delete_app_internal(JRUBY19_SINATRA_SIMPLE_APP)
+      delete_app_internal(JRUBY19_SINATRA_MYSQL_APP)
+      delete_app_internal(JRUBY19_RAILS3_SIMPLE_APP)
+      delete_app_internal(JRUBY19_RAILS3_MYSQL_APP)
       delete_services(all_my_services) unless @registered_user or !get_login_token
       # This used to delete the entire user, but that now requires admin
       # privs so it was removed, as was the delete_user method.  See the
@@ -389,7 +399,9 @@ class AppCloudHelper
     if (app_manifest[:state] == 'STARTED')
       return
     end
-
+    if @config[app]['runtime']
+      app_manifest[:staging][:stack] = @config[app]['runtime']
+    end
     app_manifest[:state] = 'STARTED'
     #Enable console for Rails applications, as done in vmc
     if app_manifest[:staging][:model] == 'rails3'
@@ -588,6 +600,19 @@ class AppCloudHelper
     response = HTTPClient.get "#{@base_uri}/info", nil, auth_hdr(token)
     frameworks = JSON.parse(response.content)
     frameworks['frameworks']
+  end
+
+  def get_runtimes token
+    response = HTTPClient.get "#{@base_uri}/info", nil, auth_hdr(token)
+    frameworks = JSON.parse(response.content)
+    runtimes = {}
+    if frameworks['frameworks']
+      frameworks['frameworks'].each_value do |f|
+        next unless f['runtimes']
+          f['runtimes'].each { |r| runtimes[r['name']] = r}
+      end
+    end
+    runtimes
   end
 
   def pending_unless_framework_exists(token, framework)
