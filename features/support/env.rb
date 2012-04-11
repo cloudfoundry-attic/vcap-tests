@@ -341,11 +341,25 @@ class AppCloudHelper
         total_size += File.size(filename)
       end
 
-      unless VMC::Cli::ZipUtil.get_files_to_pack(explode_dir).empty?
-        VMC::Cli::ZipUtil.pack(explode_dir, upload_file)
-        file = File.open(upload_file, 'rb')
+      appcloud_resources = @client.check_resources(fingerprints)
+      if appcloud_resources
+          # We can then delete what we do not need to send.
+          appcloud_resources.each do |resource|
+            FileUtils.rm_f resource[:fn]
+            # adjust filenames sans the explode_dir prefix
+            resource[:fn].sub!("#{explode_dir}/", '')
+          end
       end
-      @client.upload_app(appname , file)
+      # If no resource needs to be sent, add an empty file to ensure we have
+      # a multi-part request that is expected by nginx fronting the CC.
+      if VMC::Cli::ZipUtil.get_files_to_pack(explode_dir).empty?
+        Dir.chdir(explode_dir) do
+          File.new(".__empty__", "w")
+        end
+      end
+      VMC::Cli::ZipUtil.pack(explode_dir, upload_file)
+      file = File.open(upload_file, 'rb')
+      @client.upload_app(appname , file, appcloud_resources)
     end
     ensure
       # Cleanup if we created an exploded directory.
