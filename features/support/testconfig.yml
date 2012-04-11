@@ -421,4 +421,13 @@ standalone_erlang_app:
   path: "assets/standalone/erlang_app"
   no_url: true
 
+javaee-namespace-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/javaee-namespace-app/target"
 
+auto-reconfig-annotation-app:
+  framework: "spring_web/1.0"
+  memory: 512
+  path: "assets/spring/auto-reconfig-annotation-app/target"

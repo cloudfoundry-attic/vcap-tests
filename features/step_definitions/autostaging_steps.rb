@@ -374,3 +374,19 @@ Then /^I should have the same (\d+) records on retrieving all records from the R
   # The Roo page returns an extra row for the footer in the table .. hence the "+ 1"
   verify_contents arg1.to_i + 1, response.body_str, "//table/tr"
 end
+
+Given /^I deploy a Spring Web Application that uses the javaee namespace$/ do
+  expected_health = 1.0
+  create_and_upload_app SPRING_APP_WITH_JAVAEE_NS
+  health = start_app_check_health expected_health
+  health.should == expected_health
+end
+
+Given /^I deploy a Spring 3.1 Hibernate application with an annotation context using a local DataSource$/ do
+    expected_health = 1.0
+    create_and_upload_app AUTO_RECONFIG_ANNOTATION_APP
+    mysqlsvc = provision_db_service @token
+    attach_provisioned_service @app, mysqlsvc, @token
+    health = start_app_check_health expected_health
+    health.should == expected_health
+end

@@ -209,3 +209,15 @@ end
 After("@creates_postgresql_quota_service") do |scenario|
   delete_service @postgresql_quota_service[:name] if @postgresql_quota_service
 end
+
+# javaee namespace
+
+After("@creates_javaee_namespace_app") do
+  AppCloudHelper.instance.delete_app_internal SPRING_APP_WITH_JAVAEE_NS
+end
+
+# spring annotation config
+
+After("@creates_auto_reconfig_annotation_app") do
+    AppCloudHelper.instance.delete_app_internal AUTO_RECONFIG_ANNOTATION_APP
+end
