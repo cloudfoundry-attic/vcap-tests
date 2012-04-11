@@ -61,6 +61,8 @@ JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
 VBLOB_APP = "vblob_app"
 SERVICE_QUOTA_APP = "service_quota_app"
+SPRING_APP_WITH_JAVAEE_NS = "javaee-namespace-app"
+AUTO_RECONFIG_ANNOTATION_APP="auto-reconfig-annotation-app"
 
 class Fixnum
   def to_json(options = nil)
@@ -195,6 +197,8 @@ class AppCloudHelper
       delete_app_internal(RAILS_CONSOLE_TEST_APP)
       delete_app_internal(VBLOB_APP)
       delete_app_internal(SERVICE_QUOTA_APP)
+      delete_app_internal(SPRING_APP_WITH_JAVAEE_NS)
+      delete_app_internal(AUTO_RECONFIG_ANNOTATION_APP)
       delete_services(all_my_services) unless @registered_user or !get_login_token
       # This used to delete the entire user, but that now requires admin
       # privs so it was removed, as was the delete_user method.  See the

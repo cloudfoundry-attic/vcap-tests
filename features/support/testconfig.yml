@@ -445,3 +445,13 @@ broken_gem_app:
   memory: 64
   path: "assets/sinatra/broken_gem_app"
 
+javaee-namespace-app:
+  framework: "spring_web/1.0"
+  startup: "thin start"
+  memory: 256
+  path: "assets/spring/javaee-namespace-app/target"
+
+auto-reconfig-annotation-app:
+  framework: "spring_web/1.0"
+  memory: 512
+  path: "assets/spring/auto-reconfig-annotation-app/target"
