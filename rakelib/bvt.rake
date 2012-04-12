@@ -1,6 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
 require "parallel_runner"
+require "tmpdir"
 
 namespace :bvt do
   task :run do
@@ -37,8 +38,9 @@ namespace :bvt do
 
   task :run_uaa do
     config_path=ENV['CLOUD_FOUNDRY_CONFIG_PATH']?"-DCLOUD_FOUNDRY_CONFIG_PATH=#{ENV['CLOUD_FOUNDRY_CONFIG_PATH']} ":''
-    sh "cd #{CoreComponents.root}/uaa/uaa; MAVEN_OPTS=\"#{ENV['MAVEN_OPTS']}\" mvn -P vcap #{config_path}-Duaa.integration.test=true -Dtest=*IntegrationTests test | tee /tmp/uaa.bvt.log | grep 'BUILD SUCCESSFUL'" do |ok,status|
-      logmsg = `tail -20 /tmp/uaa.bvt.log`
+    logfile = File.join(Dir.tmpdir, "uaa.bvt.log")
+    sh "cd #{CoreComponents.root}/uaa/uaa; MAVEN_OPTS=\"#{ENV['MAVEN_OPTS']}\" mvn -P vcap #{config_path}-Duaa.integration.test=true -Dtest=*IntegrationTests test | tee #{logfile} | grep 'BUILD SUCCESSFUL'" do |ok,status|
+      logmsg = `tail -20 #{logfile}`
       ok or fail "UAA integration tests failed...truncated logs:\n#{logmsg}\nUAA integration tests failed"
     end
   end
