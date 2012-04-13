@@ -1,5 +1,6 @@
 Given /^I have provisioned an atmos service$/ do
-  pending unless find_service 'atmos'
+  pending "Atmos BVTs are disabled"
+  # pending unless find_service 'atmos'
   @atmos_service = provision_atmos_service @token
   @atmos_service.should_not == nil
 end
