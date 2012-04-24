@@ -87,6 +87,7 @@ class AppCloudHelper
     @registered_user_passwd = ENV['VCAP_BVT_USER_PASSWD']
     @service_broker_url = ENV['SERVICE_BROKER_URL']
     @service_broker_token = ENV['SERVICE_BROKER_TOKEN']
+    @service_snapshot_quota = ENV['SERVICE_SNAPSHOT_QUOTA'] || 5
     @base_uri = "http://api.#{@target}"
     @droplets_uri = "#{@base_uri}/assets"
     @resources_uri = "#{@base_uri}/resources"

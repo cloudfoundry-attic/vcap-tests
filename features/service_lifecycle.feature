@@ -23,6 +23,8 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc2
     When I rollback to previous snapshot for mysql service
     Then I should be able to get from mysql service with key abc, and I should see mysqlabc
+    When The number of snapshots for mysql service achieves upper bound
+    Then I should receive error if I continue to create snapshot for mysql service
     Then I delete my service
     Then I delete my application
 
@@ -58,6 +60,8 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from redis service with key abc, and I should see redisabc2
     When I rollback to previous snapshot for redis service
     Then I should be able to get from redis service with key abc, and I should see redisabc
+    When The number of snapshots for redis service achieves upper bound
+    Then I should receive error if I continue to create snapshot for redis service
     Then I delete my service
     Then I delete my application
 
@@ -93,6 +97,8 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc2
     When I rollback to previous snapshot for mongodb service
     Then I should be able to get from mongo service with key abc, and I should see mongodbabc
+    When The number of snapshots for mongo service achieves upper bound
+    Then I should receive error if I continue to create snapshot for mongo service
     Then I delete my service
     Then I delete my application
 
@@ -128,6 +134,8 @@ Feature: Deploy the sinatra canonical app and test lifecycle APIs
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc2
     When I rollback to previous snapshot for postgresql service
     Then I should be able to get from postgresql service with key abc, and I should see postgresqlabc
+    When The number of snapshots for postgresql service achieves upper bound
+    Then I should receive error if I continue to create snapshot for postgresql service
     Then I delete my service
     Then I delete my application
 

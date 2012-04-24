@@ -31,6 +31,32 @@ When /^I rollback to previous snapshot for (\w+) service$/ do |service|
   rollback_snapshot @snapshot_id
 end
 
+When /^The number of snapshots for (\w+) service achieves upper bound$/ do |service|
+  parse_service_id unless  @service_id
+  quota = @service_snapshot_quota - 1
+  (1..quota).each do |i|
+    create_snapshot
+  end
+end
+
+Then /^I should receive error if I continue to create snapshot for (\w+) service$/ do |service|
+  parse_service_id unless  @service_id
+  easy = Curl::Easy.new
+  easy.url = "#{@base_uri}/services/v1/configurations/#{@service_id}/snapshots"
+  easy.headers = auth_headers
+  easy.resolve_mode =:ipv4
+  easy.http_post
+  easy.response_code.should == 200
+
+  resp = easy.body_str
+  resp.should_not == nil
+  job = JSON.parse(resp)
+  job = wait_job(job["job_id"])
+  job.should_not == nil
+  job["status"].should == "failed"
+  job["result"]["snapshot_id"].should == nil
+end
+
 When /^I create a serialized URL of (\w+) service$/ do |service|
   parse_service_id unless  @service_id
   @serialized_url = get_serialized_url
