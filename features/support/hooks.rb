@@ -209,3 +209,10 @@ end
 After("@creates_postgresql_quota_service") do |scenario|
   delete_service @postgresql_quota_service[:name] if @postgresql_quota_service
 end
+
+# service lifecycle
+After("@lifecycle") do |scenario|
+  delete_app_services_check
+  @service_id = nil
+  delete_app @app, @token if @app
+end
