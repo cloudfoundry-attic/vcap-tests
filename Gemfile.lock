@@ -71,6 +71,7 @@ GEM
       rubyzip (~> 0.9.4)
       terminal-table (~> 1.4.2)
       uuidtools (~> 2.1.0)
+    yajl-ruby (0.8.3)
 
 PLATFORMS
   ruby
@@ -93,3 +94,4 @@ DEPENDENCIES
   rubyzip (~> 0.9.4)
   terminal-table
   vmc (>= 0.3.16.beta5)
+  yajl-ruby
