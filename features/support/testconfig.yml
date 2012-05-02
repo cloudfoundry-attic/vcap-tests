@@ -433,4 +433,9 @@ standalone_erlang_app:
   path: "assets/standalone/erlang_app"
   no_url: true
 
+broken_gem_app:
+  framework: sinatra
+  runtime: ruby18
+  memory: 64
+  path: "assets/sinatra/broken_gem_app"
 
