@@ -105,6 +105,10 @@ After("@creates_java_app_with_delay") do
   AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
 end
 
+After("@creates_memcached_app") do
+  AppCloudHelper.instance.delete_app_internal MEMCACHED_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
