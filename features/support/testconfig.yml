@@ -245,6 +245,11 @@ my_test_app_env_test_app:
   memory: 64
   path: "assets/sinatra/hello_vcap"
 
+memcached_app:
+  framework: "http://b20nine.com/unknown"
+  memory: 64
+  path: "assets/sinatra/memcached_app"
+
 neo4j_app:
   framework: "http://b20nine.com/unknown"
   memory: 128
