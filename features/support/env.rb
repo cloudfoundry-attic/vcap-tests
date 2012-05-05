@@ -626,6 +626,21 @@ class AppCloudHelper
     end
   end
 
+  def pending_unless_default_runtime_info_exists
+    runtimes = get_frameworks(@token).values.first['runtimes']
+    unless (runtimes.first.include?('default'))
+      pending "Not running test because the feature of default runtime info is not available in this Cloud Foundry instance"
+    end
+  end
+
+  def get_default_runtime(framework)
+    default_runtime = nil
+    get_frameworks(@token)[framework]['runtimes'].each do |runtime|
+      default_runtime = runtime['name'] if runtime['default']
+    end
+    default_runtime
+  end
+
    def provision_rabbitmq_srs_service token
      name = "#{@namespace}#{@app || 'simple_rabbitmq_srs_app'}rabbitmq_srs"
      @client.create_service('rabbitmq-srs', name)
