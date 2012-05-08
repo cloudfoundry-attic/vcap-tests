@@ -739,6 +739,8 @@ When /^I provision ([\w\-]+) service$/ do |requested_service|
     expected_health = 1.0
     health = poll_until_done @app, expected_health, @token
     health.should == expected_health
+  else
+    pending "#{requested_service} service is not supported in target environment"
   end
 end
 
