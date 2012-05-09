@@ -1,12 +1,21 @@
 require 'vmc'
 
 When /^I first access console of my application$/ do
-  console_output = run_console get_app_name @app
-  #Due to small bug in vmc console_login method, the prompt may or may
-  #not be pre-pended with "Switch to inspect mode \n".  Pull out the last line
-  #just in case
-  prompt = console_output.split("\n")[-1]
-  @console_response = [prompt]
+  #Console may not be available immediately after app start
+  #if system is under heavy load.  Try a few times.
+  3.times do
+    begin
+      console_output = run_console get_app_name @app
+      #Due to small bug in vmc console_login method, the prompt may or may
+      #not be pre-pended with "Switch to inspect mode \n".  Pull out the last line
+      #just in case
+      prompt = console_output.split("\n")[-1]
+      @console_response = [prompt]
+      break
+    rescue VMC::Cli::CliExit
+      sleep 1
+    end
+  end
 end
 
 When /^I send command (.+) to console of my application$/ do |cmd|
