@@ -105,6 +105,10 @@ After("@creates_java_app_with_delay") do
   AppCloudHelper.instance.delete_app_internal JAVA_APP_WITH_STARTUP_DELAY
 end
 
+After("@creates_memcached_app") do
+  AppCloudHelper.instance.delete_app_internal MEMCACHED_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -216,3 +220,13 @@ After("@lifecycle") do |scenario|
   @service_id = nil
   delete_app @app, @token if @app
 end
+
+# memcached
+After("@creates_memcached_app") do |scenario|
+  delete_app @app, @token if @app
+end
+
+After("@creates_memcached_service") do |scenario|
+  delete_service @memcached_service[:name] if @memcached_service
+end
+
