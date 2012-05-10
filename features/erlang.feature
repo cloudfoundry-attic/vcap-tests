@@ -1,3 +1,4 @@
+@erlang
 Feature: Use Erlang on AppCloud
   As an Erlang user of AppCloud
   I want to be able to deploy and manage Erlang applications

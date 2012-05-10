@@ -24,6 +24,9 @@ task :help do
   puts "  ruby\t\t\t\trun ruby-based bvts (rails3, sinatra)"
   puts "  jvm\t\t\t\trun jvm-based bvts (spring, java_web, grails, lift)"
   puts "  java\t\t\t\trun java-based bvts (spring, java_web)"
+  puts "  python\t\t\t\trun python-based bvts (wsgi, django)"
+  puts "  php\t\t\t\trun php-based bvts (php)"
+  puts "  erlang\t\t\t\trun erlang-based bvts (otp_rebar)"
   puts "  services\t\t\trun services-based bvts"
   puts "  ci-tests\t\t\tset up a test cloud, run the bvts, and then tear it down"
   puts "  help\t\t\t\tlist help commands"
@@ -52,6 +55,15 @@ task :jvm => ['build', 'bvt:init', 'bvt:run_jvm']
 
 desc "Run java-based tests"
 task :java => ['build', 'bvt:init', 'bvt:run_java']
+
+desc "Run python-based tests"
+task :python => ['build', 'bvt:init', 'bvt:run_python']
+
+desc "Run php-based tests"
+task :php => ['build', 'bvt:init', 'bvt:run_php']
+
+desc "Run erlang-based tests"
+task :erlang => ['build', 'bvt:init', 'bvt:run_erlang']
 
 desc "Run services-based tests"
 task :services => ['build', 'bvt:init', 'bvt:run_services']
