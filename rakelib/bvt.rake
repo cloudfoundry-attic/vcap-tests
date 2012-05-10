@@ -32,6 +32,18 @@ namespace :bvt do
     sh "bundle exec cucumber --tags @java"
   end
 
+  task :run_python do
+    sh "bundle exec cucumber --tags @python"
+  end
+
+  task :run_php do
+    sh "bundle exec cucumber --tags @php"
+  end
+
+  task :run_erlang do
+    sh "bundle exec cucumber --tags @erlang"
+  end
+
   task :run_services do
     sh "bundle exec cucumber --tags @services"
   end
