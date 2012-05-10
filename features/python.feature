@@ -1,3 +1,4 @@
+@python
 Feature: Use Python on AppCloud
   As a Python user of AppCloud
   I want to be able to deploy and manage Python applications
@@ -5,19 +6,19 @@ Feature: Use Python on AppCloud
   Background: Authentication
     Given I have registered and logged in
 
-  @creates_wsgi_app
+  @creates_wsgi_app @wsgi
   Scenario: Deploy Simple Python Application
     Given I have deployed a simple Python application
     Then it should be available for use
     Then I delete my application
 
-  @creates_wsgi_app_with_dependency
+  @creates_wsgi_app_with_dependency @wsgi
   Scenario: Deploy Python Application with a dependency
     Given I have deployed a Python application with a dependency
     Then it should be available for use
     Then I delete my application
 
-  @creates_django_app
+  @creates_django_app @django
   Scenario: Deploy Django Application
     Given I have deployed a Django application
     Then it should be available for use

@@ -1,3 +1,4 @@
+@php
 Feature: Use PHP on AppCloud
   As a PHP user of AppCloud
   I want to be able to deploy and manage PHP applications
