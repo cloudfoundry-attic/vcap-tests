@@ -120,6 +120,7 @@ PLAY_VERSION="2.0.1"
 desc "Build the tests. If the git hash associated with the test assets has not changed, nothing is built. To force a build, invoke 'rake build[--force]'"
 task :build, [:force] do |t, args|
   download_play if not File.exists? File.join(Dir.pwd, "play-#{PLAY_VERSION}","play")
+  install_erlang if not erlang_installed?
   puts "\nBuilding tests"
   sh('git submodule update --init')
   if build_required? args.force
