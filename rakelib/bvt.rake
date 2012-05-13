@@ -5,7 +5,7 @@ require "tmpdir"
 
 namespace :bvt do
   task :run do
-    sh "bundle exec cucumber --tags ~@bvt_upgrade --tags ~@pending"
+    sh "BVT_CLEAN_ALL=true bundle exec cucumber --tags ~@bvt_upgrade --tags ~@pending"
   end
 
   task :run_junit_format do
