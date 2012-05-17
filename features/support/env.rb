@@ -59,7 +59,7 @@ SIMPLE_KV_APP = "simple_kv_app"
 BROKERED_SERVICE_APP = "brokered_service_app"
 JAVA_APP_WITH_STARTUP_DELAY = "java_app_with_startup_delay"
 RAILS_CONSOLE_TEST_APP = "rails_console_test_app"
-VBLOB_APP = "vblob_app"
+VBLOB_APP = "app_sinatra_service"
 SERVICE_QUOTA_APP = "service_quota_app"
 
 class Fixnum

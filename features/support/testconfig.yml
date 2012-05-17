@@ -319,7 +319,7 @@ rails_console_19_test_app:
 vblob_app:
   framework: "http://b20nine.com/unknown"
   memory: 256
-  path: "assets/sinatra/vblob_app"
+  path: "assets/sinatra/app_sinatra_service"
 
 service_quota_app:
   framework: "http://b20nine.com/unknown"
