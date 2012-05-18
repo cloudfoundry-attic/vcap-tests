@@ -54,3 +54,8 @@ Feature: Deploy applications that make use of autostaging
         Then I delete all my service
         Then I delete my application
 
+      @creates_javaee_namespace_app @java
+      Scenario: Start Spring Web Application using javaee namespace
+        Given I deploy a Spring Web Application that uses the javaee namespace
+        Then the application should start with no errors
+        Then I delete my application

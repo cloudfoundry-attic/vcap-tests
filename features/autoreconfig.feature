@@ -55,3 +55,10 @@ Feature: Deploy applications that make use of autostaging
         Then I delete all my service
         Then I delete my application
 
+      @creates_auto_reconfig_annotation_app @creates_services @java @services
+      Scenario: start Spring 3.1 Hibernate application with an annotation context using a local DataSource
+        Given I deploy a Spring 3.1 Hibernate application with an annotation context using a local DataSource
+        Then the Hibernate SessionFactory should be auto-configured
+        Then I delete all my service
+        Then I delete my application
+
