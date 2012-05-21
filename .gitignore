@@ -16,3 +16,4 @@ ci-working-dir
 .build
 .bvt_parallel.log
 play-2.0.1
+*.gem
