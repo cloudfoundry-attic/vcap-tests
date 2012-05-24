@@ -1,3 +1,4 @@
+require 'singleton'
 require 'rest_client'
 
 class UaaHelper
