@@ -129,7 +129,7 @@ task :build, [:force] do |t, args|
 Please run 'sudo aptitude install maven2 default-jdk' on your Linux box"
     `mvn -v 2>&1`
     raise prompt_message if $?.exitstatus != 0
-    ENV['MAVEN_OPTS']="-XX:MaxPermSize=256M"
+    ENV['MAVEN_OPTS']="-Xmx1024m -XX:MaxPermSize=256M"
     ENV['PLAY2_HOME']=File.join(Dir.pwd, "play-#{PLAY_VERSION}")
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
@@ -176,6 +176,10 @@ end
 
 def download_play
   puts "Downloading and unpacking Play Framework"
+  prompt_message = "\nBVTs require the unzip utility to install Play Framework.
+    Please run 'sudo apt-get install unzip' on your Linux box"
+  `unzip -v 2>&1`
+  raise prompt_message if $?.exitstatus != 0
   sh("wget http://download.playframework.org/releases/play-#{PLAY_VERSION}.zip")
   sh("unzip -q play-#{PLAY_VERSION}.zip")
   FileUtils.rm_f("play-#{PLAY_VERSION}.zip")

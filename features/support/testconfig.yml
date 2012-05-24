@@ -447,57 +447,57 @@ broken_gem_app:
 
 play_computer_database_scala_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_scala/target"
 
 play_todolist_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/todolist/target"
 
 play_zentasks_cf_by_name_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/zentasks_cf_by_name/target"
 
 play_zentasks_cf_by_type_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/zentasks_cf_by_type/target"
 
-play_computer_database_autoconfig_disabled_app:
+play_comp_db_autoconf_disabled_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_autoconfig_disabled/target"
 
 play_todolist_with_cfruntime_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/todolist_with_cfruntime/target"
 
 play_computer_database_jpa_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_jpa/target"
 
 play_computer_database_jpa_mysql_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_jpa_mysql/target"
 
 play_computer_database_multi_dbs_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_multi_dbs/target"
 
 play_computer_database_cf_by_name_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_cf_by_name/target"
 
 play_computer_database_cf_by_type_app:
   framework: "play"
-  memory: 128
+  memory: 256
   path: "assets/play/computer_database_cf_by_type/target"
 
 javaee-namespace-app:
