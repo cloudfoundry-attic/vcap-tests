@@ -932,3 +932,7 @@ Then /^I should be able to immediately access the Java application through its u
   contents.body_str.should =~ /I am up and running/
   contents.close
 end
+
+Given /^PENDING/ do
+  pending
+end
