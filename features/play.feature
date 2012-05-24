@@ -60,6 +60,7 @@ Feature: Play! application support
     Then I delete my application
 
   Scenario: Deploy Play Application using cloud properties for mysql configuration by service name
+    Given PENDING we allow services to be named without a namespace
     Given I have deployed my application named play_zentasks_cf_by_name_app without starting
     Then I provision mysql service without restarting
     Then I start my application named play_zentasks_cf_by_name_app
@@ -73,6 +74,7 @@ Feature: Play! application support
     Then I delete my application
 
   Scenario: Deploy Play Application using cloud properties for postgresql configuration by service name
+    Given PENDING we allow services to be named without a namespace
     Given that the postgresql service is available
     Given I have deployed my application named play_computer_database_cf_by_name_app without starting
     Then I provision postgresql service without restarting
@@ -88,9 +90,9 @@ Feature: Play! application support
 
   Scenario: Deploy Play Application with auto-reconfiguration disabled
     Given that the postgresql service is available
-    Given I have deployed my application named play_computer_database_autoconfig_disabled_app without starting
+    Given I have deployed my application named play_comp_db_autoconf_disabled_app without starting
     Then I provision postgresql service without restarting
-    Then I start my application named play_computer_database_autoconfig_disabled_app
+    Then I start my application named play_comp_db_autoconf_disabled_app
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application URL computers
@@ -176,6 +178,3 @@ Feature: Play! application support
     Then I should be able to access my application file logs/stdout.log and get text including database [default] connected at jdbc:postgresql
     Then I delete all my service
     Then I delete my application
-
-
-
