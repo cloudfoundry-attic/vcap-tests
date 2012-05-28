@@ -48,7 +48,7 @@ Feature: Standalone application support
     Given I have deployed my application named standalone_java_app
     When I query status of my application
     Then I should get the state of my application
-    Then I should be able to access my application file logs/stdout.log and see Hello from the cloud.  Java opts:  -Xms256m -Xmx256m -Djava.io.tmpdir=appdir/temp
+    Then I should be able to access my application file logs/stdout.log and get text including Hello from the cloud.  Java opts:  -Xms256m -Xmx256m -Djava.io.tmpdir=appdir/temp
     When I delete my application
     Then it should not be on Cloud Foundry
 

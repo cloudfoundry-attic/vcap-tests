@@ -76,6 +76,12 @@ grails_app:
   memory: 512
   path: "assets/grails/guestbook/target"
 
+grails_app_7:
+  framework: "grails"
+  runtime: java7
+  memory: 512
+  path: "assets/grails/guestbook/target"
+
 roo_app:
   framework: "spring_web/1.0"
   memory: 256
@@ -240,6 +246,12 @@ app_spring_service:
   memory: 512
   path: "assets/spring/app_spring_service/target"
 
+app_spring_service_7:
+  framework: "spring"
+  runtime: java7
+  memory: 512
+  path: "assets/spring/app_spring_service/target"
+
 my_test_app_env_test_app:
   framework: "http://b20nine.com/unknown"
   memory: 64
@@ -378,6 +390,14 @@ standalone_java_app:
   path: "assets/standalone/java_app/target/appassembler"
   no_url: true
 
+standalone_java_app_7:
+  framework: "standalone"
+  command: "bin/hello-cloud"
+  runtime: java7
+  memory: 256
+  path: "assets/standalone/java_app/target/appassembler"
+  no_url: true
+
 standalone_node_app:
   framework: "standalone"
   command: "node app.js"
@@ -457,6 +477,12 @@ play_computer_database_scala_app:
 
 play_todolist_app:
   framework: "play"
+  memory: 128
+  path: "assets/play/todolist/target"
+
+play_todolist_app_7:
+  framework: "play"
+  runtime: java7
   memory: 128
   path: "assets/play/todolist/target"
 
