@@ -934,5 +934,41 @@ Then /^I should be able to immediately access the Java application through its u
 end
 
 Given /^PENDING/ do
-  pending
+    pending
+end
+
+Given /^I have Java 7 runtime available$/ do
+  # Try to find Java 7
+  java7_ready = true
+
+  # figure out if cloud has Java 7 runtime
+  runtimes = @client.info().to_a().join()
+  if (runtimes =~ /java7/)
+    puts "target cloud has Java 7 runtime"
+  else
+    puts "target cloud does not support Java 7"
+    java7_ready = false
+  end
+
+  if !java7_ready
+    pending "Not running Java 7 test because the Java 7 runtime is not installed"
+  end
+end
+
+Then /^I should be able to get java version, and I should see (\S+)$/ do |value|
+  contents = get_app_contents @app, "java"
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 200
+  contents.body_str.should include value
+  contents.close
+end
+
+Then /^I should be able to get app status, and I should see (\S+) jvm version$/ do |value|
+  contents = get_app_contents @app, "/"
+  contents.should_not == nil
+  contents.body_str.should_not == nil
+  contents.response_code.should == 200
+  contents.body_str.should include "JVM version: #{value}"
+  contents.close
 end
