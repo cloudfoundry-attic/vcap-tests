@@ -316,6 +316,12 @@ Given /^I deploy a Spring Grails application using the MySQL DB service$/ do
   health.should == expected_health
 end
 
+Given /^I deploy a Spring Grails application using Java 7 and the MySQL DB service$/ do
+  expected_health = 1.0
+  health = create_and_start_app GRAILS_APP_7, expected_health
+  health.should == expected_health
+end
+
 When /^I add (\d+) records to the Grails application$/ do |arg1|
   @records = {}
   uri = get_uri @app, "guest/save"
