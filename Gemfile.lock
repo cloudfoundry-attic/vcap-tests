@@ -98,5 +98,5 @@ DEPENDENCIES
   rspec (= 1.3.0)
   rubyzip (~> 0.9.4)
   terminal-table
-  vmc (>= 0.3.17)
+  vmc (~> 0.3.17)
   yajl-ruby
