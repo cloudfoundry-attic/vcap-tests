@@ -47,7 +47,7 @@ class UaaHelper
 
   def login(username, password)
     url = @uaabase + "/login.do"
-    response = RestClient.post url, {:username=>username, :password=>password}, {"Accept"=>"application/json"} { |response, request, result| response }
+    response = RestClient.post url, {:username=>username, :password=>password}, {"Accept"=>"application/json"} do |response, request, result| response end
     response.should_not == nil
     response.code.should == 302
     response.headers
@@ -62,7 +62,7 @@ class UaaHelper
   end
 
   def basic_auth(id, secret)
-    "Basic " + Base64::strict_encode64("#{id}:#{secret}")
+    "Basic " + Base64::encode64("#{id}:#{secret}").gsub("\n", "")
   end
 
   def get_url(path,headers={})
