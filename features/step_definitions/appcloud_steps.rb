@@ -49,11 +49,8 @@ Then /^I should get an authentication token that I need to use with all subseque
   @token.should_not == nil
 end
 
-Then /^the token should be a jwt token if the user has a vmware email address$/ do
-  user = AppCloudHelper.instance.get_registered_user
-  if user.end_with?("@vmware.com") || user.end_with?("@rbcon.com")
-    /(^bearer\s\S+[.]\S+[.]\S+$)/.match(@token).should_not == nil
-  end
+Then /^the token should be a jwt token$/ do
+  /(^bearer\s\S+[.]\S+[.]\S+$)/.match(@token).should_not == nil
 end
 
 Then /^I should be able to change my password$/ do
