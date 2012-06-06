@@ -241,6 +241,30 @@ app_node_version06:
   memory: 64
   path: "assets/node/app_node_version"
 
+node_autoconfig:
+  framework: "node"
+  runtime: node06
+  memory: 64
+  path: "assets/node/node_autoconfig"
+
+node_autoconfig04:
+  framework: "node"
+  runtime: node
+  memory: 64
+  path: "assets/node/node_autoconfig"
+
+node_autoconfig_disabled_by_file:
+  framework: "node"
+  runtime: node
+  memory: 64
+  path: "assets/node/node_autoconfig_disabled_by_file"
+
+node_autoconfig_disabled_by_module:
+  framework: "node"
+  runtime: node
+  memory: 64
+  path: "assets/node/node_autoconfig_disabled_by_module"
+
 app_spring_service:
   framework: "spring_web/1.0"
   memory: 512
