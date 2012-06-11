@@ -483,7 +483,7 @@ play_todolist_app:
 play_todolist_app_7:
   framework: "play"
   runtime: java7
-  memory: 128
+  memory: 256
   path: "assets/play/todolist/target"
 
 play_zentasks_cf_by_name_app:
