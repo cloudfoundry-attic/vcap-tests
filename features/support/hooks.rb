@@ -230,3 +230,11 @@ After("@creates_memcached_service") do |scenario|
   delete_service @memcached_service[:name] if @memcached_service
 end
 
+# elasticsearch
+After("@creates_elasticsearch_app") do |scenario|
+  delete_app @app, @token if @app
+end
+
+After("@creates_elasticsearch_service") do |scenario|
+  delete_service @elasticsearch_service[:name] if @elasticsearch_service
+end

@@ -65,6 +65,7 @@ SERVICE_QUOTA_APP = "service_quota_app"
 SPRING_APP_WITH_JAVAEE_NS = "javaee-namespace-app"
 AUTO_RECONFIG_ANNOTATION_APP="auto-reconfig-annotation-app"
 MEMCACHED_APP = "memcached_app"
+ELASTICSEARCH_APP = "elasticsearch_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -200,6 +201,7 @@ class AppCloudHelper
       delete_app_internal(VBLOB_APP)
       delete_app_internal(SERVICE_QUOTA_APP)
       delete_app_internal(MEMCACHED_APP)
+      delete_app_internal(ELASTICSEARCH_APP)
       delete_services(all_my_services) unless @registered_user or !get_login_token
       # This used to delete the entire user, but that now requires admin
       # privs so it was removed, as was the delete_user method.  See the
@@ -771,6 +773,17 @@ class AppCloudHelper
         :tier=>"free",
         :version=>"5.1.45",
         :name=>name,
+    }
+  end
+
+  def provision_elasticsearch_service token
+    name = "#{@namespace}#{@app || 'elasticsearch_app'}elasticsearch"
+    @client.create_service(:elasticsearch, name)
+    service_manifest = {
+     :vendor=>"elasticsearch",
+     :tier=>"free",
+     :version=>"0.19",
+     :name=>name
     }
   end
 

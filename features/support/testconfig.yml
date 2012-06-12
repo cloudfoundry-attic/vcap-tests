@@ -267,6 +267,11 @@ neo4j_app:
   memory: 128
   path: "assets/sinatra/neo4j_app"
 
+elasticsearch_app:
+  framework: "http://b20nine.com/unknown"
+  memory: 64
+  path: "assets/sinatra/elasticsearch_app"
+
 simple_wsgi_app:
   framework: "wsgi"
   memory: 64
