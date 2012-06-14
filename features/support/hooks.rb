@@ -109,6 +109,10 @@ After("@creates_memcached_app") do
   AppCloudHelper.instance.delete_app_internal MEMCACHED_APP
 end
 
+After("@creates_couchdb_app") do
+  AppCloudHelper.instance.delete_app_internal COUCHDB_APP
+end
+
 at_exit do
   AppCloudHelper.instance.cleanup
 end
@@ -228,5 +232,14 @@ end
 
 After("@creates_memcached_service") do |scenario|
   delete_service @memcached_service[:name] if @memcached_service
+end
+
+# couchdb
+After("@creates_couchdb_app") do |scenario|
+  delete_app @app, @token if @app
+end
+
+After("@creates_couchdb_service") do |scenario|
+  delete_service @couchdb_service[:name] if @couchdb_service
 end
 

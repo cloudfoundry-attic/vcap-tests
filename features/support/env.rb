@@ -65,6 +65,7 @@ SERVICE_QUOTA_APP = "service_quota_app"
 SPRING_APP_WITH_JAVAEE_NS = "javaee-namespace-app"
 AUTO_RECONFIG_ANNOTATION_APP="auto-reconfig-annotation-app"
 MEMCACHED_APP = "memcached_app"
+COUCHDB_APP = "couchdb_app"
 
 class Fixnum
   def to_json(options = nil)
@@ -200,6 +201,7 @@ class AppCloudHelper
       delete_app_internal(VBLOB_APP)
       delete_app_internal(SERVICE_QUOTA_APP)
       delete_app_internal(MEMCACHED_APP)
+      delete_app_internal(COUCHDB_APP)
       delete_services(all_my_services) unless @registered_user or !get_login_token
       # This used to delete the entire user, but that now requires admin
       # privs so it was removed, as was the delete_user method.  See the
@@ -686,6 +688,17 @@ class AppCloudHelper
      :vendor=>"memcached",
      :tier=>"free",
      :version=>"1.4",
+     :name=>name
+    }
+  end
+
+  def provision_couchdb_service token
+    name = "#{@namespace}#{@app || 'couchdb_app'}couchdb"
+    @client.create_service(:couchdb, name)
+    service_manifest = {
+     :vendor=>"couchdb",
+     :tier=>"free",
+     :version=>"1.2",
      :name=>name
     }
   end
