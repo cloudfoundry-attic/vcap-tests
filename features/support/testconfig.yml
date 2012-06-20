@@ -262,6 +262,11 @@ memcached_app:
   memory: 64
   path: "assets/sinatra/memcached_app"
 
+couchdb_app:
+  framework: "http://b20nine.com/unknown"
+  memory: 64
+  path: "assets/sinatra/couchdb_app"
+
 neo4j_app:
   framework: "http://b20nine.com/unknown"
   memory: 128
