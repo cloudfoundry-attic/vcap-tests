@@ -551,3 +551,15 @@ auto-reconfig-annotation-app:
   framework: "spring_web/1.0"
   memory: 512
   path: "assets/spring/auto-reconfig-annotation-app/target"
+
+node_imagemagick:
+  framework: "node"
+  runtime: node
+  memory: 64
+  path: "assets/node/node_imagemagick"
+
+sinatra_rmagick:
+  framework: "sinatra"
+  memory: 64
+  runtime: ruby19
+  path: "assets/sinatra/sinatra_rmagick"
