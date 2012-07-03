@@ -241,6 +241,12 @@ app_node_version06:
   memory: 64
   path: "assets/node/app_node_version"
 
+app_node_version08:
+  framework: "node"
+  runtime: node08
+  memory: 64
+  path: "assets/node/app_node_version"
+
 app_spring_service:
   framework: "spring_web/1.0"
   memory: 512
