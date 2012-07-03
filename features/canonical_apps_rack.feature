@@ -23,8 +23,18 @@ Feature: Deploy the rack canonical app and check its services
   Scenario: rack test deploy app
     When I query status of my application
     Then I should get the state of my application
+    Then I should be able to access my application URL rack/env and see production
     Then I should be able to access my application root and see hello from sinatra
     Then I should be able to access crash and it should crash
+    When I delete my application
+    Then it should not be on Cloud Foundry
+
+  Scenario: rack test setting RACK_ENV
+    Given I have my running application named app_rack_service
+    Then I set app_rack_service environment variable RACK_ENV to development
+    Then I stop my application
+    Then I start my application named app_rack_service
+    Then I should be able to access my application URL rack/env and see development
     When I delete my application
     Then it should not be on Cloud Foundry
 

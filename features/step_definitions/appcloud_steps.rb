@@ -969,3 +969,16 @@ Then /^I should be able to get app status, and I should see (\S+) jvm version$/ 
   contents.body_str.should include "JVM version: #{value}"
   contents.close
 end
+
+Then /^I should be able to access my application URL (\S+) and see (\S+)$/ do |path, expected_value|
+  path = nil if  path == "root"
+  contents = get_app_contents @app, path
+  contents.should_not == nil
+  contents.body_str.should == expected_value
+  contents.response_code.should == 200
+  contents.close
+end
+
+Then /^I set (\w+) environment variable (\w+) to (\w+)$/ do |app, env_name, env_value|
+  environment_add app, env_name, env_value
+end
