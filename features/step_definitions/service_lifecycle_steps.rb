@@ -282,16 +282,15 @@ def import_service_from_url(url)
 end
 
 def import_service_from_data(temp_file)
-  content = nil
-  File.open(temp_file.path, "rb") do |f|
-    content = f.read
-  end
+  post_data = []
+  post_data << Curl::PostField.content("_method", "put")
+  post_data << Curl::PostField.file("data_file", temp_file.path)
 
-  payload = {"data" => Base64.encode64(content)}
   easy = Curl::Easy.new("#{@base_uri}/services/v1/configurations/#{@service_id}/serialized/data")
-  easy.headers = auth_headers
+  easy.multipart_form_post = true
+  easy.headers = {"AUTHORIZATION" => get_login_token}
   easy.resolve_mode =:ipv4
-  easy.http_put(JSON payload)
+  easy.http_post(post_data)
 
   resp = easy.body_str
   resp.should_not == nil
