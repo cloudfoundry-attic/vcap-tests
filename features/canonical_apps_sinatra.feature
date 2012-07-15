@@ -24,9 +24,21 @@ Feature: Deploy the sinatra canonical app and check its services
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see hello from sinatra
+    Then I should be able to access my application URL rack/env and see production
+    Then I should be able to access my application file logs/stdout.log and get text including for production with backup
     Then I should be able to access crash and it should crash
     When I delete my application
     Then it should not be on AppCloud
+
+  Scenario: sinatra test setting RACK_ENV
+    Given I have my running application named app_sinatra_service
+    Then I set app_sinatra_service environment variable RACK_ENV to development
+    Then I stop my application
+    Then I start my application named app_sinatra_service
+    Then I should be able to access my application URL rack/env and see development
+    Then I should be able to access my application file logs/stdout.log and get text including for development with backup
+    When I delete my application
+    Then it should not be on Cloud Foundry
 
   @mysql
   Scenario: sinatra test mysql service

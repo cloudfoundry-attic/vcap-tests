@@ -24,7 +24,18 @@ Feature: Deploy the rails canonical app and check its services
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see hello from rails
+    Then I should be able to access my application file logs/stdout.log and get text including starting in production
     Then I should be able to access crash and it should crash
+    When I delete my application
+    Then it should not be on AppCloud
+
+  Scenario: rails test setting RAILS_ENV
+    Given I have my running application named app_rails_service
+    Then I stop my application
+    Then I set app_rails_service environment variable RAILS_ENV to development
+    Then I start my application named app_rails_service
+    Then I should be able to access my application root and see hello from rails
+    Then I should be able to access my application file logs/stdout.log and get text including starting in development
     When I delete my application
     Then it should not be on AppCloud
 
