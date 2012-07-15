@@ -72,7 +72,7 @@ Then /^I should able to access the same key-value from (\w+)$/ do |app|
   res.body_str.should == @simple_value
 end
 
-BROKER_API_VERSION = "poc"
+BROKER_API_VERSION = "v1"
 
 def broker_hdrs
   {
