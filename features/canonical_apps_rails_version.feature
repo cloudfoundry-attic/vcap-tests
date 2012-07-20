@@ -21,7 +21,9 @@ Feature: Deploy the rails canonical app with different version
 
   @versions
   Scenario: rails test deploy app version18
-    Given I have deployed my application named app_rails_version18
+    Given I have deployed my application named app_rails_version18 without starting
+    Then I set app_rails_version18 environment variable BUNDLE_WITHOUT to assets
+    Then I start my application named app_rails_version18
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see it's running version 1.8.7
@@ -30,7 +32,9 @@ Feature: Deploy the rails canonical app with different version
 
   @versions
   Scenario: rails test deploy app version19
-    Given I have deployed my application named app_rails_version19
+    Given I have deployed my application named app_rails_version19 without starting
+    Then I set app_rails_version19 environment variable BUNDLE_WITHOUT to assets
+    Then I start my application named app_rails_version19
     When I query status of my application
     Then I should get the state of my application
     Then I should be able to access my application root and see it's running version 1.9.2
