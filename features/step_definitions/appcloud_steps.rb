@@ -691,7 +691,7 @@ Then /^I should be able to access my application file (\S+) and see (.+)$/ do |f
 end
 
 
-Then /^I should be able to access my application file (\S+) and get text including (.+)$/ do |file, expected_contents|
+Then /^I should be able to access my application file (\S+) and( not)? get text including (.+)$/ do |file, not_expected, expected_contents|
   @instance = '0'
   response = get_app_files @app, @instance, file, @token
   response.should_not == nil
@@ -700,7 +700,7 @@ Then /^I should be able to access my application file (\S+) and get text includi
   responses.each do |response|
     matched = true if response=~ /#{Regexp.escape(expected_contents)}/
   end
-  matched.should == true
+  matched.should == (not_expected ? false : true)
 end
 
 Then /^I should be able to list application files and not find file (\S+)$/ do |file|
@@ -979,6 +979,7 @@ Then /^I should be able to access my application URL (\S+) and see (\S+)$/ do |p
   contents.close
 end
 
-Then /^I set (\w+) environment variable (\w+) to (\w+)$/ do |app, env_name, env_value|
+Then /^I set (\w+) environment variable (\w+) to( \S+)?$/ do |app, env_name, env_value|
+  env_value = env_value.strip if env_value
   environment_add app, env_name, env_value
 end
