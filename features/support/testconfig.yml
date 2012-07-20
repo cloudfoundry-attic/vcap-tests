@@ -211,6 +211,16 @@ sinatra_autoconfig_disabled_by_gem:
   memory: 64
   path: "assets/sinatra/autoconfig_disabled_by_gem"
 
+sinatra_gem_groups:
+  framework: "sinatra"
+  memory: 256
+  path: "assets/sinatra/gem_groups"
+
+sinatra_windows_gemfile:
+  framework: "sinatra"
+  memory: 256
+  path: "assets/sinatra/windows_gemfile"
+
 app_node_service:
   framework: "node"
   runtime: node
