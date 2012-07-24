@@ -39,7 +39,7 @@ class UaaHelper
 
   def client_token(client_id, client_secret)
     url = @uaabase + "/oauth/token"
-    response = RestClient.post url, {:client_id=>client_id, :grant_type=>"client_credentials", :scope=>"read write password"}, {"Accept"=>"application/json", "Authorization"=>basic_auth(client_id, client_secret)}
+    response = RestClient.post url, {:client_id=>client_id, :grant_type=>"client_credentials"}, {"Accept"=>"application/json", "Authorization"=>basic_auth(client_id, client_secret)}
     response.should_not == nil
     response.code.should == 200
     JSON.parse(response.body)["access_token"]
