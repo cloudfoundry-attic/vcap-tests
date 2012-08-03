@@ -526,6 +526,18 @@ broken_gem_app:
   memory: 64
   path: "assets/sinatra/broken_gem_app"
 
+git_gems_app_ruby18:
+  framework: sinatra
+  runtime: ruby18
+  memory: 256
+  path: "assets/sinatra/git_gems_app"
+
+git_gems_app_ruby19:
+  framework: sinatra
+  runtime: ruby19
+  memory: 256
+  path: "assets/sinatra/git_gems_app"
+
 play_computer_database_scala_app:
   framework: "play"
   memory: 256
