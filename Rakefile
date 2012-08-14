@@ -134,7 +134,7 @@ Please run 'sudo aptitude install maven2 default-jdk' on your Linux box"
     TESTS_TO_BUILD.each do |test|
       puts "\tBuilding '#{test}'"
       Dir.chdir test do
-        sh('mvn package -DskipTests') do |success, exit_code|
+        sh('mvn clean package -DskipTests') do |success, exit_code|
           unless success
             clear_build_artifact
             do_mvn_clean('-q')
