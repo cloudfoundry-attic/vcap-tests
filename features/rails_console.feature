@@ -76,4 +76,38 @@ Feature: Deploy the rails canonical app and check the console
     Then I close console
     Then I delete my application
 
+   @runs_rails_console
+   Scenario: rails test console MySQL connection
+    Given I have deployed my application named rails_console_19_test_app
+    When I provision mysql service
+    When I first access console of my application
+    Then I should get responses irb():001:0>  from console of my application
+    When I send command User.all to console of my application
+    Then I should get response including => [] from console of my application
+    Then I send command user=User.new({:name=> "Test", :email=>"test@test.com"}) to console of my application
+    When I send command user.save! to console of my application
+    Then I should get response including => true from console of my application
+    When I send command User.all to console of my application
+    Then I should get response including => [#<User id: 1 from console of my application
+    Then I close console
+    Then I delete my service
+    Then I delete my application
+
+   @runs_rails_console
+   Scenario: rails test console Postgres connection
+    Given I have deployed my application named rails_console_19_test_app
+    When I provision postgresql service
+    When I first access console of my application
+    Then I should get responses irb():001:0>  from console of my application
+    When I send command User.all to console of my application
+    Then I should get response including => [] from console of my application
+    Then I send command user=User.new({:name=> "Test", :email=>"test@test.com"}) to console of my application
+    When I send command user.save! to console of my application
+    Then I should get response including => true from console of my application
+    When I send command User.all to console of my application
+    Then I should get response including => [#<User id: 1 from console of my application
+    Then I close console
+    Then I delete my service
+    Then I delete my application
+
 
