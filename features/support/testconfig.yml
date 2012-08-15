@@ -386,7 +386,7 @@ rails_console_test_app:
 rails_console_19_test_app:
   framework: "rails3"
   memory: 256
-  path: "assets/rails3/hello_vcap"
+  path: "assets/rails3/rails_console_test_app"
   runtime: ruby19
 
 vblob_app:
