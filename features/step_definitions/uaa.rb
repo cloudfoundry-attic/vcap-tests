@@ -26,9 +26,10 @@ class UaaHelper
     client_id = "testapp"
     begin
       response = JSON.parse(get_url "/oauth/clients/#{client_id}", "Authorization"=>"Bearer #{token}")
+      response["client_id"].should_not == nil
       @webclient = {:client_id=>response["client_id"]}
     rescue RestClient::ResourceNotFound
-      @webclient = register_client({:client_id=>client_id, :client_secret=>"appsecret", :authorized_grant_types=>["authorization_code"]}, token)
+      @webclient = register_client({:client_id=>client_id, :client_secret=>"appsecret", :authorized_grant_types=>["authorization_code"], :scope=>["openid", "cloud_controller.read"]}, token)
     rescue RestClient::Unauthorized
       puts "Unauthorized admin client not able to create new client"
     end
@@ -79,16 +80,16 @@ class UaaHelper
     url = @uaabase + path
     begin
       response = RestClient.get url, {"Accept"=>"application/json"}
-      response.code
+      [response.code,response.headers]
     rescue RestClient::Exception => e
-      e.http_code
+      [e.http_code,e.response.headers]
     end
   end
 
 end
 
 Given /^I know the UAA service base URL$/ do
-  @uaabase = @client.info[:authorization_endpoint]
+  @uaabase = ENV['VCAP_BVT_UAA_BASE'] || @client.info[:authorization_endpoint]
   @uaahelper = UaaHelper.instance
   @uaahelper.uaabase = @uaabase
 end
@@ -123,7 +124,7 @@ Then /^the content should contain prompts$/ do
 end
 
 When /^I try and get the user data$/ do
-  @code = @uaahelper.get_status "/Users"
+  @code,@headers = @uaahelper.get_status "/Users"
 end
 
 Then /^the response should be UNAUTHORIZED$/ do
